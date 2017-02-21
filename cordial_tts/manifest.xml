@@ -1,11 +1,11 @@
 <package>
   <description brief="cordial_tts">
 
-     cordial_tts
+     Interface to use CoRDial with Ivona Text-To-Speech
 
   </description>
   <author>Elaine Short</author>
-  <license>BSD</license>
+  <license>GPL</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/cordial_tts</url>
   <depend package="rospy"/>
