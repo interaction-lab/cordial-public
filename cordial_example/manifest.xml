@@ -1,0 +1,19 @@
+<package>
+  <description brief="cordial_experiment_example">
+
+    Examples using CoRDial.  Requires signing up for Ivona and adding your keys to the launchfile.
+
+  </description>
+  <author>Elaine Short</author>
+  <license>GPL</license>
+  <review status="unreviewed" notes=""/>
+  <url></url>
+  <depend package="rospy"/>
+  <depend package="cordial_core"/>
+  <depend package="cordial_tablet"/>
+  <depend package="cordial_sound"/>
+  <depend package="cordial_sprite"/>
+  <depend package="tf"/>
+</package>
+
+

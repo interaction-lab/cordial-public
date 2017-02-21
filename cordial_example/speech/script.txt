@@ -1,0 +1,5 @@
+[statement1]Hi! <mischievous>Welcome to cordial, the most cordial robot controller!
+[statement2]I'll do <yay> behaviors tagged in the script!
+[statement3]These <lift-drop>first few sentences were pre-generated.
+[statement4]I recommend<headpose 30 0 0>  you keep my statements short and sweet<headpose 0 0 0>.
+[statement5]It makes it easier<yay> for everything to stay synchronized.
