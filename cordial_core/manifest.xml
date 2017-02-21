@@ -1,0 +1,19 @@
+<package>
+  <description brief="cordial_core">
+
+     The core code for CoRDial, the Co-Robot Dialogue system.
+
+  </description>
+  <author>Elaine Short</author>
+  <license>GPL</license>
+  <review status="unreviewed" notes=""/>
+  <url></url>
+  <depend package="rospy"/>
+  <depend package="actionlib"/>
+  <depend package="cordial_sound"/>
+  <depend package="cordial_tts" />
+  <depend package="geometry_msgs" />
+  <depend package="cordial_face" />
+</package>
+
+
