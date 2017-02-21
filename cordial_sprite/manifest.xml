@@ -1,0 +1,19 @@
+<package>
+  <description brief="cordial_sprite">
+
+     Code for running the SPRITE robot, including with CoRDial
+
+  </description>
+  <author>Elaine Short</author>
+  <license>GPL</license>
+  <review status="unreviewed" notes=""/>
+  <url></url>
+  <depend package="rospy"/>
+  <depend package="roscpp"/>
+  <depend package="actionlib"/>
+  <depend package="cordial_core"/>
+  <depend package="cordial_face"/>
+
+</package>
+
+
