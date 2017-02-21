@@ -1,0 +1,16 @@
+string id
+string name
+string text
+int64 x
+int64 y
+int64 width
+int64 height
+bool drawn
+bool filled
+int64 bcolor
+string arrange
+string img
+int64 textx
+int64 texty
+int64 xpadding
+int64 ypadding
