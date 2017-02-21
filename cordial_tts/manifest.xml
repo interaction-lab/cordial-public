@@ -1,0 +1,14 @@
+<package>
+  <description brief="cordial_tts">
+
+     cordial_tts
+
+  </description>
+  <author>Elaine Short</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/cordial_tts</url>
+  <depend package="rospy"/>
+</package>
+
+
