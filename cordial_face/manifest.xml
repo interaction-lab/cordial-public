@@ -1,0 +1,15 @@
+<package>
+  <description brief="cordial_face">
+
+     Javascript face for the SPRITE robot.
+
+  </description>
+  <author>Elaine</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/cordial_face</url>
+  <depend package="rospy"/>
+  <depend package="geometry_msgs"/>
+</package>
+
+
