@@ -26,7 +26,6 @@ from cordial_sound.msg import SoundRequest
 from cordial_tts import CoRDialTTS
 from cordial_sound.libsoundplay import SoundClient
 from cordial_face.msg import FaceRequest
-from cordial_sync import CoRDialSync
 
 import yaml
 import sys
@@ -76,11 +75,6 @@ class PlayerServer():
             self._tts = CoRDialTTS(voice, ivona_access_key, ivona_secret_key)
 
         base_topic = ""
-
-        #if self._phone_face:
-        #    s = CoRDialSync()
-        #    s.find_adj(50)
-        #    sync_info = s.get_info()
 
         self._behavior_client = actionlib.SimpleActionClient(base_topic+'Behavior',BehaviorAction)
         if self._phone_face:
