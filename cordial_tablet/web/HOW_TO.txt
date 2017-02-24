@@ -1,19 +1,23 @@
-Instructions for serving the CoRDial face to the local network:
+Instructions for making your own tablet-based interface:
 
-First time setup:
+1. Make a folder in your project and make a softlink to cordial_tablet/js in it.
+2. Make folders in your project called "img" (for token and area images) and "bkgd" for background images.
+3. Make a page that starts up the cordial_tablet (see cordial_screen.html)
+4. Write the ROS backend code (see cordial_example/scripts/tablet_only.py)
+5. Set up http-server:
 
 $ sudo apt-get install nodejs
 $ sudo apt-get install npm
 $ npm config set registry http://registry.npmjs.org/
 $ sudo npm install http-server –g
 
-
-To serve the page:
+6. Run the rosbridge_websocket (see run.launch in this package)
+7. Run your ROS backend code
+8. Serve the page:
 
 $ http-server
 
-
-To access the page, point the web browser of any computer on the local network to:
+9:Point the web browser of any computer on the local network to:
 
 http://<this computer's address>:8080
 
