@@ -37,11 +37,11 @@ CoRDial Setup Instructions
 
 8. Clone the repository
 
-    git clone https://github.com/interaction-lab/in-home-sar.git
+    git clone https://github.com/interaction-lab/cordial-public.git
 
-9. Checkout the stable version
+9. Checkout the master branch
 
-    git checkout internal_stable
+    git checkout master
 
 10. Make everything
 
@@ -50,17 +50,17 @@ CoRDial Setup Instructions
 11. Test your installation
 
     1. generate audio files (only needs to be done once or when changes to speech are made):
-        roscd cordial_experiment_example/speech
+        roscd cordial_example/speech
         ./gen_audio.sh
         
     2. start "background" ROS nodes:
         plug in the robot (if testing with physical robot)
-        roslaunch cordial_experiment_example run.launch
+        roslaunch cordial_example run.launch
         
     3. run example:
-        roscd cordial_experiment_example/scripts
-        ./tablet_and_robot.py 
-        (can also try ./robot_only.py or ./tablet_only.py)
+        roscd cordial_example/scripts
+        ./tablet_only.py 
+        (can also try ./robot_only.py)
         
     4. view tablet:
         roscd cordial_tablet/web
