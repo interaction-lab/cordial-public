@@ -87,8 +87,8 @@ class SPRITEAnimator:
       self._tf_thread = threading.Thread(target=self.pose_pub)
       self._tf_thread.start()
 
-      self._idle_thread = threading.Thread(target=self.idle)
-      self._idle_thread.start()
+      #self._idle_thread = threading.Thread(target=self.idle)
+      #self._idle_thread.start()
 
       
 
