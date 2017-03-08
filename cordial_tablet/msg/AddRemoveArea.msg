@@ -12,5 +12,6 @@ string arrange
 string img
 int64 textx
 int64 texty
+int64 textsize
 int64 xpadding
 int64 ypadding

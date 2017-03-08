@@ -135,8 +135,11 @@ function refresh_screen(msg){
     }
 }
 
-function add_token(name, img_location, x, y, type, text){
+function add_token(name, img_location, x, y, type, text,textsize){
     var sprite = new PIXI.Sprite.fromImage(img_location);
+
+    if(textsize==0){textsize=60}
+
     //var sprite = new PIXI.Sprite(texture);
     sprite.interactive=false;
     if(type=="interactive"){
@@ -170,7 +173,7 @@ function add_token(name, img_location, x, y, type, text){
 	sprite.graphics =  new PIXI.Graphics();
 	sprite.addChild(sprite.graphics)
 
-	sprite_text= new PIXI.Text(text, {font : '60px Georgia'});
+	sprite_text= new PIXI.Text(text, {font : textsize+'px Helvetica'});
 	sprite_text.x = (sprite_text.width+padding)/2
 	sprite_text.y = (sprite_text.height+padding)/2
 	sprite_text.anchor.x = 0.5;
@@ -213,7 +216,7 @@ function add_token(name, img_location, x, y, type, text){
 
     sprite_layer.addChild(sprite)
     
-    sprite_text= new PIXI.Text(text, {font : '60px Georgia'});
+    sprite_text= new PIXI.Text(text, {font : textsize+'px Helvetica'});
     sprite_text.x = 0
     sprite_text.y = 0
     sprite_text.anchor.x = 0.5;
@@ -266,8 +269,11 @@ function touchmove_cb(touchData){
     };
 };
 
-function add_area(name, x, y,width, height, drawn, arrange, text, textx, texty, xpadding, ypadding,is_filled, bkgd_color,img){
+function add_area(name, x, y,width, height, drawn, arrange, text, textx, texty, textsize, xpadding, ypadding,is_filled, bkgd_color,img){
     var area = new PIXI.Rectangle(x,y,width,height);
+
+    if(textsize==0){textsize=60}
+
     area.name = name
     area.arrange = arrange
     area.xpadding = xpadding
@@ -283,7 +289,7 @@ function add_area(name, x, y,width, height, drawn, arrange, text, textx, texty, 
 	}
 		
     	graphics.drawRect(x,y,width,height);
-    	var area_text= new PIXI.Text(text);
+    	var area_text= new PIXI.Text(text,{font : textsize+'px Helvetica'});
             
     	area_text.x = x+textx+5;
     	area_text.y = y+texty+5;
@@ -301,7 +307,7 @@ function add_area(name, x, y,width, height, drawn, arrange, text, textx, texty, 
 	area_bkgd.x=x
 	area_bkgd.y=y
 	area_layer.addChild(area_bkgd)
-	var area_text= new PIXI.Text(text);
+	var area_text= new PIXI.Text(text,{font : textsize+'px Helvetica'});
             
     	area_text.x = x+textx+5;
     	area_text.y = y+texty+5;
@@ -864,7 +870,7 @@ function req_area(msg){
         }
 	console.log("Error: area with that name already exists! Removal not implemented.")
     }else{
-	add_area(msg.name, msg.x, msg.y, msg.width, msg.height, msg.drawn, msg.arrange, msg.text, msg.textx,msg.texty,msg.xpadding,msg.ypadding, msg.filled, msg.bcolor,msg.img);
+	add_area(msg.name, msg.x, msg.y, msg.width, msg.height, msg.drawn, msg.arrange, msg.text, msg.textx,msg.texty, msg.textsize, msg.xpadding,msg.ypadding, msg.filled, msg.bcolor,msg.img);
     }
 }
 
@@ -890,7 +896,7 @@ function req_token(msg){
     if(msg_contains("add")){
 	if (!exists){
 	    console.log("Adding token: " + msg.name)
-	    sprite = add_token(msg.name,"img/"+msg.img_loc, msg.x, msg.y, msg.type, msg.text);
+	    sprite = add_token(msg.name,"img/"+msg.img_loc, msg.x, msg.y, msg.type, msg.text, msg.textsize);
 	    exists=true
 	}else{
 	    console.log("Token already exists; not adding. Name: " + msg.name)

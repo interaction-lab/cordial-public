@@ -37,11 +37,10 @@ def process_script(filename, outdir, tts, file_format=".ogg"):
             l = line.strip()
             tokens = l.split(']')
             p = tokens[0].strip("[")
-
             l = tokens[1].strip()
             data=tts.phrase_to_file(p,l,outdir)            
             if p in out.keys():
-                print "Warning: phrase id: " + p + " in script file " + f + " is overwriting a previous instance; check your files!"
+                print "Warning: phrase id: " + p + " in script file " + filename + " is overwriting a previous instance; check your files!"
                 
             data["file"]= data["file"].split(".")[0]+file_format
             out[p]=data

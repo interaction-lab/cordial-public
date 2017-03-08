@@ -4,6 +4,7 @@ string action
 string img_loc
 string type
 string text
+int64 textsize
 int64 x
 int64 y
 int64 tint
