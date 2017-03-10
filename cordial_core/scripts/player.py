@@ -79,6 +79,7 @@ class PlayerServer():
         self._behavior_client = actionlib.SimpleActionClient(base_topic+'Behavior',BehaviorAction)
         if self._phone_face:
             self._face_pub = rospy.Publisher(base_topic+'face', FaceRequest, queue_size=10)
+            rospy.sleep(0.5)
         rospy.loginfo("CoRdial Player waiting for behavior server..")
         self._behavior_client.wait_for_server()
         rospy.loginfo("CoRDial Player connected to behavior server")       
@@ -86,8 +87,8 @@ class PlayerServer():
         self._feedback.behavior = "none"
 
         rospy.loginfo("Starting CoRDial Player server...")
-        self._server = actionlib.SimpleActionServer(base_topic+'Player', PlayerAction, execute_cb=self.execute_cb)
-        self._server.start()
+        self._server = actionlib.SimpleActionServer(base_topic+'Player', PlayerAction, execute_cb=self.execute_cb,auto_start=False)
+
         info = ""
         if self._phone_face:
             info += ", using CoRDial face"
@@ -105,6 +106,7 @@ class PlayerServer():
             
         info += ". Delay time is " + str(self._speech_delay_time) + "s."
 
+        self._server.start()
         rospy.loginfo("CoRDial Player server started"+ info)
 
 

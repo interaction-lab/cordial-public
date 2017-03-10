@@ -37,14 +37,17 @@ class DragonbotCoRDialServer():
         base_topic = "" 
 
         self._server = actionlib.SimpleActionServer(base_topic+"Behavior", BehaviorAction, execute_cb=self.execute, auto_start=False)
-        self._server.start()
+
 
         self._face_pub = rospy.Publisher(base_topic+'face', FaceRequest, queue_size=10)
+        rospy.sleep(0.5)
 
         self._last_viseme=rospy.Time.now()
 
         self._keyframe_client = actionlib.SimpleActionClient(base_topic+'KeyframePlayer', KeyframePlayerAction)
         self._keyframe_client.wait_for_server()
+
+        self._server.start()
         rospy.loginfo("SPRITE CoRDial server started.")
         
 
@@ -83,6 +86,7 @@ class DragonbotCoRDialServer():
         feedback = BehaviorFeedback(status=BehaviorFeedback.PLAYING)
         self._server.publish_feedback(feedback)
 
+        self._keyframe_client.wait_for_result()
         if success:
             result = BehaviorResult(result=BehaviorResult.DONE)
             self._server.set_succeeded(result)

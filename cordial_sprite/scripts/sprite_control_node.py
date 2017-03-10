@@ -61,6 +61,7 @@ class SPRITEAnimator:
       self._server = actionlib.SimpleActionServer(base_topic+"KeyframePlayer", KeyframePlayerAction, execute_cb=self.execute_cb, auto_start = False)
       self._face_pub = rospy.Publisher(base_topic+'face_keyframes', FaceKeyframeRequest, queue_size=10)
       self._face_lookat = rospy.Publisher(base_topic+'lookat', LookatRequest, queue_size=10)
+      rospy.sleep(0.5)
 
       rospy.loginfo("Starting motor controller...")
       self.mc = MotorController(zeros,port)
@@ -90,18 +91,14 @@ class SPRITEAnimator:
       #self._idle_thread = threading.Thread(target=self.idle)
       #self._idle_thread.start()
 
-      
 
-
-      self._server.start()
       self._thread_dict["idle"]=True
       self._thread_dict["preempt"]=False
       self._thread_dict["moving"]=True
+      self._server.start()
       rospy.loginfo("Keyframe player server started.")
 
-   def idle(self):
-      
-      
+   def idle(self):   
       current_pose= self._current_pose
       dofs = ['z','pa','ya']
       dof_i = [2,4,5]
@@ -340,10 +337,11 @@ class SPRITEAnimator:
             self._current_pose = pose_6d
 
    def execute_cb(self, goal):
+      rospy.loginfo("SPRITE Animator Server got goal: " + str(goal))
       self._thread_dict["idle"]=False
-      self.preempt_movement()
+      #self.preempt_movement() #only necessary if using idle
       success=True
-      #rospy.loginfo("SPRITE Animator Server got goal: " + str(goal))
+      
       if goal.behavior == "lookat":
          l = LookatRequest(follow_frame=True, frameid=goal.args[0])
          self._face_lookat.publish(l)
