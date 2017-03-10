@@ -47,7 +47,11 @@ CoRDial Setup Instructions
 
     rosmake cordial_sprite cordial_tablet
 
-11. Test your installation
+11. If you're on 16.10, add the rosbridge websocket port to your firewall's allowed list
+
+    sudo ufw allow 9090
+
+12. Test your installation
 
     1. generate audio files (only needs to be done once or when changes to speech are made):
         roscd cordial_example/speech
