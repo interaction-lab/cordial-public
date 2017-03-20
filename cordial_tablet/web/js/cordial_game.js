@@ -113,12 +113,14 @@ function ros_init(ros_master_uri){
     pose_publisher = new ROSLIB.Topic({
 	ros : ros,
 	name : '/CoRDial/tablet/tokens/position',
+	queue_size: 3,
 	messageType: 'cordial_tablet/TokenPose'
     });
 
     location_publisher = new ROSLIB.Topic({
 	ros : ros,
 	name : '/CoRDial/tablet/tokens/location',
+	queue_size: 3,
 	messageType: 'cordial_tablet/TokenLocation'
     });
 
