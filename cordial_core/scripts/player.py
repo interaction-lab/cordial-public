@@ -38,7 +38,7 @@ class PlayerServer():
     _feedback = PlayerFeedback()
     _result = PlayerResult()
 
-    def __init__(self, phone_face, delay=0.0,phrase_file=None, use_tts=False, voice=None, ivona_access_key=None, ivona_secret_key=None):
+    def __init__(self, phone_face, delay=0.0,phrase_file=None, use_tts=False, voice=None):
         self._use_tts = use_tts
 
         if phrase_file and not len(phrase_file)>0 and not use_tts:
@@ -47,10 +47,6 @@ class PlayerServer():
         elif not phrase_file and not use_tts:
             rospy.logerr("CoRDial Player Error: Must specify phrase file or allow tts! Continuing without sound...")
             self._sound = False
-        elif (not phrase_file or len(phrase_file)>0) and use_tts and (not ivona_secret_key or not ivona_access_key):
-            rospy.logerr("CoRDial Player Error: Must specify ivona keys to allow tts! Continuing without sound...")
-            self._sound = False
-            self._use_tts=False
         else:
             self._sound = True
 
@@ -72,7 +68,7 @@ class PlayerServer():
             rospy.loginfo("Phrase file read.")
         
         if self._use_tts:
-            self._tts = CoRDialTTS(voice, ivona_access_key, ivona_secret_key)
+            self._tts = CoRDialTTS(voice)
 
         base_topic = ""
 
@@ -280,8 +276,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Core audio + behavior playback of CoRDial')
     parser.add_argument('-f', '--use-face', help='Collect visemes and send to cordial_face', action='store_true')
     parser.add_argument('-v', '--voice', help="Which voice to use with TTS. Child Voices: Ivy, Justin; Adult Voices: Salli, Joey, Kimberly, Kendra, Eric, Jennifer; Silly Voices: Chipmunk", default="Ivy")
-    parser.add_argument('-k1', '--ivona-access-key', help="Ivona access key", nargs='?', default=None)
-    parser.add_argument('-k2', '--ivona-secret-key', help="Ivona secret key", nargs='?', default=None)
     parser.add_argument('-d', '--delay', help="How much should the speech be delayed by, in s", default=0.0, type=float)
     parser.add_argument('-p', '--phrase-file', help="Phrase file for pre-loaded speech", nargs="?", default=None)
     parser.add_argument('-t', '--use-tts', help="Enable text-to-speech (online)", action='store_true')
@@ -289,7 +283,7 @@ if __name__ == '__main__':
     
     rospy.init_node('cordial_player')
 
-    PlayerServer(args.use_face, args.delay, args.phrase_file, args.use_tts,args.voice, args.ivona_access_key,args.ivona_secret_key)
+    PlayerServer(args.use_face, args.delay, args.phrase_file, args.use_tts,args.voice);
     
     while not rospy.is_shutdown():
         rospy.spin()

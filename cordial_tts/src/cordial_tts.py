@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
 #------------------------------------------------------------------------------
-# Interface between CoRDial and Pyvona
-# Copyright (C) 2017 Elaine Schaertl Short
-#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -18,18 +15,25 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #------------------------------------------------------------------------------
 
-
+"""
+Text To Speech Service integrated with Amazon Polly
+"""
 
 import roslib; roslib.load_manifest('cordial_tts')
-import pyvona as iv
 import sys
-import yaml
 import re
 import os
+import json
+from boto3 import client
+from botocore.exceptions import BotoCoreError, ClientError
+from contextlib import closing
+import pygame
+import tempfile
 
 class CoRDialTTS():
-    def __init__(self, voice, access_key, secret_key):
-        self._tts = tts = iv.create_voice(access_key, secret_key, voice)
+    def __init__(self, voice, **kwargs):
+        self.voice = voice; 
+        self.aws_polly = client("polly")
 
     def extract_behaviors(self,line):
         vis_transl = {"p": "M_B_P",
@@ -80,34 +84,46 @@ class CoRDialTTS():
             else:
                 i += 1
 
+	try:
+	    response = self.aws_polly.synthesize_speech(Text=phrase, OutputFormat="json",
+                                                        VoiceId=self.voice, SpeechMarkTypes =["viseme", "word"])
+    	except (BotoCoreError, ClientError) as error:
+	    print(error)
+	    sys.exit(-1)
 
-        
-        s = self._tts.fetch_speechmarks_str(phrase)
-        s = s.split("\n")
-        s = map(lambda l: l.split(" "), s)
-        s = filter(lambda l: len(l) > 1, s)
+	s = []
+	if "AudioStream" in response:
+	    with closing(response["AudioStream"]) as stream:
+                data = stream.read()
+                s = data.split('\n')
+                s = [json.loads(line) for line in s if line != '']
+	else:
+	    print("Could not stream audio")
+	    sys.exit(-1)
 
-        word_times = filter(lambda l: l[1]=="word", s)
+	word_times = filter(lambda l: l["type"]=="word", s) # Start edits
         for a in actions:
             if a[0] > len(word_times)-1:
-                a[0] = s[-1][0]
+                a[0] = s[-1]["time"] / 1000.  # convert ms to seconds
             else:
-                a[0] = (word_times[a[0]][0])
+	        a[0] = (word_times[a[0]]["time"]) / 1000.  # convert ms to seconds
 
-        data=[]
+
+	data=[]
         for a in actions:
             args = a[2]
             data.append({"start":float(a[0])+.01, #prevent visemes and actions from being at exactly the same time
                          "type":"action",
                          "args":args,
-                         "id": a[1]})
+			 "id": a[1]}) # End edits
 
-        visemes = map(lambda l: [l[0],vis_transl[l[-1]]], filter(lambda l: l[1]=="viseme",s))
-
-        for v in visemes:
-            data.append({"start":float(v[0]),
+	visemes = map(lambda l: [l["time"],vis_transl[l["value"]]], filter(lambda l: l["type"]=="viseme",s))
+	for v in visemes:
+            data.append({"start":float(v[0]) / 1000.,  # convert ms to seconds
                          "type":"viseme",
-                         "id": v[1]})
+                         "id": v[1]})	
+
+
         return phrase, data
 
     def phrase_to_file(self,name, line, outdir):
@@ -116,17 +132,77 @@ class CoRDialTTS():
         data={}
         phrase, data["behaviors"]=self.extract_behaviors(line)
 
-        self._tts.fetch_voice(phrase, outdir_path+"/"+name+"."+self._tts.codec)
+        #self._tts.fetch_voice(phrase, outdir_path+"/"+name+"."+self._tts.codec)
 
-        data["file"] = outdir_path+"/"+name+"."+self._tts.codec
+        data["file"] = outdir_path+"/"+name+".ogg"
         data["text"] = '"'+phrase+'"'
+
+
+	try:
+	    response = self.aws_polly.synthesize_speech(Text=phrase, OutputFormat="ogg_vorbis",
+                                                        VoiceId=self.voice)
+    	except (BotoCoreError, ClientError) as error:
+	    print(error)
+	    sys.exit(-1)
+
+	if "AudioStream" in response:
+	    with closing(response["AudioStream"]) as stream:
+		output = data["file"]
+		try:
+		    with open(output, "wb") as file:
+			file.write(stream.read())
+		except IOError as error:
+		    	print(error)
+			sys.exit(-1)
+	    
+	else:
+	    print("Could not stream audio")
+	    sys.exit(-1)
+
         return data
 
     def say(self,phrase, wait=False, interrupt=False):
-        return self._tts.speak(phrase, wait, interrupt)
+        try:
+	    response = self.aws_polly.synthesize_speech(Text=phrase, 
+                                                        OutputFormat="ogg_vorbis",
+                                                        VoiceId=self.voice)
+    	except (BotoCoreError, ClientError) as error:
+	    print(error)
+	    sys.exit(-1)
+
+        with tempfile.SpooledTemporaryFile() as f:
+            if "AudioStream" in response:
+                with closing(response["AudioStream"]) as stream:
+                    try:
+                        f.write(stream.read())
+                    except IOError as error:
+                        print(error)
+                        sys.exit(-1)
+	    
+            else:
+                print("Could not stream audio")
+                sys.exit(-1)
+            
+            f.seek(0)
+
+            if not pygame.mixer.get_init():
+                pygame.mixer.init()
+            else:
+                if interrupt:
+                    pygame.mixer.stop()
+            channel = pygame.mixer.Channel(5)
+            sound = pygame.mixer.Sound(f)
+            channel.play(sound)
+            if wait:
+                while channel.get_busy():
+                    pass
+                return -1
+            return sound.get_length()
+	    
 
     def is_speaking(self):
-        self._tts.is_busy()
+        return not pygame.mixer.get_init() or pygame.mixer.Channel(5).get_busy()
 
     def shutup(self):
-        self._tts.shutup()
+        if pygame.mixer.get_init():
+            pygame.mixer.stop()

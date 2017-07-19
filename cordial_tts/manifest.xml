@@ -1,14 +1,10 @@
 <package>
-  <description brief="cordial_tts">
-
-     Interface to use CoRDial with Ivona Text-To-Speech
-
+  <description brief="TTS using Amazon Polly">
+     Python implementation of a cordial-compatible TTS system using Amazon Polly.
   </description>
-  <author>Elaine Short</author>
-  <license>GPL</license>
+  <author>Sophia Mallaro, David Becerra</author>
+  <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/cordial_tts</url>
-  <depend package="rospy"/>
 </package>
 
 
