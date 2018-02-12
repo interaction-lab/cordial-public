@@ -204,3 +204,7 @@ class CoRDialTTS():
     def shutup(self):
         if pygame.mixer.get_init():
             pygame.mixer.stop()
+
+if __name__=="__main__":
+    c = CoRDialTTS("Kendra")
+    c.say("Hello world!", True)
