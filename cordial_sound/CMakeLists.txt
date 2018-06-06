@@ -11,5 +11,5 @@ rosbuild_genmsg()
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
-add_subdirectory(test)
+# add_subdirectory(test)
 
