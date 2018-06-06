@@ -87,3 +87,19 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+**/*.pyc
+**/msg_gen/**
+**/srv_gen/**
+**/build/**
+**/msg/*Action.msg
+**/msg/*Feedback.msg
+**/msg/*Goal.msg
+**/msg/*Result.msg
+**/src/**/msg/*
+**/src/**/srv/*
+**/*~
+**/#*#
+**/build/**
+**/__*__.py
+**/*.yaml
