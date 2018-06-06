@@ -74,7 +74,7 @@ class LookatServer:
         for i in range(len(goal.frames)):
             poses = goal.frames[i].positions
             time = int(goal.times[i]*1000)-elapsed
-            req = FaceRequest(aus=aus, au_degrees = poses, au_ms=len(aus)*[time])
+            req = FaceRequest(aus=aus, au_degrees = poses, au_ms=time)
             self._face_pub.publish(req)
             rospy.sleep(time/1000.0)
             elapsed += time
