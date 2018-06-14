@@ -92,7 +92,7 @@ function startFace(bkgd_color,
 		   mouth_height,
 		   mouth_thickness,
 		   mouth_opening,
-		   mouth_width_scale,
+		   mouth_dimple_size,
 		   upper_lip_height_scale,
 		   lower_lip_height_scale,
 		   brow_color,
@@ -151,7 +151,7 @@ function startFace(bkgd_color,
           //addNose(0x000000, 0,0,10,10)
           //addNose(0x000000, 0,100,10,10)
 
-          // addMouth(color, x, y, width, height, thickness, opening, width_scale, ulip_h_scale, llip_h_scale)
+          // addMouth(color, x, y, width, height, thickness, opening, dimple_size, ulip_h_scale, llip_h_scale)
           addMouth( mouth_color,
       	      mouth_x,
       	      mouth_y,
@@ -159,7 +159,7 @@ function startFace(bkgd_color,
       	      mouth_height,
       	      mouth_thickness,
       	      mouth_opening,
-      	      mouth_width_scale,
+      	      mouth_dimple_size,
       	      upper_lip_height_scale,
       	      lower_lip_height_scale)
 
@@ -385,7 +385,7 @@ function drawMouth(x0,y0,x1,y1,x2,y2,x3,y3, id){
 
   lipObject.threedee.children[0].geometry = line.geometry;
 	if(id == 0){
-		console.log(lipObject)
+		//move the circles at the ends of the lips
 		lipObject.threedee.children[1].position.x = x3
 		lipObject.threedee.children[1].position.y = y3
 		lipObject.threedee.children[2].position.x = x0
@@ -448,9 +448,8 @@ function addEyes(white_color, iris_color, size, height, separation, iris_size, p
 Initializes the mouth object, which consists of two lip objects.
 The lip objects each consist of 4 control points: two mouth corners and two intermediate control points.
 The lips share the same lip corners
-Note that thickness isn't measured in pixels like the other values. It's best to keep it in the .02 area.
 */
-function addMouth(color, x, y, width, height, thickness, opening, width_scale, ulip_h_scale, llip_h_scale){
+function addMouth(color, x, y, width, height, thickness, opening, dimple_size, ulip_h_scale, llip_h_scale){
 
     upperLipControlPoints = [new THREE.Vector3(width/2, 0, 0),new THREE.Vector3(width/5, -height, 0), new THREE.Vector3(-width/5, -height, 0),new THREE.Vector3(-width/2, 0, 0)]
     lowerLipControlPoints = [new THREE.Vector3(width/2, 0, 0),new THREE.Vector3(width/5,-height, 0), new THREE.Vector3(-width/5, -height, 0),new THREE.Vector3(-width/2, 0, 0)]
@@ -460,12 +459,13 @@ function addMouth(color, x, y, width, height, thickness, opening, width_scale, u
 
 		var circleShape = new THREE.Shape();
 		circleShape.moveTo(0,0)
-		circleShape.arc(0,0,thickness*400,0,6.6, true)
+		circleShape.arc(0,0,dimple_size,0,6.6, true)
+		console.log(thickness)
 
     llip = new constructLipPoints("llip", x,y, lowerLipControlPoints);
     addLine(llip.threedee, lowerCurve, color, thickness, 0,0,53,0,0,0,1);
-		addShape(llip.threedee,circleShape, color, width/2, 0, 54, 0, 0, 0, 1 );
-		addShape(llip.threedee,circleShape, color, -width/2, 0, 54, 0, 0, 0, 1 );
+		addShape(llip.threedee,circleShape, color, width/2, 0, 53, 0, 0, 0, 1 );
+		addShape(llip.threedee, circleShape, color, -width/2, 0, 53, 0, 0, 0, 1 );
 
 
     ulip = new constructLipPoints("ulip", x,y, upperLipControlPoints);
@@ -600,10 +600,10 @@ function addBrows(color, width, height, thickness, arch){
     var y = height
 
     lbrow = new facePart("lbrow", xl,y)
-    addShape(lbrow.threedee, leftBrowShape, color, 0,0,55,0,0,.11,1);
+    addShape(lbrow.threedee, leftBrowShape, color, 0,0,55,0,0,0,1);
 
     rbrow = new facePart("rbrow", xr,y)
-    addShape(rbrow.threedee, rightBrowShape, color, 0,0,55,0,0,.11,1);
+    addShape(rbrow.threedee, rightBrowShape, color, 0,0,55,0,0,0,1);
 
     lbrow.scale({y:arch}, 1);
     rbrow.scale({y:arch}, 1);
@@ -632,7 +632,7 @@ function addLine(threedee, shape, color, width,  x, y, z, rx, ry, rz, s) {
     var line = new MeshLine();
     line.setGeometry( geometry );
 
-    var material = new MeshLineMaterial({lineWidth:width, color:new THREE.Color( color )});
+    var material = new MeshLineMaterial({lineWidth:width/300, color:new THREE.Color( color )});
 
     var mesh = new THREE.Mesh( line.geometry, material ); // this syntax could definitely be improved!
     mesh.position.set( x, y, z );

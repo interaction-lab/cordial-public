@@ -10,16 +10,15 @@
 		<script src="libs/roslib.min.js"></script>
 		<script src="libs/meshLines.js"></script>
 		<script src="js/newface.js"></script>
-		<script src="js/facecontrol.js"></script>
 		<script>
 		  startFace(0xDBC61F, //background color
 		  'DB1','', //robot name, ros_master_uri
 		  .009, //cm per pixel
-		  0.0, //viseme compression factorE
+		  0, //viseme compression factor
 		  0xffffff, 0x8B4513,200,0,300, 100, .7,"round", //eyes (white_color, iris_color, size, height, separation, iris_size, pupil_scale, pupil_shape)
 		  150,20,.4, //eyelids (color, width, height, arch)
 		  0xff99cc, 0,-20,0,0, //nose (color, x, y, width, height)
-		  0x2c241b, 15,-160,500,20,.02,2, 1.2, .2, .2, //mouth (color, x, y, width, height, thickness, opening, width_scale, ulip_h_scale, llip_h_scale)
+		  0x2c241b, 15,-160,450,20,6,2, 6, 100.2, 1000.2, //mouth (color, x, y, width, height, thickness, opening, dimple_size, ulip_h_scale, llip_h_scale)
 		  0x2c241b, 120,120,10,.3 //brows (color, width, height, thickness, arch)
 		  )
 		</script>
