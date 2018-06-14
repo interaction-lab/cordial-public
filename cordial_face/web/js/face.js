@@ -87,7 +87,7 @@ function startFace(bkgd_color,
 		   mouth_opening,
 		   mouth_width_scale,
 		   upper_lip_height_scale,
-		   lower_lip_height_scale, 
+		   lower_lip_height_scale,
 		   brow_color,
 		   brow_width,
 		   brow_height,
@@ -104,7 +104,7 @@ function startFace(bkgd_color,
     container = document.createElement( 'div' );
     document.body.appendChild( container );
     viseme_adjustment=viseme_adj
-    //camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+    // camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
     camera = new THREE.OrthographicCamera(window.innerWidth/-2, window.innerWidth/2, window.innerHeight/2, window.innerHeight/-2, 1, 2000)
 
     camera.position.set( 0, -eye_height, camera_depth );
@@ -142,7 +142,7 @@ function startFace(bkgd_color,
 
     //addNose(0x000000, 0,0,10,10)
     //addNose(0x000000, 0,100,10,10)
-    
+
     // addMouth(color, x, y, width, height, thickness, opening, width_scale, ulip_h_scale, llip_h_scale)
     addMouth( mouth_color,
 	      mouth_x,
@@ -154,7 +154,7 @@ function startFace(bkgd_color,
 	      mouth_width_scale,
 	      upper_lip_height_scale,
 	      lower_lip_height_scale)
-    
+
     // addBrows(color, width, height, thickness, arch)
     addBrows(brow_color,
 	     brow_width,
@@ -165,14 +165,14 @@ function startFace(bkgd_color,
     last_blink = 0;
     last_gaze = 0;
     looking = false;
-    
+
     aus_l = []
     aus_r = []
     for(i=0;i<=n_aus+1;i++){
 	aus_l.push(0)
 	aus_r.push(0)
     }
-    
+
     lookat(0,0,500);
     zeroFace(500);
 
@@ -256,7 +256,7 @@ function facePart(name, x, y, z, xs, ys, zs){
     this.idle_scale = {x:1,y:1,z:1};
     //below MUST be set after assembling the part
     this.idle_size = {x:0, y:0, z:0};
- 
+
     this.threedee = new THREE.Object3D();
     this.threedee.position.x = x;
     this.threedee.position.y = y;
@@ -301,7 +301,7 @@ function facePart(name, x, y, z, xs, ys, zs){
 	var ret = new THREE.Vector3(helper.box.max.x-helper.box.min.x, helper.box.max.y-helper.box.min.y, helper.box.max.z-helper.box.min.z);
 	return(ret);
     }
-	
+
 }
 
 function getPart(name){
@@ -338,7 +338,7 @@ function lookat(x,y,z,t){
     var leyez = z-leye.position.z
 
     var xgoal = -Math.atan2(leyey, leyez)
-    
+
     var ygoal = Math.atan2(leyex*Math.cos(xgoal), leyez)
 
     getPart("leye").rot({x: xgoal, y:ygoal}, t);
@@ -361,7 +361,7 @@ function lookat_real_world(realx,realy,realz,vel){
     x = realx/cm_per_px;
     y = realy/cm_per_px;
     z = realz/cm_per_px;
-    
+
     var leye = getPart("leye").threedee
 
     var leyex = x-leye.position.x
@@ -370,7 +370,7 @@ function lookat_real_world(realx,realy,realz,vel){
 
     var xgoal = -Math.atan2(leyey, leyez)
     var ygoal = Math.atan2(leyex*Math.cos(xgoal), leyez)
- 
+
     var xdist = Math.abs(leye.rotation.x-xgoal)
     var ydist = Math.abs(leye.rotation.y-ygoal)
 
@@ -458,10 +458,10 @@ function viseme(viseme_name, t){
     console.log("Viseme: " + viseme_name)
     switch(viseme_name){
 
-    case "M_B_P": //au 23, 24?, 14?, 
+    case "M_B_P": //au 23, 24?, 14?,
 	au(23, .75)
 	au(14, .25)
-	
+
 	zero_aus_no_move([10,11,16,17,25,26,27])
 	move_face(t)
 	break;
@@ -480,8 +480,8 @@ function viseme(viseme_name, t){
 	au(27, 1)
 	zero_aus_no_move([11,12,16,17,18,20])
 	move_face(t)
-	
-	
+
+
 	break;
 
     case "EH_AE_AY": //au 25, 26, 14
@@ -500,7 +500,7 @@ function viseme(viseme_name, t){
 	move_face(t)
 	break;
 
-    case "N_NG_D_Z": //au 10, 
+    case "N_NG_D_Z": //au 10,
 	au(10,.6)
 	au(18,.5)
 
@@ -527,18 +527,18 @@ function viseme(viseme_name, t){
     case "L": //au 25
 	au(10,.5)
 	au(18,.5)
-	
+
 	zero_aus_no_move([11,12,14,16,17,20,26,27])
 	move_face(t)
 
 	break;
 
     // "you" "too" "moo"
-    case "OO": //au 10, 25, 
+    case "OO": //au 10, 25,
 	au(10,1)
 	au(25,1)
 	au(18,1)
-	
+
 	zero_aus_no_move([11,12,14,16,17,20,26,27])
 	move_face(t)
 
@@ -553,7 +553,7 @@ function viseme(viseme_name, t){
 function blink(t){
     au(43, 1.0, t/2);
     blink_time=t
-    
+
     d = new Date()
     blink_end = d.getTime()+t/2;
     blinking=true
@@ -581,7 +581,7 @@ function move_face(t){
     brow_rot_targetr = (Math.PI/8)*aus_r[1];
     rbrow = getPart("rbrow");
     lbrow = getPart("lbrow");
-    
+
     rbrow.rot({z:rbrow.idle_rot.z+brow_rot_targetr}, t);
     lbrow.rot({z:lbrow.idle_rot.z-brow_rot_targetl}, t);
 
@@ -654,6 +654,22 @@ function move_face(t){
     nose = getPart("nose");
     nose.scale({x:nose.idle_scale.x*width_scale}, t);
 
+
+		var circleShape = new THREE.Shape();
+		circleShape.moveTo(0,0)
+		circleShape.arc(0,0,20,0,6.6, true)
+
+    // rbrow.threedee.children[0].geometry.vertices = new THREE.ShapeGeometry( circleShape )
+		// rbrow.threedee.children[0].geometry.verticesNeedUpdate = true
+		// rbrow.threedee.children[0].geometry.elementsNeedUpdate = true;
+		// rbrow.threedee.children[0].geometry.morphTargetsNeedUpdate = true;
+		// rbrow.threedee.children[0].geometry.uvsNeedUpdate = true;
+		// rbrow.threedee.children[0].geometry.normalsNeedUpdate = true;
+		// rbrow.threedee.children[0].geometry.colorsNeedUpdate = true;
+		// rbrow.threedee.children[0].geometry.tangentsNeedUpdate = true;
+
+
+
     // ***** MOUTH *****
     ulip=getPart("ulip");
     llip=getPart("llip");
@@ -662,11 +678,11 @@ function move_face(t){
     max_down_dist = (nose.idle_pos.y-llip.idle_pos.y)/1.5
 
     // upper lip position (aus 10, 11)
-    
+
     upper_dist = max_up_dist*(.55*aus_l[10]+.25*aus_l[11]+.35*aus_l[17]+.2*aus_l[25]+.1*aus_l[26]+.75*aus_l[27])/2.2
-    
+
     // upper lip width (aus 11, 12, 14)
-    
+
     upper_w_scale = 1+.1*aus_l[11]+.2*aus_l[12]+.25*aus_l[14]+.25*aus_l[17]-.7*aus_l[18]+.35*aus_l[20]
 
     // upper lip height (aus 10, 11, 12)
@@ -684,7 +700,7 @@ function move_face(t){
     // lower lip height (aus 12, 13, 14)
 
     lower_h_scale = 1+.2*aus_l[12]+.9*aus_l[13]-.3*aus_l[14]-2*aus_l[15]-aus_l[17]-.25*aus_l[20]-.5*aus_l[23]-.5*aus_l[24]-.25*aus_l[27]
-    
+
 
     //adjust zero scales:
     if(upper_w_scale == 0) upper_w_scale += 0.001;
@@ -697,6 +713,9 @@ function move_face(t){
     llip.scale({x:llip.idle_scale.x*lower_w_scale, y:llip.idle_scale.y*lower_h_scale},t);
     ulip.pos({y:ulip.idle_pos.y+upper_dist},t);
     llip.pos({y:llip.idle_pos.y+lower_dist},t);
+
+		console.log(rbrow.threedee.children[0].geometry)
+
 }
 
 
@@ -721,35 +740,49 @@ function addEyes(white_color, iris_color, size, height, separation, iris_size, p
     var x_adj = (separation)*(size/camera_depth);
     var y_adj = height * (size/camera_depth);
 
-    reye = new facePart("reye", -(separation/2)-x_adj, y_adj, -size);
-    addSphere(reye.threedee, size, white_color,0 , 0, 0, 0, 0, 0, 1 );
-    addShape(reye.threedee,circleShape, iris_color, 0, 0, size, 0, 0, 0, 1 );
-    addShape(reye.threedee,pupilShape, 0x000000, 0, 0, size, 0, 0, 0, pupil_scale );
-    reye.idle_size = reye.size()
-    
-    leye = new facePart("leye", (separation/2)+x_adj, y_adj, -size);
-    addSphere(leye.threedee, size, white_color, 0, 0, 0, 0, 0, 0, 1 );
-    addShape(leye.threedee,circleShape, iris_color, 0, 0, size, 0, 0, 0, 1 );
-    addShape(leye.threedee,pupilShape, 0x000000, 0, 0, size, 0, 0, 0, pupil_scale );
-    leye.idle_size = leye.size()
+    // reye = new facePart("reye", -(separation/2)-x_adj, y_adj, -size);
+    // addSphere(reye.threedee, size, white_color,0 , 0, 0, 0, 0, 0, 1 );
+    // addShape(reye.threedee,circleShape, iris_color, 0, 0, size, 0, 0, 0, 1 );
+    // addShape(reye.threedee,pupilShape, 0x000000, 0, 0, size, 0, 0, 0, pupil_scale );
+    // reye.idle_size = reye.size()
+    //
+    // leye = new facePart("leye", (separation/2)+x_adj, y_adj, -size);
+    // addSphere(leye.threedee, size, white_color, 0, 0, 0, 0, 0, 0, 1 );
+    // addShape(leye.threedee,circleShape, iris_color, 0, 0, size, 0, 0, 0, 1 );
+    // addShape(leye.threedee,pupilShape, 0x000000, 0, 0, size, 0, 0, 0, pupil_scale );
+    // leye.idle_size = leye.size()
+
+	reye = new facePart("reye", -(separation/2)-x_adj, y_adj, -size);
+   addSphere(reye.threedee, size, white_color,0 , 0, 0, 0, 0, 0, 1 );
+   addShape(reye.threedee,circleShape, 0x187254, 0, 0, size, 0, 0, 0, 1 );
+   addShape(reye.threedee,pupilShape, 0x000000, 0, 0, size, 0, 0, 0, pupil_scale);
+   // addShape(reye.threedee,circleShape, 0xffffff, 0, 0, size, 0, 0, 0, 0.05);
+   reye.idle_size = reye.size()
+
+	 leye = new facePart("leye", (separation/2)+x_adj, y_adj, -size);
+   addSphere(leye.threedee, size, white_color, 0, 0, 0, 0, 0, 0, 1 );
+   addShape(leye.threedee,circleShape, 0x187254, 0, 0, size, 0, 0, 0, 1 );
+   addShape(leye.threedee,pupilShape, 0x000000, 0, 0, size, 0, 0, 0, pupil_scale);
+   // addShape(leye.threedee,circleShape, 0xffffff, 0, 0, size, 0, 0, 0, 0.05 );
+   leye.idle_size = leye.size()
 }
 
 
 function addMouth(color, x, y, width, height, thickness, opening, width_scale, ulip_h_scale, llip_h_scale){
 
     var arcShape = new THREE.Shape();
-    
+
     arcShape.absarc( 0, width, width, 0, -3.23, true );
     arcShape.absarc( 0, width, width, -.15, -3.23, false );
-    
+
     llip = new facePart("llip", x,y-(height-width));
     addLine(llip.threedee, arcShape, color, thickness, 0,0,0,0,0,.11,1);
-    
+
     ulip = new facePart("ulip", x,y);
     addLine(ulip.threedee, arcShape, color, thickness, 0,0,0,0,0,.11,1);
 
     mouth_fix = llip.idle_pos.y + (ulip.idle_pos.y-llip.idle_pos.y)/2;
-  
+
     ulip.idle_scale.x = width_scale;
     llip.idle_scale.x = width_scale;
     ulip.idle_scale.y = ulip_h_scale;
@@ -775,7 +808,7 @@ function addNose(color, x, y, width, height){
     triangleShape.lineTo(  xc, yc );
     triangleShape.lineTo( 0, -yc );
     triangleShape.lineTo(  -xc, yc );
-    
+
     nose = new facePart("nose", x, y);
     addShape(nose.threedee, triangleShape, color, 0,0,0,0,0,0,1);
     nose.idle_size = nose.size();
@@ -790,7 +823,7 @@ function addLids(color, width, height, arch){
     arcShape.moveTo( 2*width, width*10);
     arcShape.moveTo( 2*width, -width*10);
     arcShape.moveTo( width, -width*10);
-        
+
     arcShape.absarc( 0, 0, width, 0, 3.23, true );
     //arcShape.absarc( 0, 0, width, -.15, 3.23, false );
 
@@ -804,16 +837,16 @@ function addLids(color, width, height, arch){
     var xr = reye.threedee.position.x
 
     var y = height //+ (camera_depth*leye.threedee.position.y/(camera_depth-leye.threedee.position.z));
-    
+
     ullid = new facePart("ullid", xl,y)
     addShape(ullid.threedee, arcShape, color,0,0,0,0,0,0,1);
-    
+
     urlid = new facePart("urlid", xr,y)
     addShape(urlid.threedee, arcShape, color, 0,0,0,0,0,0,1);
 
     ullid.scale({y:arch}, 1);
     urlid.scale({y:arch}, 1);
-    
+
     arcShape = new THREE.Shape();
 
     arcShape.moveTo( -width,width*10);
@@ -822,14 +855,14 @@ function addLids(color, width, height, arch){
     arcShape.moveTo( 2*width, -width*10);
     arcShape.moveTo( 2*width, width*10);
     arcShape.moveTo( width, width*10);
-        
+
     arcShape.absarc( 0, 0, width, 0, -3.23, true );
-    
+
     y = y - 2*height;
 
     lllid = new facePart("lllid", xl,y)
     addShape(lllid.threedee, arcShape, color,0,0,0,0,0,0,1);
-    
+
     lrlid = new facePart("lrlid", xr,y)
     addShape(lrlid.threedee, arcShape, color, 0,0,0,0,0,0,1);
 
@@ -841,7 +874,7 @@ function addLids(color, width, height, arch){
     urlid.idle_scale.y = arch;
     lllid.idle_scale.y = arch;
     lrlid.idle_scale.y = arch;
-    
+
     ullid.idle_size = ullid.size();
     urlid.idle_size = urlid.size();
     lllid.idle_size = lllid.size();
@@ -850,27 +883,51 @@ function addLids(color, width, height, arch){
 
 
 function addBrows(color, width, height, thickness, arch){
-    var arcShape = new THREE.Shape();
 
+	  //original arc eyebrow
+		var arcShape = new THREE.Shape();
 
-    arcShape.absarc( 0, 0, width, 0, 3.23, true );
     arcShape.absarc( 0, 0, width, -.15, 3.23, false );
+		arcShape.absarc( 0, 0, width, 0, 3.23, true );
+
+		//left eyebrow shape
+		var leftBrowShape = new THREE.Shape();
+		var upperPoints = [new THREE.Vector2(0, 140), new THREE.Vector2(width+45, 30)];
+		var lowerPoints = [new THREE.Vector2(0, 80), new THREE.Vector2(-width,0)];
+
+		leftBrowShape.moveTo(-width-20,0);
+		leftBrowShape.quadraticCurveTo(-width-30, 0, -width-45, 60);
+		leftBrowShape.splineThru(upperPoints);
+		leftBrowShape.quadraticCurveTo(width+50, 20, width+45, 10);
+		leftBrowShape.splineThru(lowerPoints);
+
+		//right eyebrow shape
+		var rightBrowShape = new THREE.Shape();
+		var upperPoints = [new THREE.Vector2(0, 140), new THREE.Vector2(-width-45, 30)];
+		var lowerPoints = [new THREE.Vector2(0, 80), new THREE.Vector2(width,0)];
+
+		rightBrowShape.moveTo(width+10,0);
+		rightBrowShape.quadraticCurveTo(width+30, 0, width+45, 60);
+		rightBrowShape.splineThru(upperPoints);
+		rightBrowShape.quadraticCurveTo(-width-50, 20, -width-45, 10);
+		rightBrowShape.splineThru(lowerPoints);
+
 
     var leye = getPart("leye");
     var reye = getPart("reye");
-    
+
     //var xl = camera_depth*leye.threedee.position.x/(camera_depth-leye.threedee.position.z);
     //var xr = camera_depth*reye.threedee.position.x/(camera_depth-reye.threedee.position.z);
     var xl = leye.threedee.position.x
     var xr = reye.threedee.position.x
 
     var y = height //+ (camera_depth*leye.threedee.position.y/(camera_depth-leye.threedee.position.z));
-        
-    lbrow = new facePart("lbrow", xl,y)
+
+		lbrow = new facePart("lbrow", xl,y)
     addLine(lbrow.threedee, arcShape, color, thickness, 0,0,0,0,0,.11,1);
-    
+
     rbrow = new facePart("rbrow", xr,y)
-    addLine(rbrow.threedee, arcShape, color, thickness, 0,0,0,0,0,.11,1);
+		addLine(rbrow.threedee, arcShape, color, thickness, 0,0,0,0,0,.11,1);
 
     lbrow.scale({y:arch}, 1);
     rbrow.scale({y:arch}, 1);
@@ -907,7 +964,7 @@ function addShape( threedee, shape, color, x, y, z, rx, ry, rz, s ) {
     threedee.add( mesh );
 
     // line
-    //addLine(threedee, shape, 0x333333, 5, x, y, z, rx, ry, rz, s);
+    // addLine(threedee, shape, 0x333333, 5, x, y, z, rx, ry, rz, s);
 }
 
 function addSphere( threedee, radius, color, x, y, z, rx, ry, rz, s ) {
@@ -1067,11 +1124,13 @@ function onDocumentMouseDown( event ) {
     mouseX = event.clientX - windowHalfX;
     mouseY = windowHalfY - event.clientY;
     clickOrTouch(mouseX, mouseY)
- 
+
 }
 
 function clickOrTouch( x, y) {
-    doPoke();
+	if (typeof gui === "undefined"){
+    	doPoke();
+	}
     lookat_real_world(0, 0, 60, 1.7);
 }
 
@@ -1107,7 +1166,7 @@ function onDocumentTouchStart( event ) {
     mouseX = event.touches[0].pageX - windowHalfX;
     mouseY = windowHalfY - event.touches[0].pageY;
     clickOrTouch(mouseX, mouseY)
-    
+
 
 }
 
@@ -1153,4 +1212,3 @@ function animate() {
     //print_elapsed()
     //set_time()
 }
-
