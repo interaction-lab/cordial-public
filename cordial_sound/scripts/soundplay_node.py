@@ -50,14 +50,18 @@ import tempfile
 from diagnostic_msgs.msg import DiagnosticStatus, KeyValue, DiagnosticArray
 
 try:
-    import pygst
-    pygst.require('0.10')
-    import gst
-    import gobject
+    # import pygst
+    # pygst.require('0.10')
+    # import gst
+    # import gobject
+    import gi
+    gi.require_version('Gst', '1.0')
+    from gi.repository import GObject, Gst
+
 except:
     str="""
 **************************************************************
-Error opening pygst. Is gstreamer installed? (sudo apt-get install python-gst0.10 
+Error opening pygst. Is gstreamer installed? (sudo apt-get install python-gst0.10
 **************************************************************
 """
     rospy.logfatal(str)
@@ -70,7 +74,7 @@ def sleep(t):
     except:
         pass
 
-
+#Class soundtype responsibe for calling the actual functions to play the wav files
 class soundtype:
     STOPPED = 0
     LOOPING = 1
@@ -79,7 +83,14 @@ class soundtype:
     def __init__(self, file, volume = 1.0):
         self.lock = threading.RLock()
         self.state = self.STOPPED
-        self.sound = gst.element_factory_make("playbin","player")
+        GObject.threads_init()
+        Gst.init(None)
+
+        self.sound = Gst.ElementFactory.make("playbin", "player")
+        if not self.sound:
+            sys.stderr.write("'playbin' gstreamer plugin missing\n")
+            sys.exit(1)
+        # self.sound = gst.element_factory_make("playbin","player")
         if (":" in file):
             uri = file
         elif os.path.isfile(file):
@@ -112,17 +123,18 @@ class soundtype:
         finally:
             self.lock.release()
 
-    def loop(self):  
+    def loop(self):
         self.lock.acquire()
         try:
             self.staleness = 0
             if self.state == self.COUNTING:
                 self.stop()
-            
+
             if self.state == self.STOPPED:
-              self.sound.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_FLUSH, 0)
-              self.sound.set_state(gst.STATE_PLAYING)
-            
+              self.sound.seek_simple(Gst.Format.TIME, gst.SeekFlags.FLUSH, 0)
+              # self.sound.set_state(gst.STATE_PLAYING)
+              self.sound.set_state(Gst.State.PLAYING)
+
             self.state = self.LOOPING
         finally:
             self.lock.release()
@@ -131,7 +143,7 @@ class soundtype:
         if self.state != self.STOPPED:
             self.lock.acquire()
             try:
-                self.sound.set_state(gst.STATE_NULL)
+                self.sound.set_state(Gst.State.NULL)
                 self.state = self.STOPPED
             finally:
                 self.lock.release()
@@ -143,10 +155,10 @@ class soundtype:
             self.staleness = 0
             if self.state == self.LOOPING:
                 self.stop()
-            
-            self.sound.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_FLUSH, 0)
-            self.sound.set_state(gst.STATE_PLAYING)
-        
+
+            self.sound.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, 0)
+            self.sound.set_state(Gst.State.PLAYING)
+
             self.state = self.COUNTING
         finally:
             self.lock.release()
@@ -166,8 +178,8 @@ class soundtype:
         position = 0
         duration = 0
         try:
-            position = self.sound.query_position(gst.FORMAT_TIME)[0]
-            duration = self.sound.query_duration(gst.FORMAT_TIME)[0]
+            position = self.sound.query_position(Gst.Format.TIME)[0]
+            duration = self.sound.query_duration(Gst.Format.TIME)[0]
         except Exception, e:
             position = 0
             duration = 0
@@ -184,7 +196,7 @@ class soundplay:
     def stopdict(self,dict):
         for sound in dict.values():
             sound.stop()
-    
+
     def stopall(self):
         self.stopdict(self.builtinsounds)
         self.stopdict(self.filesounds)
@@ -194,20 +206,21 @@ class soundplay:
         if not self.initialized:
             return
         self.mutex.acquire()
-        
+
         # Force only one sound at a time
         # self.stopall()
         try:
             if data.sound == SoundRequest.ALL and data.command == SoundRequest.PLAY_STOP:
                 self.stopall()
-            else:               
+            else:
                 if data.sound == SoundRequest.PLAY_FILE:
                     if not data.arg in self.filesounds.keys():
                         rospy.logdebug('command for uncached wave: "%s"'%data.arg)
                         try:
                             self.filesounds[data.arg] = soundtype(data.arg)
                         except:
-                            rospy.logerr( "Exception: " + sys.exec_info()[0])
+                            rospy.logerr( "Exception:")
+                            print(sys.exc_info()[0])
                             rospy.logerr('Error setting up to play "%s". Does this file exist on the machine on which cordial_sound is running?'%data.arg)
                             return
                     else:
@@ -244,6 +257,8 @@ class soundplay:
                         params = self.builtinsoundparams[data.sound]
                         self.builtinsounds[data.sound] = soundtype(params[0], params[1])
                     sound = self.builtinsounds[data.sound]
+
+
                 if sound.staleness != 0 and data.command != SoundRequest.PLAY_STOP:
                     # This sound isn't counted in active_sounds
                     rospy.logdebug("activating %i %s"%(data.sound,data.arg))
@@ -260,6 +275,8 @@ class soundplay:
                         return
                     sound.command(data.command, volume)
                 else:
+                    print("command : {}".format(data.command))
+                    print(sound)
                     sound.command(data.command)
         except Exception, e:
             rospy.logerr('Exception in callback: %s'%str(e))
@@ -285,7 +302,7 @@ class soundplay:
         for key in purgelist:
            rospy.logdebug('Purging %s from cache'%key)
            del dict[key]
-    
+
     def cleanup(self):
         self.mutex.acquire()
         try:
@@ -328,7 +345,7 @@ class soundplay:
         self.diagnostic_pub = rospy.Publisher("/CoRDial/sound/diagnostics", DiagnosticArray, queue_size=10)
 
         rootdir = os.path.join(os.path.dirname(__file__),'..','sounds')
-        
+
         self.builtinsoundparams = {
                 SoundRequest.BACKINGUP              : (os.path.join(rootdir, 'BACKINGUP.ogg'), 0.1),
                 SoundRequest.NEEDS_UNPLUGGING       : (os.path.join(rootdir, 'NEEDS_UNPLUGGING.ogg'), 1),
@@ -336,7 +353,7 @@ class soundplay:
                 SoundRequest.NEEDS_UNPLUGGING_BADLY : (os.path.join(rootdir, 'NEEDS_UNPLUGGING_BADLY.ogg'), 1),
                 SoundRequest.NEEDS_PLUGGING_BADLY   : (os.path.join(rootdir, 'NEEDS_PLUGGING_BADLY.ogg'), 1),
                 }
-        
+
         self.mutex = threading.Lock()
         sub = rospy.Subscriber("/CoRDial/robotsound", SoundRequest, self.callback)
         self.mutex.acquire()
@@ -372,13 +389,13 @@ class soundplay:
         self.hotlist = []
         if not self.initialized:
             rospy.loginfo('cordial_sound node is ready to play sound')
-            
+
     def sleep(self, duration):
-        try:    
-            rospy.sleep(duration)   
+        try:
+            rospy.sleep(duration)
         except rospy.exceptions.ROSInterruptException:
             pass
-    
+
     def idle_loop(self):
         self.last_activity_time = rospy.get_time()
         while (rospy.get_time() - self.last_activity_time < 10 or
@@ -392,4 +409,3 @@ class soundplay:
 
 if __name__ == '__main__':
     soundplay()
-
