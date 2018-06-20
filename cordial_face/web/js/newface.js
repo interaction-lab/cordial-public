@@ -776,7 +776,7 @@ Same as above, but it does not move the face.
 */
 function zero_aus_no_move(to_zero){
     for(a in to_zero){
-	au(to_zero[a],0)
+			au(to_zero[a],0)
     }
 }
 
@@ -807,6 +807,11 @@ times - the time at which the viseme should be played
 */
 function play_visemes(visemes, time_per, times){
     viseme_buffer = visemes
+		console.log(times)
+		for(time in times){
+			times[time]-=.035;
+		}
+		console.log(times)
     viseme_time_buffer = times
     viseme_dur = time_per
     d = new Date();
@@ -830,100 +835,110 @@ function viseme(viseme_name, t){
     switch(viseme_name){
 
     case "M_B_P": //au 23, 24?, 14?,
-	au(23, .75)
-	au(14, .25)
+		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		au(23, .75)
+		au(14, .25)
 
-	zero_aus_no_move([10,11,16,17,25,26,27])
-	move_face(t)
-	break;
+
+		move_face(t)
+		break;
 
     case "AA_AH": //au 25, 26, 14
-	au(26, 1)
-	au(25, .5)
-	au(14, .5)
+		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		au(26, 1)
+		au(25, .5)
+		au(14, .5)
 
-	zero_aus_no_move([10,11,12,16,17,18,20,27])
-	move_face(t)
-	break;
+		move_face(t)
+		break;
 
     case "AO_AW": //au 25, 26, 27
-	au(26, .75)
-	au(27, 1)
-	zero_aus_no_move([10,11,12,16,17,18,20])
-	move_face(t)
+		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		au(26, .75)
+		au(27, 1)
 
-
-	break;
+		move_face(t)
+		break;
 
     case "EH_AE_AY": //au 25, 26, 14
-	au(14, .75)
-	au(26, .75)
+		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		au(14, .75)
+		au(26, .75)
 
-	zero_aus_no_move([10,11,12,16,17,18,20,27])
-	move_face(t)
+		move_face(t)
 
-	break;
+		break;
 
     case "CH_SH_ZH": //au 18, 25, 10
-	au(10, .75)
-	au(18, 1)
-	au(25, 1)
-	zero_aus_no_move([11,12,14,16,17,20,26,27])
-	move_face(t)
-	break;
+		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		au(10, .75)
+		au(18, 1)
+		au(25, 1)
+		move_face(t)
+		break;
 
     case "N_NG_D_Z": //au 10,
-	au(10,.6)
-	au(18,.5)
+		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		au(10,.6)
+		au(18,.5)
 
-	zero_aus_no_move([10,11,16,17,25,26,27])
-	move_face(t)
+		move_face(t)
 
-	break;
+		break;
 
     case "R_ER": //au 10
-	au(10,1)
-	au(18,.7)
-	au(25, .8)
+		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		au(10,1)
+		au(18,.7)
+		au(25, .8)
 
-	zero_aus_no_move([10,11,12,14,16,17,20,26,27])
-	move_face(t)
+		move_face(t)
 
-	break;
+		break;
 
     case "EY": //au 25, 26, 14
+		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		au(26,1)
 
-	au(26,1)
-	zero_aus_no_move([10,11,12,16,17,18,20,27])
-	move_face(t)
-	break;
+		move_face(t)
+		break;
 
     case "L": //au 25
-	au(10,.65)
-	au(18,.5)
-	au(25, .7)
+		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		au(10,.65)
+		au(18,.5)
+		au(25, .7)
 
-	zero_aus_no_move([11,12,14,16,17,20,26,27])
-	move_face(t)
+		move_face(t)
 
-	break;
+		break;
 
     // "you" "too" "moo"
     case "OO": //au 10, 25,
-	au(10,1)
-	au(25,1)
-	au(26,.4)
-	au(18,1)
-	au(16,.3)
+		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		au(10,1)
+		au(25,1)
+		au(26,.4)
+		au(18,1)
+		au(16,.3)
 
-	zero_aus_no_move([11,12,14,17,20,27])
-	move_face(t)
+		move_face(t)
 
-	break;
+		break;
+
+		case "F":
+		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		au(10,0.5);
+		au(23,1);
+		au(25,1);
+
+		move_face(t)
+
+		break;
 
     case "IDLE":
-	zeroFace(t)
-	break;
+		zeroFace(t)
+		break;
     }
 }
 
@@ -1050,23 +1065,23 @@ function move_face(t){
 
     max_up_dist = (nose.idle_pos.y-ulip.idle_pos.y)/1.5
     max_down_dist = (nose.idle_pos.y-llip.idle_pos.y)/1.5
-    max_x_variation = (upperLipControlPoints[0].x - upperLipControlPoints[3].x) / 2; //should be width divided by 2 I think
+    max_x_variation = (upperLipControlPoints[0].x - upperLipControlPoints[3].x) / 4; //should be width divided by 2 I think
 
     lcorner = upperLipControlPoints[0].clone();
     rcorner = upperLipControlPoints[3].clone();
 
-    lcorner.x += max_x_variation*(.2*aus_l[12] + .05*aus_l[13] + .25*aus_l[14] -.1*aus_l[26] -.3*aus_l[27] +.35*aus_l[17]-.7*aus_l[18] + .25*aus_l[20] -.2*aus_l[23] -.1*aus_l[24])/1.12
-    lcorner.y += max_down_dist*(-.2*aus_l[25] -.2*aus_l[26] + .7*aus_l[13]-1.5*aus_l[15]-.5*aus_l[27] - .2*aus_l[20] -.3*aus_l[23] -.5*aus_l[24])/2.3
-    rcorner.x -= max_x_variation*(.2*aus_r[12] + .05*aus_r[13] + .25*aus_r[14]-.1*aus_r[26] -.3*aus_r[27] +.35*aus_r[17]-.7*aus_r[18] + .25*aus_r[20] -.2*aus_r[23] -.1*aus_r[24])/1.12
-    rcorner.y += max_down_dist*(-.2*aus_r[25] -.2*aus_r[26] + .7*aus_r[13]-1.5*aus_r[15]-.5*aus_r[27] - .2*aus_r[20] -.3*aus_r[23] -.5*aus_r[24])/2.3
+    lcorner.x += max_x_variation*(.2*aus_l[12] + .05*aus_l[13] + .25*aus_l[14] -.1*aus_l[26] -.3*aus_l[27] +.35*aus_l[17]-.7*aus_l[18] + .25*aus_l[20] -.2*aus_l[23] -.1*aus_l[24])/1.1
+    lcorner.y += max_down_dist*(-.2*aus_l[25] -.2*aus_l[26] + .7*aus_l[13]-1.5*aus_l[15]-.5*aus_l[27] - .2*aus_l[20] -.3*aus_l[23] -.5*aus_l[24])/3.4
+    rcorner.x -= max_x_variation*(.2*aus_r[12] + .05*aus_r[13] + .25*aus_r[14]-.1*aus_r[26] -.3*aus_r[27] +.35*aus_r[17]-.7*aus_r[18] + .25*aus_r[20] -.2*aus_r[23] -.1*aus_r[24])/1.1
+    rcorner.y += max_down_dist*(-.2*aus_r[25] -.2*aus_r[26] + .7*aus_r[13]-1.5*aus_r[15]-.5*aus_r[27] - .2*aus_r[20] -.3*aus_r[23] -.5*aus_r[24])/3.4
 
 
     upperl = upperLipControlPoints[1].clone();
     upperr = upperLipControlPoints[2].clone();
 
-    upperl.x += max_x_variation*(.55*aus_l[10] + .25*aus_l[14]-.6*aus_l[18]+ .25*aus_l[20] -.1*aus_l[23])/2.2
+    upperl.x += max_x_variation*(.55*aus_l[10] + .25*aus_l[14]-.6*aus_l[18]+ .25*aus_l[20] -.1*aus_l[23])/1.05
     upperl.y += max_up_dist*(.1*aus_l[25] +.3*aus_l[26] +.6*aus_l[27] + .55*aus_l[10]+.35*aus_l[17])/2.2
-    upperr.x -= max_x_variation*(.55*aus_r[10] + .25*aus_r[14]-.6*aus_r[18] + .25*aus_r[20] -.1*aus_r[23])/2.2
+    upperr.x -= max_x_variation*(.55*aus_r[10] + .25*aus_r[14]-.6*aus_r[18] + .25*aus_r[20] -.1*aus_r[23])/1.05
     upperr.y += max_up_dist*(.1*aus_r[25] +.3*aus_r[26] +.6*aus_r[27] + .55*aus_r[10]+.35*aus_r[17])/2.2
 
 
@@ -1074,10 +1089,10 @@ function move_face(t){
     lowerl = lowerLipControlPoints[1].clone();
     lowerr = lowerLipControlPoints[2].clone();
 
-    lowerl.x += max_x_variation*(.25*aus_l[14] + .5*aus_l[16] + .2*aus_l[26]-.6*aus_l[18]+ .25*aus_l[20] -.2*aus_l[23])/2.2
-    lowerl.y += max_down_dist*(-.4*aus_l[25] -.7*aus_l[26] -1.6*aus_l[27]+ .55*aus_l[10] -.2*aus_l[16] +.45*aus_l[17])/2.3
-    lowerr.x -= max_x_variation*(.25*aus_r[14] + .5*aus_r[16] + .2*aus_r[26]-.6*aus_r[18] + .25*aus_r[20] -.2*aus_r[23])/2.2
-    lowerr.y += max_down_dist*(-.4*aus_r[25] -.7*aus_r[26] -1.6*aus_r[27] + .55*aus_r[10] -.2*aus_r[16] +.45*aus_r[17])/2.3
+    lowerl.x += max_x_variation*(.25*aus_l[14] + .5*aus_l[16] + .2*aus_l[26]-.6*aus_l[18]+ .25*aus_l[20] -.2*aus_l[23])/1.05
+    lowerl.y += max_down_dist*(-.4*aus_l[25] -.7*aus_l[26] -1.6*aus_l[27]+ .55*aus_l[10] -.2*aus_l[16] +.45*aus_l[17])/2.2
+    lowerr.x -= max_x_variation*(.25*aus_r[14] + .5*aus_r[16] + .2*aus_r[26]-.6*aus_r[18] + .25*aus_r[20] -.2*aus_r[23])/1.05
+    lowerr.y += max_down_dist*(-.4*aus_r[25] -.7*aus_r[26] -1.6*aus_r[27] + .55*aus_r[10] -.2*aus_r[16] +.45*aus_r[17])/2.2
 
     upperLip = [rcorner, upperr, upperl, lcorner];
     lowerLip = [rcorner, lowerr, lowerl, lcorner];
@@ -1094,55 +1109,56 @@ function move_face(t){
 **/
 
 function get_goal(message) {
-    if(message.visemes.length!=0){
-	console.log('Message received: visemes: ' + message.visemes);
-	stop_visemes()
-	// play_visemes(message.visemes, message.viseme_ms, message.times, message.start)
-	play_visemes(message.visemes, 60, message.times, message.start)
-    }
-    if(message.aus.length!=0){
-	console.log('Message received: aus: ' + message.aus + " degrees: " + message.au_degrees + " side: " + message.side)
-	side = "b"
-	if(message.side == 1){
-	    side = 'r'
+	if(message.visemes.length!=0){
+		console.log('Message received: visemes: ' + message.visemes);
+		console.log(message)
+		stop_visemes()
+		// play_visemes(message.visemes, message.viseme_ms, message.times, message.start)
+		play_visemes(message.visemes, 35, message.times, message.start)
 	}
-	if(message.side == 2){
-	    side = 'l'
+	if(message.aus.length!=0){
+		console.log('Message received: aus: ' + message.aus + " degrees: " + message.au_degrees + " side: " + message.side)
+		side = "b"
+		if(message.side == 1){
+			side = 'r'
+		}
+		if(message.side == 2){
+			side = 'l'
+		}
+		for(a in message.aus){
+			this_au = parseInt(message.aus[a])
+			if(message.au_ms[a]<0){
+				console.log("Time cannot be less than zero!")
+			} else {
+				if(this_au == 1 ||this_au == 4||this_au==2||this_au==5 || this_au == 7 || this_au == 43){
+					au(this_au, message.au_degrees[a], side)
+				}
+				else {
+					au(this_au, message.au_degrees[a], "b")
+				}
+			}
+		}
+		move_face(message.au_ms)
 	}
-	for(a in message.aus){
-	    this_au = parseInt(message.aus[a])
-	    if(message.au_ms[a]<0){
-		console.log("Time cannot be less than zero!")
-	    } else {
-		if(this_au == 1 ||this_au == 4||this_au==2||this_au==5 || this_au == 7 || this_au == 43){
-		    au(this_au, message.au_degrees[a], side)
+	if(message.hold_gaze==1){
+		looking = true
+	}
+	if(message.hold_gaze==2){
+		looking = false
+	}
+	if(message.retarget_gaze){
+		console.log("Message received: gaze: " + message.gaze_target.x + "," + message.gaze_target.y + "," +  message.gaze_target.z)
+		x = message.gaze_target.x
+		y = message.gaze_target.y
+		z = message.gaze_target.z
+		gaze_vel = message.gaze_vel
+		if(gaze_vel > 0){
+			lookat_real_world(x, y, z, gaze_vel)
 		}
 		else {
-		    au(this_au, message.au_degrees[a], "b")
+			lookat_real_world(x, y, z, 1.7) //1.7 rad/s is an average human eye saccade speed
 		}
-	    }
 	}
-	move_face(message.au_ms)
-    }
-    if(message.hold_gaze==1){
-	looking = true
-    }
-    if(message.hold_gaze==2){
-	looking = false
-    }
-    if(message.retarget_gaze){
-	console.log("Message received: gaze: " + message.gaze_target.x + "," + message.gaze_target.y + "," +  message.gaze_target.z)
-	x = message.gaze_target.x
-	y = message.gaze_target.y
-	z = message.gaze_target.z
-	gaze_vel = message.gaze_vel
-	if(gaze_vel > 0){
-	    lookat_real_world(x, y, z, gaze_vel)
-	}
-	else {
-	    lookat_real_world(x, y, z, 1.7) //1.7 rad/s is an average human eye saccade speed
-	}
-    }
 }
 
 /*
@@ -1246,6 +1262,7 @@ function onDocumentMouseDown( event ) {
 
 function clickOrTouch( x, y) {
   if (typeof gui === "undefined"){
+		//don't do the poke animation if the  gui is up or else dragging the controllers makes the poke happen
     doPoke();
   }
     lookat_real_world(0, 0, 60, 1.7);

@@ -57,7 +57,7 @@ try:
 except:
     str="""
 **************************************************************
-Error opening pygst. Is gstreamer installed? (sudo apt-get install python-gst0.10 
+Error opening pygst. Is gstreamer installed? (sudo apt-get install python-gst0.10
 **************************************************************
 """
     rospy.logfatal(str)
@@ -112,17 +112,17 @@ class soundtype:
         finally:
             self.lock.release()
 
-    def loop(self):  
+    def loop(self):
         self.lock.acquire()
         try:
             self.staleness = 0
             if self.state == self.COUNTING:
                 self.stop()
-            
+
             if self.state == self.STOPPED:
               self.sound.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_FLUSH, 0)
               self.sound.set_state(gst.STATE_PLAYING)
-            
+
             self.state = self.LOOPING
         finally:
             self.lock.release()
@@ -143,10 +143,10 @@ class soundtype:
             self.staleness = 0
             if self.state == self.LOOPING:
                 self.stop()
-            
+
             self.sound.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_FLUSH, 0)
             self.sound.set_state(gst.STATE_PLAYING)
-        
+
             self.state = self.COUNTING
         finally:
             self.lock.release()
@@ -184,7 +184,7 @@ class soundplay:
     def stopdict(self,dict):
         for sound in dict.values():
             sound.stop()
-    
+
     def stopall(self):
         self.stopdict(self.builtinsounds)
         self.stopdict(self.filesounds)
@@ -194,20 +194,20 @@ class soundplay:
         if not self.initialized:
             return
         self.mutex.acquire()
-        
+
         # Force only one sound at a time
         # self.stopall()
         try:
             if data.sound == SoundRequest.ALL and data.command == SoundRequest.PLAY_STOP:
                 self.stopall()
-            else:               
+            else:
                 if data.sound == SoundRequest.PLAY_FILE:
                     if not data.arg in self.filesounds.keys():
                         rospy.logdebug('command for uncached wave: "%s"'%data.arg)
                         try:
                             self.filesounds[data.arg] = soundtype(data.arg)
                         except:
-                            rospy.logerr( "Exception: " + sys.exec_info()[0])
+                            rospy.logerr( "Exception: " + repr(sys.exc_info()[0]))
                             rospy.logerr('Error setting up to play "%s". Does this file exist on the machine on which cordial_sound is running?'%data.arg)
                             return
                     else:
@@ -285,7 +285,7 @@ class soundplay:
         for key in purgelist:
            rospy.logdebug('Purging %s from cache'%key)
            del dict[key]
-    
+
     def cleanup(self):
         self.mutex.acquire()
         try:
@@ -328,7 +328,7 @@ class soundplay:
         self.diagnostic_pub = rospy.Publisher("/CoRDial/sound/diagnostics", DiagnosticArray, queue_size=10)
 
         rootdir = os.path.join(os.path.dirname(__file__),'..','sounds')
-        
+
         self.builtinsoundparams = {
                 SoundRequest.BACKINGUP              : (os.path.join(rootdir, 'BACKINGUP.ogg'), 0.1),
                 SoundRequest.NEEDS_UNPLUGGING       : (os.path.join(rootdir, 'NEEDS_UNPLUGGING.ogg'), 1),
@@ -336,7 +336,7 @@ class soundplay:
                 SoundRequest.NEEDS_UNPLUGGING_BADLY : (os.path.join(rootdir, 'NEEDS_UNPLUGGING_BADLY.ogg'), 1),
                 SoundRequest.NEEDS_PLUGGING_BADLY   : (os.path.join(rootdir, 'NEEDS_PLUGGING_BADLY.ogg'), 1),
                 }
-        
+
         self.mutex = threading.Lock()
         sub = rospy.Subscriber("/CoRDial/robotsound", SoundRequest, self.callback)
         self.mutex.acquire()
@@ -372,13 +372,13 @@ class soundplay:
         self.hotlist = []
         if not self.initialized:
             rospy.loginfo('cordial_sound node is ready to play sound')
-            
+
     def sleep(self, duration):
-        try:    
-            rospy.sleep(duration)   
+        try:
+            rospy.sleep(duration)
         except rospy.exceptions.ROSInterruptException:
             pass
-    
+
     def idle_loop(self):
         self.last_activity_time = rospy.get_time()
         while (rospy.get_time() - self.last_activity_time < 10 or
@@ -392,4 +392,3 @@ class soundplay:
 
 if __name__ == '__main__':
     soundplay()
-
