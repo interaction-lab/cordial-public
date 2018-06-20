@@ -74,7 +74,24 @@ def sleep(t):
     except:
         pass
 
-#Class soundtype responsibe for calling the actual functions to play the wav files
+'''
+Class soundtype responsible for calling Gst to play sounds
+    fields: lock - locking mechanism
+            state - keeps track of what the player is currently doing
+            sound - the GST player object
+            uri - path to the sound file to play
+            volume - number tracking the current volume the file is being played at
+            staleness - how old the player is
+            file - the wav / ogg file being played
+
+    methods:command() - general purpose method to do something with a file (play, stop, loop, etc.)
+            setVolume() - changes the volume of a file
+            loop() - plays a file repeatedly
+            stop() - stops playing a file
+            single() - plays a file through once
+            getStaleness() - queries duration and position, and determines
+                             how long a file has been finished playing for
+'''
 class soundtype:
     STOPPED = 0
     LOOPING = 1
@@ -83,9 +100,9 @@ class soundtype:
     def __init__(self, file, volume = 1.0):
         self.lock = threading.RLock()
         self.state = self.STOPPED
+
         GObject.threads_init()
         Gst.init(None)
-
         self.sound = Gst.ElementFactory.make("playbin", "player")
         if not self.sound:
             sys.stderr.write("'playbin' gstreamer plugin missing\n")
@@ -108,6 +125,16 @@ class soundtype:
     def __del__(self):
         # stop our GST object so that it gets garbage-collected
         self.stop()
+
+    def command(self, cmd, arg = 1.0):
+         if cmd == SoundRequest.PLAY_STOP:
+             self.stop()
+         elif cmd == SoundRequest.PLAY_ONCE:
+             self.single()
+         elif cmd == SoundRequest.PLAY_START:
+             self.loop()
+         elif cmd == SoundRequest.CHANGE_VOL:
+             self.set_volume(arg)
 
     def set_volume(self, vol):
         if vol > 1.0:
@@ -163,16 +190,6 @@ class soundtype:
         finally:
             self.lock.release()
 
-    def command(self, cmd, arg = 1.0):
-         if cmd == SoundRequest.PLAY_STOP:
-             self.stop()
-         elif cmd == SoundRequest.PLAY_ONCE:
-             self.single()
-         elif cmd == SoundRequest.PLAY_START:
-             self.loop()
-         elif cmd == SoundRequest.CHANGE_VOL:
-             self.set_volume(arg)
-
     def get_staleness(self):
         self.lock.acquire()
         position = 0
@@ -192,6 +209,14 @@ class soundtype:
             self.staleness = self.staleness + 1
         return self.staleness
 
+'''
+class soundplay responsible for determining where the soundfile will be coming from
+    files can come from three main sources: local, generated on-the-fly, or built-in.
+        local files - use the SoundRequest type PLAY_FILE
+        generated files use the SoundRequest type SAY
+        built-in files are the fallback case
+
+'''
 class soundplay:
     def stopdict(self,dict):
         for sound in dict.values():
@@ -210,10 +235,13 @@ class soundplay:
         # Force only one sound at a time
         # self.stopall()
         try:
+            #immediately stop sound if that is the command being issued
             if data.sound == SoundRequest.ALL and data.command == SoundRequest.PLAY_STOP:
                 self.stopall()
             else:
+                #determine the the source of the file
                 if data.sound == SoundRequest.PLAY_FILE:
+                    #cache the file or read from the cache
                     if not data.arg in self.filesounds.keys():
                         rospy.logdebug('command for uncached wave: "%s"'%data.arg)
                         try:
@@ -227,6 +255,8 @@ class soundplay:
                         print "cached"
                         rospy.logdebug('command for cached wave: "%s"'%data.arg)
                     sound = self.filesounds[data.arg]
+
+                # if sound has not been recorded, get a wav from the text given
                 elif data.sound == SoundRequest.SAY:
                     if not data.arg in self.voicesounds.keys():
                         rospy.logdebug('command for uncached text: "%s"' % data.arg)
@@ -251,6 +281,8 @@ class soundplay:
                     else:
                         rospy.logdebug('command for cached text: "%s"'%data.arg)
                     sound = self.voicesounds[data.arg]
+
+                #Otherwise, just play one of the built in sounds
                 else:
                     rospy.logdebug('command for builtin wave: %i'%data.sound)
                     if not data.sound in self.builtinsounds:
@@ -267,6 +299,7 @@ class soundplay:
 #                    if self.active_sounds > self.num_channels:
 #                        mixer.set_num_channels(self.active_sounds)
 #                        self.num_channels = self.active_sounds
+                
                 if(data.command == SoundRequest.CHANGE_VOL):
                     try:
                         volume = float(data.arg2)
@@ -275,8 +308,6 @@ class soundplay:
                         return
                     sound.command(data.command, volume)
                 else:
-                    print("command : {}".format(data.command))
-                    print(sound)
                     sound.command(data.command)
         except Exception, e:
             rospy.logerr('Exception in callback: %s'%str(e))
