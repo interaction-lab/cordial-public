@@ -50,10 +50,14 @@ import tempfile
 from diagnostic_msgs.msg import DiagnosticStatus, KeyValue, DiagnosticArray
 
 try:
-    import pygst
-    pygst.require('0.10')
-    import gst
-    import gobject
+    # import pygst
+    # pygst.require('0.10')
+    # import gst
+    # import gobject
+    import gi
+    gi.require_version('Gst', '1.0')
+    from gi.repository import GObject, Gst
+
 except:
     str="""
 **************************************************************
@@ -70,7 +74,24 @@ def sleep(t):
     except:
         pass
 
+'''
+Class soundtype responsible for calling Gst to play sounds
+    fields: lock - locking mechanism
+            state - keeps track of what the player is currently doing
+            sound - the GST player object
+            uri - path to the sound file to play
+            volume - number tracking the current volume the file is being played at
+            staleness - how old the player is
+            file - the wav / ogg file being played
 
+    methods:command() - general purpose method to do something with a file (play, stop, loop, etc.)
+            setVolume() - changes the volume of a file
+            loop() - plays a file repeatedly
+            stop() - stops playing a file
+            single() - plays a file through once
+            getStaleness() - queries duration and position, and determines
+                             how long a file has been finished playing for
+'''
 class soundtype:
     STOPPED = 0
     LOOPING = 1
@@ -79,7 +100,14 @@ class soundtype:
     def __init__(self, file, volume = 1.0):
         self.lock = threading.RLock()
         self.state = self.STOPPED
-        self.sound = gst.element_factory_make("playbin","player")
+
+        GObject.threads_init()
+        Gst.init(None)
+        self.sound = Gst.ElementFactory.make("playbin", "player")
+        if not self.sound:
+            sys.stderr.write("'playbin' gstreamer plugin missing\n")
+            sys.exit(1)
+        # self.sound = gst.element_factory_make("playbin","player")
         if (":" in file):
             uri = file
         elif os.path.isfile(file):
@@ -97,6 +125,16 @@ class soundtype:
     def __del__(self):
         # stop our GST object so that it gets garbage-collected
         self.stop()
+
+    def command(self, cmd, arg = 1.0):
+         if cmd == SoundRequest.PLAY_STOP:
+             self.stop()
+         elif cmd == SoundRequest.PLAY_ONCE:
+             self.single()
+         elif cmd == SoundRequest.PLAY_START:
+             self.loop()
+         elif cmd == SoundRequest.CHANGE_VOL:
+             self.set_volume(arg)
 
     def set_volume(self, vol):
         if vol > 1.0:
@@ -120,8 +158,9 @@ class soundtype:
                 self.stop()
 
             if self.state == self.STOPPED:
-              self.sound.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_FLUSH, 0)
-              self.sound.set_state(gst.STATE_PLAYING)
+              self.sound.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, 0)
+              # self.sound.set_state(gst.STATE_PLAYING)
+              self.sound.set_state(Gst.State.PLAYING)
 
             self.state = self.LOOPING
         finally:
@@ -131,7 +170,7 @@ class soundtype:
         if self.state != self.STOPPED:
             self.lock.acquire()
             try:
-                self.sound.set_state(gst.STATE_NULL)
+                self.sound.set_state(Gst.State.NULL)
                 self.state = self.STOPPED
             finally:
                 self.lock.release()
@@ -144,30 +183,20 @@ class soundtype:
             if self.state == self.LOOPING:
                 self.stop()
 
-            self.sound.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_FLUSH, 0)
-            self.sound.set_state(gst.STATE_PLAYING)
+            self.sound.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, 0)
+            self.sound.set_state(Gst.State.PLAYING)
 
             self.state = self.COUNTING
         finally:
             self.lock.release()
-
-    def command(self, cmd, arg = 1.0):
-         if cmd == SoundRequest.PLAY_STOP:
-             self.stop()
-         elif cmd == SoundRequest.PLAY_ONCE:
-             self.single()
-         elif cmd == SoundRequest.PLAY_START:
-             self.loop()
-         elif cmd == SoundRequest.CHANGE_VOL:
-             self.set_volume(arg)
 
     def get_staleness(self):
         self.lock.acquire()
         position = 0
         duration = 0
         try:
-            position = self.sound.query_position(gst.FORMAT_TIME)[0]
-            duration = self.sound.query_duration(gst.FORMAT_TIME)[0]
+            position = self.sound.query_position(Gst.Format.TIME)[0]
+            duration = self.sound.query_duration(Gst.Format.TIME)[0]
         except Exception, e:
             position = 0
             duration = 0
@@ -180,6 +209,14 @@ class soundtype:
             self.staleness = self.staleness + 1
         return self.staleness
 
+'''
+class soundplay responsible for determining where the soundfile will be coming from
+    files can come from three main sources: local, generated on-the-fly, or built-in.
+        local files - use the SoundRequest type PLAY_FILE
+        generated files use the SoundRequest type SAY
+        built-in files are the fallback case
+
+'''
 class soundplay:
     def stopdict(self,dict):
         for sound in dict.values():
@@ -198,22 +235,28 @@ class soundplay:
         # Force only one sound at a time
         # self.stopall()
         try:
+            #immediately stop sound if that is the command being issued
             if data.sound == SoundRequest.ALL and data.command == SoundRequest.PLAY_STOP:
                 self.stopall()
             else:
+                #determine the the source of the file
                 if data.sound == SoundRequest.PLAY_FILE:
+                    #cache the file or read from the cache
                     if not data.arg in self.filesounds.keys():
                         rospy.logdebug('command for uncached wave: "%s"'%data.arg)
                         try:
                             self.filesounds[data.arg] = soundtype(data.arg)
                         except:
-                            rospy.logerr( "Exception: " + repr(sys.exc_info()[0]))
+                            rospy.logerr( "Exception:")
+                            print(sys.exc_info()[0])
                             rospy.logerr('Error setting up to play "%s". Does this file exist on the machine on which cordial_sound is running?'%data.arg)
                             return
                     else:
                         print "cached"
                         rospy.logdebug('command for cached wave: "%s"'%data.arg)
                     sound = self.filesounds[data.arg]
+
+                # if sound has not been recorded, get a wav from the text given
                 elif data.sound == SoundRequest.SAY:
                     if not data.arg in self.voicesounds.keys():
                         rospy.logdebug('command for uncached text: "%s"' % data.arg)
@@ -238,12 +281,16 @@ class soundplay:
                     else:
                         rospy.logdebug('command for cached text: "%s"'%data.arg)
                     sound = self.voicesounds[data.arg]
+
+                #Otherwise, just play one of the built in sounds
                 else:
                     rospy.logdebug('command for builtin wave: %i'%data.sound)
                     if not data.sound in self.builtinsounds:
                         params = self.builtinsoundparams[data.sound]
                         self.builtinsounds[data.sound] = soundtype(params[0], params[1])
                     sound = self.builtinsounds[data.sound]
+
+
                 if sound.staleness != 0 and data.command != SoundRequest.PLAY_STOP:
                     # This sound isn't counted in active_sounds
                     rospy.logdebug("activating %i %s"%(data.sound,data.arg))
@@ -252,6 +299,7 @@ class soundplay:
 #                    if self.active_sounds > self.num_channels:
 #                        mixer.set_num_channels(self.active_sounds)
 #                        self.num_channels = self.active_sounds
+
                 if(data.command == SoundRequest.CHANGE_VOL):
                     try:
                         volume = float(data.arg2)
