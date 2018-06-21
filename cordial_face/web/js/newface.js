@@ -33,6 +33,7 @@ var aus_r;
 var n_aus = 43;
 
 var upperLipControlPoints = []; lowerLipControlPoints = [];
+var lBrowControlPoints = []; rBrowControlPoints = [];
 
 var targetRotation = 0;
 var targetRotationOnMouseDown = 0;
@@ -394,6 +395,66 @@ function drawMouth(x0,y0,x1,y1,x2,y2,x3,y3, id){
 }
 
 /*
+  Constructs a set of lips from give control points, and places them at the given xx,y values.
+  name - a string - the name (either ulip or llip)
+  x - an integer - x offset
+  y - an integer - y offset
+  control points  - an array of 4 vector3's - defines mouth control points from right to left
+*/
+function constructBrowPoints(name, x, y, controlPoints){
+  this.name = name;
+  this.id = name == 'lbrow' ? 0 : 1;
+  this.idle_pos = {x:x, y:y, z:33};
+
+  this.threedee = new THREE.Object3D();
+  this.threedee.position.x = x;
+  this.threedee.position.y = y;
+
+  this.points= {x0:controlPoints[0].x, y0:controlPoints[0].y,
+                x1:controlPoints[1].x, y1:controlPoints[1].y,
+                x2:controlPoints[2].x, y2:controlPoints[2].y, brow:this.id};
+
+  this.threedee.name = name;
+  parts.push(this);
+  scene.add(this.threedee);
+
+
+  this.moveToLocation = function(newPoints, time){
+    var goal =   {x0:newPoints[0].x, y0:newPoints[0].y,
+                  x1:newPoints[1].x, y1:newPoints[1].y,
+                  x2:newPoints[2].x, y2:newPoints[2].y, brow:this.id};
+    var tween = new TWEEN.Tween(this.points).to(goal, time);
+    tween.easing(TWEEN.Easing.Quadratic.InOut);
+    tween.onUpdate(function() {
+	       drawBrows(this.x0, this.y0, this.x1, this.y1, this.x2, this.y2, this.brow)
+          });
+    tween.start();
+    }
+  }
+
+	/*
+	This is a helper method to update the geometry of one of the lips.
+	This creates a Catmull Rom spline that interpolates between the control points.
+	x0,y0,...x3,y3 - floats that represent the location of the control points in local space (relative to the lip object)
+	id - in integer that is either 0 for lower lip or 1 for upper lip
+	*/
+	function drawBrows(x0,y0,x1,y1,x2,y2, id){
+	  var browObject = getPart(id == 0 ? 'lbrow' : 'rbrow')
+	  var pointsArray = [new THREE.Vector3(x0,y0,0), new THREE.Vector3(x1,y1,0),
+	                     new THREE.Vector3(x2,y2,0)];
+
+	  var curve = new THREE.CatmullRomCurve3( pointsArray);
+	  curve.curveType = 'catmullrom';
+
+	  var splinePoints = curve.getPoints( 10 );
+	  var splineGeometry = new THREE.Geometry().setFromPoints( splinePoints );
+	  var line = new MeshLine();
+	  line.setGeometry( splineGeometry, function(p){return p;});
+
+	  browObject.threedee.children[0].geometry = line.geometry;
+	}
+
+/*
 returns the part from the list of parts in the scene based on name.
 */
 function getPart(name){
@@ -460,7 +521,6 @@ function addMouth(color, x, y, width, height, thickness, opening, dimple_size, u
 		var circleShape = new THREE.Shape();
 		circleShape.moveTo(0,0)
 		circleShape.arc(0,0,dimple_size,0,6.6, true)
-		console.log(thickness)
 
     llip = new constructLipPoints("llip", x,y, lowerLipControlPoints);
     addLine(llip.threedee, lowerCurve, color, thickness, 0,0,53,0,0,0,1);
@@ -563,33 +623,15 @@ function addLids(color, width, height, arch){
 
 
 /*
-Adds both brow objects. The brows are splined shapes that taper at the ends
-TODO: Change these to control points?
+Adds both brow objects. The brows are controlled by three points and taper at the ends
 */
 function addBrows(color, width, height, thickness, arch){
 
-		//left eyebrow shape
-		var leftBrowShape = new THREE.Shape();
-		var upperPoints = [new THREE.Vector2(0, 140), new THREE.Vector2(width+45, 30)];
-		var lowerPoints = [new THREE.Vector2(0, 80), new THREE.Vector2(-width,0)];
+		rBrowControlPoints = [new THREE.Vector3(-1.2*width, 0, 0),new THREE.Vector3(-width/2, 3*thickness, 0), new THREE.Vector3(width, 2.2*thickness, 0)]
+    lBrowControlPoints = [new THREE.Vector3(1.2*width, 0, 0),new THREE.Vector3(width/2,3*thickness, 0), new THREE.Vector3(-width, 2.2*thickness, 0)]
 
-		leftBrowShape.moveTo(-width-20,0);
-		leftBrowShape.quadraticCurveTo(-width-30, 0, -width-45, 60);
-		leftBrowShape.splineThru(upperPoints);
-		leftBrowShape.quadraticCurveTo(width+50, 20, width+45, 10);
-		leftBrowShape.splineThru(lowerPoints);
-
-		//right eyebrow shape
-		var rightBrowShape = new THREE.Shape();
-		var upperPoints = [new THREE.Vector2(0, 140), new THREE.Vector2(-width-45, 30)];
-		var lowerPoints = [new THREE.Vector2(0, 80), new THREE.Vector2(width,0)];
-
-		rightBrowShape.moveTo(width+10,0);
-		rightBrowShape.quadraticCurveTo(width+30, 0, width+45, 60);
-		rightBrowShape.splineThru(upperPoints);
-		rightBrowShape.quadraticCurveTo(-width-50, 20, -width-45, 10);
-		rightBrowShape.splineThru(lowerPoints);
-
+		var lCurve = new THREE.CatmullRomCurve3( lBrowControlPoints);
+    var rCurve = new THREE.CatmullRomCurve3( rBrowControlPoints);
 
     var leye = getPart("leye");
     var reye = getPart("reye");
@@ -599,20 +641,11 @@ function addBrows(color, width, height, thickness, arch){
 
     var y = height
 
-    lbrow = new facePart("lbrow", xl,y)
-    addShape(lbrow.threedee, leftBrowShape, color, 0,0,55,0,0,0,1);
+    lbrow = new constructBrowPoints("lbrow", xl,y,lBrowControlPoints)
+    addLine(lbrow.threedee, lCurve, color, thickness,0,0,55,0,0,0,1);
 
-    rbrow = new facePart("rbrow", xr,y)
-    addShape(rbrow.threedee, rightBrowShape, color, 0,0,55,0,0,0,1);
-
-    lbrow.scale({y:arch}, 1);
-    rbrow.scale({y:arch}, 1);
-
-    lbrow.idle_scale.y = arch;
-    rbrow.idle_scale.y = arch;
-
-    lbrow.idle_size = lbrow.size();
-    rbrow.idle_size = rbrow.size();
+    rbrow = new constructBrowPoints("rbrow", xr,y,rBrowControlPoints)
+    addLine(rbrow.threedee, rCurve, color, thickness,0,0,55,0,0,0,1);
 
 }
 
@@ -630,7 +663,7 @@ function addLine(threedee, shape, color, width,  x, y, z, rx, ry, rz, s) {
     var geometry = new THREE.Geometry().setFromPoints( points );
 
     var line = new MeshLine();
-    line.setGeometry( geometry );
+    line.setGeometry( geometry);
 
     var material = new MeshLineMaterial({lineWidth:width/300, color:new THREE.Color( color )});
 
@@ -835,7 +868,7 @@ function viseme(viseme_name, t){
     switch(viseme_name){
 
     case "M_B_P": //au 23, 24?, 14?,
-		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
 		au(23, .75)
 		au(14, .25)
 
@@ -844,7 +877,7 @@ function viseme(viseme_name, t){
 		break;
 
     case "AA_AH": //au 25, 26, 14
-		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
 		au(26, 1)
 		au(25, .5)
 		au(14, .5)
@@ -853,15 +886,15 @@ function viseme(viseme_name, t){
 		break;
 
     case "AO_AW": //au 25, 26, 27
-		zero_aus_no_move([10,14,16,18,23,25,26,27])
-		au(26, .75)
+		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
+		au(26, .5)
 		au(27, 1)
 
 		move_face(t)
 		break;
 
     case "EH_AE_AY": //au 25, 26, 14
-		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
 		au(14, .75)
 		au(26, .75)
 
@@ -870,7 +903,7 @@ function viseme(viseme_name, t){
 		break;
 
     case "CH_SH_ZH": //au 18, 25, 10
-		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
 		au(10, .75)
 		au(18, 1)
 		au(25, 1)
@@ -878,16 +911,17 @@ function viseme(viseme_name, t){
 		break;
 
     case "N_NG_D_Z": //au 10,
-		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
 		au(10,.6)
 		au(18,.5)
+		au(25,.2)
 
 		move_face(t)
 
 		break;
 
     case "R_ER": //au 10
-		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
 		au(10,1)
 		au(18,.7)
 		au(25, .8)
@@ -897,14 +931,14 @@ function viseme(viseme_name, t){
 		break;
 
     case "EY": //au 25, 26, 14
-		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
 		au(26,1)
 
 		move_face(t)
 		break;
 
     case "L": //au 25
-		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
 		au(10,.65)
 		au(18,.5)
 		au(25, .7)
@@ -915,10 +949,11 @@ function viseme(viseme_name, t){
 
     // "you" "too" "moo"
     case "OO": //au 10, 25,
-		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
 		au(10,1)
+		au(13,.8)
+		au(23,1)
 		au(25,1)
-		au(26,.4)
 		au(18,1)
 		au(16,.3)
 
@@ -926,11 +961,11 @@ function viseme(viseme_name, t){
 
 		break;
 
-		case "F":
-		zero_aus_no_move([10,14,16,18,23,25,26,27])
+		case "F_V":
+		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
 		au(10,0.5);
 		au(23,1);
-		au(25,1);
+		au(25,.9);
 
 		move_face(t)
 
@@ -973,31 +1008,42 @@ Calculates the positions of all the facial features based on the current value o
 t - float representing the milliseconds it should take to move to the current AU set
 */
 function move_face(t){
-    // ***** BROWS *****
+    // ***** BROWS ***** (AU 1, 2, 4)
+		lbrow = getPart("lbrow")
 
-    //brow rotation (au 1)
-    brow_rot_targetl = (Math.PI/8)*aus_l[1];
-    brow_rot_targetr = (Math.PI/8)*aus_r[1];
-    rbrow = getPart("rbrow");
-    lbrow = getPart("lbrow");
+		var max_x = lBrowControlPoints[1].x
+		var max_y = lbrow.idle_pos.y/4
 
-    rbrow.rot({z:rbrow.idle_rot.z+brow_rot_targetr}, t);
-    lbrow.rot({z:lbrow.idle_rot.z-brow_rot_targetl}, t);
+		lInner = lBrowControlPoints[2].clone();
+		rInner = rBrowControlPoints[2].clone();
 
-    //brow height (aus 2,4)
-    brow_raise_targetr = 1 + .75*aus_r[2] - .5*aus_r[4]
-    brow_raise_targetl = 1 + .75*aus_l[2] - .5*aus_l[4]
+		lInner.y += max_y * (0.8*aus_l[1] + .1*aus_l[2] - 1.2*aus_l[4])
+		lInner.x -= max_x * (aus_l[1] + 0.5*aus_l[4])
+		rInner.y += max_y * (0.8*aus_r[1] + .1*aus_r[2] - 1.2*aus_r[4])
+		rInner.x += max_x * (aus_r[1]  + 0.5*aus_r[4])
 
-    rbrow.scale({y:rbrow.idle_scale.y*brow_raise_targetr},t);
-    lbrow.scale({y:lbrow.idle_scale.y*brow_raise_targetl},t);
+		lMid = lBrowControlPoints[1].clone();
+		rMid = rBrowControlPoints[1].clone();
 
-    //brow lowering (au 4)
-    brow_height_targetl = -20*aus_l[4]
-    brow_height_targetr = -20*aus_r[4]
+		lMid.y += max_y * (-0.3*aus_l[1] + aus_l[2] - 0.6*aus_l[4])
+		lMid.x -= max_x * (aus_l[1] + -0.5*aus_l[2] + aus_l[4])
+		rMid.y += max_y * (-0.3*aus_r[1] + aus_r[2]  - 0.6*aus_r[4])
+		rMid.x += max_x * (aus_r[1] + -0.5*aus_r[2] + aus_r[4])
 
-    rbrow.pos({y:rbrow.idle_pos.y+brow_height_targetr}, t);
-    lbrow.pos({y:lbrow.idle_pos.y+brow_height_targetl}, t);
+		lOuter = lBrowControlPoints[0].clone();
+		rOuter = rBrowControlPoints[0].clone();
 
+		lOuter.y += max_y * (0.5*aus_l[2] + 0.1*aus_l[4])
+		lOuter.x -= max_x * (-.2*aus_l[2]  + 0.2*aus_l[4])
+		rOuter.y += max_y * (0.5*aus_r[2] + 0.1*aus_r[4])
+		rOuter.x += max_x * (-.2*aus_r[2]  + 0.2*aus_l[4])
+
+
+		rBrow = [rOuter,rMid, rInner]
+		lBrow = [lOuter,lMid, lInner]
+
+		rbrow.moveToLocation(rBrow, t);
+    lbrow.moveToLocation(lBrow, t);
 
     // ***** EYELIDS ******
     closure = -.5
@@ -1079,9 +1125,9 @@ function move_face(t){
     upperl = upperLipControlPoints[1].clone();
     upperr = upperLipControlPoints[2].clone();
 
-    upperl.x += max_x_variation*(.55*aus_l[10] + .25*aus_l[14]-.6*aus_l[18]+ .25*aus_l[20] -.1*aus_l[23])/1.05
+    upperl.x += max_x_variation*(.55*aus_l[10] + .25*aus_l[14]-.4*aus_l[18]+ .25*aus_l[20] -.1*aus_l[23])/1.05
     upperl.y += max_up_dist*(.1*aus_l[25] +.3*aus_l[26] +.6*aus_l[27] + .55*aus_l[10]+.35*aus_l[17])/2.2
-    upperr.x -= max_x_variation*(.55*aus_r[10] + .25*aus_r[14]-.6*aus_r[18] + .25*aus_r[20] -.1*aus_r[23])/1.05
+    upperr.x -= max_x_variation*(.55*aus_r[10] + .25*aus_r[14]-.4*aus_r[18] + .25*aus_r[20] -.1*aus_r[23])/1.05
     upperr.y += max_up_dist*(.1*aus_r[25] +.3*aus_r[26] +.6*aus_r[27] + .55*aus_r[10]+.35*aus_r[17])/2.2
 
 
@@ -1089,9 +1135,9 @@ function move_face(t){
     lowerl = lowerLipControlPoints[1].clone();
     lowerr = lowerLipControlPoints[2].clone();
 
-    lowerl.x += max_x_variation*(.25*aus_l[14] + .5*aus_l[16] + .2*aus_l[26]-.6*aus_l[18]+ .25*aus_l[20] -.2*aus_l[23])/1.05
+    lowerl.x += max_x_variation*(.25*aus_l[14] + .5*aus_l[16] + .2*aus_l[26]-.4*aus_l[18]+ .25*aus_l[20] -.2*aus_l[23])/1.05
     lowerl.y += max_down_dist*(-.4*aus_l[25] -.7*aus_l[26] -1.6*aus_l[27]+ .55*aus_l[10] -.2*aus_l[16] +.45*aus_l[17])/2.2
-    lowerr.x -= max_x_variation*(.25*aus_r[14] + .5*aus_r[16] + .2*aus_r[26]-.6*aus_r[18] + .25*aus_r[20] -.2*aus_r[23])/1.05
+    lowerr.x -= max_x_variation*(.25*aus_r[14] + .5*aus_r[16] + .2*aus_r[26]-.4*aus_r[18] + .25*aus_r[20] -.2*aus_r[23])/1.05
     lowerr.y += max_down_dist*(-.4*aus_r[25] -.7*aus_r[26] -1.6*aus_r[27] + .55*aus_r[10] -.2*aus_r[16] +.45*aus_r[17])/2.2
 
     upperLip = [rcorner, upperr, upperl, lcorner];
