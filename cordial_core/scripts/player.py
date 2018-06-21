@@ -146,7 +146,8 @@ class PlayerServer():
             phrase,behaviors=self._tts.extract_behaviors(goal.phrase)
 
         if self._phone_face:
-            visemes = ['AO_AW', 'CH_SH_ZH', 'R_ER', 'L', 'IDLE', 'AA_AH', 'EY', 'M_B_P', 'N_NG_D_Z', 'EH_AE_AY', 'OO', 'F_V']
+            # visemes = ['AO_AW', 'CH_SH_ZH', 'R_ER', 'L', 'IDLE', 'AA_AH', 'EY', 'M_B_P', 'N_NG_D_Z', 'EH_AE_AY', 'OO', 'F_V']
+            visemes = ["BILABIAL","LABIODENTAL","INTERDENTAL","DENTAL_ALVEOLAR","POSTALVEOLAR","VELAR_GLOTTAL","CLOSE_FRONT_VOWEL","OPEN_FRONT_VOWEL","MID_CENTRAL_VOWEL","OPEN_BACK_VOWEL","CLOSE_BACK_VOWEL", 'IDLE']
             viseme_behaviors = filter(lambda b: b["id"] in visemes, behaviors)
             behaviors = filter(lambda b: b["id"] not in visemes, behaviors)
 

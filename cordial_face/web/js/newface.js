@@ -868,7 +868,7 @@ function viseme(viseme_name, t){
     switch(viseme_name){
 
     case "M_B_P": //au 23, 24?, 14?,
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
 		au(23, .75)
 		au(14, .25)
 
@@ -876,8 +876,9 @@ function viseme(viseme_name, t){
 		move_face(t)
 		break;
 
+
     case "AA_AH": //au 25, 26, 14
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
 		au(26, 1)
 		au(25, .5)
 		au(14, .5)
@@ -886,7 +887,7 @@ function viseme(viseme_name, t){
 		break;
 
     case "AO_AW": //au 25, 26, 27
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
 		au(26, .5)
 		au(27, 1)
 
@@ -894,7 +895,7 @@ function viseme(viseme_name, t){
 		break;
 
     case "EH_AE_AY": //au 25, 26, 14
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
 		au(14, .75)
 		au(26, .75)
 
@@ -903,7 +904,7 @@ function viseme(viseme_name, t){
 		break;
 
     case "CH_SH_ZH": //au 18, 25, 10
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
 		au(10, .75)
 		au(18, 1)
 		au(25, 1)
@@ -911,7 +912,7 @@ function viseme(viseme_name, t){
 		break;
 
     case "N_NG_D_Z": //au 10,
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
 		au(10,.6)
 		au(18,.5)
 		au(25,.2)
@@ -921,7 +922,7 @@ function viseme(viseme_name, t){
 		break;
 
     case "R_ER": //au 10
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
 		au(10,1)
 		au(18,.7)
 		au(25, .8)
@@ -931,14 +932,14 @@ function viseme(viseme_name, t){
 		break;
 
     case "EY": //au 25, 26, 14
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
 		au(26,1)
 
 		move_face(t)
 		break;
 
     case "L": //au 25
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
 		au(10,.65)
 		au(18,.5)
 		au(25, .7)
@@ -949,7 +950,7 @@ function viseme(viseme_name, t){
 
     // "you" "too" "moo"
     case "OO": //au 10, 25,
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
 		au(10,1)
 		au(13,.8)
 		au(23,1)
@@ -962,13 +963,130 @@ function viseme(viseme_name, t){
 		break;
 
 		case "F_V":
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
 		au(10,0.5);
 		au(23,1);
 		au(25,.9);
 
 		move_face(t)
 
+		break;
+
+		// --------------- CONSONANTS ---------------------//
+
+		// M,B,P -> My, Buy, Pie
+		case 'BILABIAL':
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
+		au(23, .75)
+		au(14, .25)
+		au(24, .7)
+
+		move_face(t)
+		break;
+
+		// F,V -> oFFer, Vest
+		case "LABIODENTAL":
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
+		au(10,0.5);
+		au(20,0.4);
+		au(25,.8);
+
+		move_face(t)
+		break;
+
+		// TH, TH - THin, THis
+		case "INTERDENTAL":
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
+		au(10,.6)
+		au(18,.75)
+		au(25,.5)
+
+		move_face(t)
+		break;
+
+		// L,T,D,Z,S,N -> Light, Top, DaD, Zebra, Sad, Nope
+		case "DENTAL_ALVEOLAR":
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
+		au(25,.65)
+
+		move_face(t)
+		break;
+
+		// R,SH,ZH,CH -> Red, SHould, aSia, CHart
+		case "POSTALVEOLAR":
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
+		au(10, .75)
+		au(18, 1)
+		au(25, 1)
+
+		move_face(t)
+		break;
+
+		// K,G,NG -> Cat, Game, thiNG
+		case "VELAR_GLOTTAL":
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
+		au(10,.6)
+		// au(18,.5)
+		au(26,.5)
+
+		move_face(t)
+		break;
+
+		// ------------------ VOWELS ------------------------//
+		// EE, I -> flEEce, bIt
+		case "CLOSE_FRONT_VOWEL":
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
+		au(26,1)
+		au(20,1)
+		au(10,.4)
+		move_face(t)
+		break;
+
+		// OO -> bOOt
+		case "CLOSE_BACK_VOWEL":
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
+		au(10,.5)
+		au(13,.8)
+		au(16,.6)
+		au(18,1)
+		au(23,1)
+		au(24,1)
+		au(25,1)
+		au(26,.4)
+
+		move_face(t)
+
+		break;
+
+		// schwa -> ArenA
+		case "MID_CENTRAL_VOWEL":
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
+		au(26, 1)
+		au(25, .5)
+		au(23,1)
+
+		move_face(t)
+		break;
+
+		// AE,AU,A,AY,EH -> trAp, mOUth, fAther, fAce, drEss
+		case "OPEN_FRONT_VOWEL":
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
+		au(14, 1)
+		au(15,.1)
+		au(20,1)
+		au(25, .7)
+		au(26, .75)
+
+		move_face(t)
+		break;
+
+		// AW,OI,O -> thOUght, chOIce, gOAt
+		case "OPEN_BACK_VOWEL":
+		zero_aus_no_move([10,13,14,16,18,23,24,25,26,27])
+		au(26, .5)
+		au(27, 1)
+
+		move_face(t)
 		break;
 
     case "IDLE":
