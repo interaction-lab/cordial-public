@@ -544,6 +544,122 @@ function viseme(viseme_name, t){
 
 	break;
 
+	// --------------- CONSONANTS ---------------------//
+
+	// M,B,P -> My, Buy, Pie
+	case 'BILABIAL':
+	zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
+	au(23, .75)
+	au(14, .25)
+	au(24, .7)
+
+	move_face(t)
+	break;
+
+	// F,V -> oFFer, Vest
+	case "LABIODENTAL":
+	zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
+	au(10,0.5);
+	au(20,0.4);
+	au(25,.8);
+
+	move_face(t)
+	break;
+
+	// TH, TH - THin, THis
+	case "INTERDENTAL":
+	zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
+	au(10,.6)
+	au(18,.75)
+	au(25,.5)
+
+	move_face(t)
+	break;
+
+	// L,T,D,Z,S,N -> Light, Top, DaD, Zebra, Sad, Nope
+	case "DENTAL_ALVEOLAR":
+	zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
+	au(25,.65)
+
+	move_face(t)
+	break;
+
+	// R,SH,ZH,CH -> Red, SHould, aSia, CHart
+	case "POSTALVEOLAR":
+	zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
+	au(10, .75)
+	au(18, 1)
+	au(25, 1)
+
+	move_face(t)
+	break;
+
+	// K,G,NG -> Cat, Game, thiNG
+	case "VELAR_GLOTTAL":
+	zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
+	au(10,.6)
+	// au(18,.5)
+	au(26,.5)
+
+	move_face(t)
+	break;
+
+	// ------------------ VOWELS ------------------------//
+	// EE, I -> flEEce, bIt
+	case "CLOSE_FRONT_VOWEL":
+	zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
+	au(26,1)
+	au(20,1)
+	au(10,.4)
+	move_face(t)
+	break;
+
+	// OO -> bOOt
+	case "CLOSE_BACK_VOWEL":
+	zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
+	au(10,.5)
+	au(13,.8)
+	au(16,.6)
+	au(18,1)
+	au(23,1)
+	au(24,1)
+	au(25,1)
+	au(26,.4)
+
+	move_face(t)
+
+	break;
+
+	// schwa -> ArenA
+	case "MID_CENTRAL_VOWEL":
+	zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
+	au(26, 1)
+	au(25, .5)
+	au(23,1)
+
+	move_face(t)
+	break;
+
+	// AE,AU,A,AY,EH -> trAp, mOUth, fAther, fAce, drEss
+	case "OPEN_FRONT_VOWEL":
+	zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
+	au(14, 1)
+	au(20, 1)
+	au(25, .7)
+	au(26, .75)
+
+	move_face(t)
+	break;
+
+	// AW,OI,O -> thOUght, chOIce, gOAt
+	case "OPEN_BACK_VOWEL":
+	zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
+	au(26, .5)
+	au(27, 1)
+
+	move_face(t)
+	break;
+	
     case "IDLE":
 	zeroFace(t)
 	break;

@@ -867,108 +867,120 @@ function viseme(viseme_name, t){
     console.log("Viseme: " + viseme_name)
     switch(viseme_name){
 
-    case "M_B_P": //au 23, 24?, 14?,
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
+		// --------------- CONSONANTS ---------------------//
+
+		// M,B,P -> My, Buy, Pie
+		case 'BILABIAL':
+		zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
 		au(23, .75)
 		au(14, .25)
+		au(24, .7)
 
-
-		move_face(t)
+		move_face(t, false)
 		break;
 
-    case "AA_AH": //au 25, 26, 14
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
-		au(26, 1)
-		au(25, .5)
-		au(14, .5)
+		// F,V -> oFFer, Vest
+		case "LABIODENTAL":
+		zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
+		au(10,0.5);
+		au(20,0.4);
+		au(25,.8);
 
-		move_face(t)
+		move_face(t, false)
 		break;
 
-    case "AO_AW": //au 25, 26, 27
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
-		au(26, .5)
-		au(27, 1)
+		// TH, TH - THin, THis
+		case "INTERDENTAL":
+		zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
+		au(10,.6)
+		au(18,.75)
+		au(25,.5)
 
-		move_face(t)
+		move_face(t, false)
 		break;
 
-    case "EH_AE_AY": //au 25, 26, 14
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
-		au(14, .75)
-		au(26, .75)
+		// L,T,D,Z,S,N -> Light, Top, DaD, Zebra, Sad, Nope
+		case "DENTAL_ALVEOLAR":
+		zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
+		au(25,.65)
 
-		move_face(t)
-
+		move_face(t, false)
 		break;
 
-    case "CH_SH_ZH": //au 18, 25, 10
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
+		// R,SH,ZH,CH -> Red, SHould, aSia, CHart
+		case "POSTALVEOLAR":
+		zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
 		au(10, .75)
 		au(18, 1)
 		au(25, 1)
-		move_face(t)
+
+		move_face(t, false)
 		break;
 
-    case "N_NG_D_Z": //au 10,
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
+		// K,G,NG -> Cat, Game, thiNG
+		case "VELAR_GLOTTAL":
+		zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
 		au(10,.6)
-		au(18,.5)
-		au(25,.2)
+		// au(18,.5)
+		au(26,.5)
 
-		move_face(t)
-
+		move_face(t, false)
 		break;
 
-    case "R_ER": //au 10
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
-		au(10,1)
-		au(18,.7)
-		au(25, .8)
-
-		move_face(t)
-
-		break;
-
-    case "EY": //au 25, 26, 14
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
+		// ------------------ VOWELS ------------------------//
+		// EE, I -> flEEce, bIt
+		case "CLOSE_FRONT_VOWEL":
+		zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
 		au(26,1)
-
-		move_face(t)
+		au(20,1)
+		au(10,.4)
+		move_face(t, false)
 		break;
 
-    case "L": //au 25
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
-		au(10,.65)
-		au(18,.5)
-		au(25, .7)
-
-		move_face(t)
-
-		break;
-
-    // "you" "too" "moo"
-    case "OO": //au 10, 25,
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
-		au(10,1)
+		// OO -> bOOt
+		case "CLOSE_BACK_VOWEL":
+		zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
+		au(10,.5)
 		au(13,.8)
-		au(23,1)
-		au(25,1)
+		au(16,.6)
 		au(18,1)
-		au(16,.3)
+		au(23,1)
+		au(24,1)
+		au(25,1)
+		au(26,.4)
 
-		move_face(t)
+		move_face(t, false)
 
 		break;
 
-		case "F_V":
-		zero_aus_no_move([10,13,14,16,18,23,25,26,27])
-		au(10,0.5);
-		au(23,1);
-		au(25,.9);
+		// schwa -> ArenA
+		case "MID_CENTRAL_VOWEL":
+		zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
+		au(26, 1)
+		au(25, .5)
+		au(23,1)
 
-		move_face(t)
+		move_face(t, false)
+		break;
 
+		// AE,AU,A,AY,EH -> trAp, mOUth, fAther, fAce, drEss
+		case "OPEN_FRONT_VOWEL":
+		zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
+		au(14, 1)
+		au(20, 1)
+		au(25, .7)
+		au(26, .75)
+
+		move_face(t, false)
+		break;
+
+		// AW,OI,O -> thOUght, chOIce, gOAt
+		case "OPEN_BACK_VOWEL":
+		zero_aus_no_move([10,13,14,16,18,20,23,24,25,26,27])
+		au(26, .5)
+		au(27, 1)
+
+		move_face(t, false)
 		break;
 
     case "IDLE":
@@ -1006,105 +1018,102 @@ function au(id, degree, side){
 /*
 Calculates the positions of all the facial features based on the current value of all the aus
 t - float representing the milliseconds it should take to move to the current AU set
+notViseme - flag to determine if the movement is a viseme. If it is, we only will modify the mouth shape
 */
-function move_face(t){
-    // ***** BROWS ***** (AU 1, 2, 4)
-		lbrow = getPart("lbrow")
+function move_face(t, notViseme=true){
+		if(notViseme){
+	    // ***** BROWS ***** (AU 1, 2, 4)
+			lbrow = getPart("lbrow")
 
-		var max_x = lBrowControlPoints[1].x
-		var max_y = lbrow.idle_pos.y/4
+			var max_x = lBrowControlPoints[1].x
+			var max_y = lbrow.idle_pos.y/4
 
-		lInner = lBrowControlPoints[2].clone();
-		rInner = rBrowControlPoints[2].clone();
+			lInner = lBrowControlPoints[2].clone();
+			rInner = rBrowControlPoints[2].clone();
 
-		lInner.y += max_y * (0.8*aus_l[1] + .1*aus_l[2] - 1.2*aus_l[4])
-		lInner.x -= max_x * (aus_l[1] + 0.5*aus_l[4])
-		rInner.y += max_y * (0.8*aus_r[1] + .1*aus_r[2] - 1.2*aus_r[4])
-		rInner.x += max_x * (aus_r[1]  + 0.5*aus_r[4])
+			lInner.y += max_y * (0.8*aus_l[1] + .1*aus_l[2] - 1.2*aus_l[4])
+			lInner.x -= max_x * (aus_l[1] + 0.5*aus_l[4])
+			rInner.y += max_y * (0.8*aus_r[1] + .1*aus_r[2] - 1.2*aus_r[4])
+			rInner.x += max_x * (aus_r[1]  + 0.5*aus_r[4])
 
-		lMid = lBrowControlPoints[1].clone();
-		rMid = rBrowControlPoints[1].clone();
+			lMid = lBrowControlPoints[1].clone();
+			rMid = rBrowControlPoints[1].clone();
 
-		lMid.y += max_y * (-0.3*aus_l[1] + aus_l[2] - 0.6*aus_l[4])
-		lMid.x -= max_x * (aus_l[1] + -0.5*aus_l[2] + aus_l[4])
-		rMid.y += max_y * (-0.3*aus_r[1] + aus_r[2]  - 0.6*aus_r[4])
-		rMid.x += max_x * (aus_r[1] + -0.5*aus_r[2] + aus_r[4])
+			lMid.y += max_y * (-0.3*aus_l[1] + aus_l[2] - 0.6*aus_l[4])
+			lMid.x -= max_x * (aus_l[1] + -0.5*aus_l[2] + aus_l[4])
+			rMid.y += max_y * (-0.3*aus_r[1] + aus_r[2]  - 0.6*aus_r[4])
+			rMid.x += max_x * (aus_r[1] + -0.5*aus_r[2] + aus_r[4])
 
-		lOuter = lBrowControlPoints[0].clone();
-		rOuter = rBrowControlPoints[0].clone();
+			lOuter = lBrowControlPoints[0].clone();
+			rOuter = rBrowControlPoints[0].clone();
 
-		lOuter.y += max_y * (0.5*aus_l[2] + 0.1*aus_l[4])
-		lOuter.x -= max_x * (-.2*aus_l[2]  + 0.2*aus_l[4])
-		rOuter.y += max_y * (0.5*aus_r[2] + 0.1*aus_r[4])
-		rOuter.x += max_x * (-.2*aus_r[2]  + 0.2*aus_l[4])
-
-
-		rBrow = [rOuter,rMid, rInner]
-		lBrow = [lOuter,lMid, lInner]
-
-		rbrow.moveToLocation(rBrow, t);
-    lbrow.moveToLocation(lBrow, t);
-
-    // ***** EYELIDS ******
-    closure = -.5
-    urlid = getPart("urlid");
-    ullid = getPart("ullid");
-    lrlid = getPart("lrlid");
-    lllid = getPart("lllid");
+			lOuter.y += max_y * (0.5*aus_l[2] + 0.1*aus_l[4])
+			lOuter.x -= max_x * (-.2*aus_l[2]  + 0.2*aus_l[4])
+			rOuter.y += max_y * (0.5*aus_r[2] + 0.1*aus_r[4])
+			rOuter.x += max_x * (-.2*aus_r[2]  + 0.2*aus_l[4])
 
 
-    // eyelid flattening (au 7)
-    lid_flattenr = .6*aus_r[7]
-    lid_flattenl = .6*aus_l[7]
+			rBrow = [rOuter,rMid, rInner]
+			lBrow = [lOuter,lMid, lInner]
 
-    lrlid.scale({y:lrlid.idle_scale.y*(1-lid_flattenr)},t);
-    lllid.scale({y:lllid.idle_scale.y*(1-lid_flattenl)},t);
+			rbrow.moveToLocation(rBrow, t);
+	    lbrow.moveToLocation(lBrow, t);
 
-    // eyelid closing (aus 5,7,43)
-    urlid_p = urlid.idle_pos.y;
-    lrlid_p = lrlid.idle_pos.y;
-    ullid_p = ullid.idle_pos.y;
-    lllid_p = lllid.idle_pos.y;
-    lid_width = ullid.idle_size.x/4;
-
-    r_eye_width = (urlid_p-lrlid_p)+urlid.threedee.scale.y*lid_width+lrlid.threedee.scale.y*lid_width;
-    l_eye_width = (ullid_p-lllid_p)+ullid.threedee.scale.y*lid_width+lllid.threedee.scale.y*lid_width;
-
-    //[-.5,0]
-    openr = -.5*aus_r[5]
-    openl = -.5*aus_l[5]
-
-    //[0,.6]
-    closer = .6*aus_r[7]
-    closel = .6*aus_l[7]
-
-    //[-.5,1]
-    closurer = (openr+closer)+aus_r[43]*(1-(openr+closer))
-    closurel = (openl+closel)+aus_l[43]*(1-(openl+closel))
-
-    urlid.pos({y:urlid_p-r_eye_width/2*(closurer)},t);
-    lrlid.pos({y:lrlid_p+r_eye_width/2*(closurer)},t);
-    ullid.pos({y:ullid_p-l_eye_width/2*(closurel)},t);
-    lllid.pos({y:lllid_p+l_eye_width/2*(closurel)},t);
-
-    // ***** NOSE *****
-
-    // nose wrinkle (raise) (au 9)
-    wrinkle_dist = 30*aus_l[9];
-    nose = getPart("nose");
-    nose.pos({y:nose.idle_pos.y+wrinkle_dist}, t);
-
-    // nose width (aus 38,39)
-    width_scale = 1+.35*aus_l[38]-.35*aus_l[39];
-    nose = getPart("nose");
-    nose.scale({x:nose.idle_scale.x*width_scale}, t);
+	    // ***** EYELIDS ******
+	    closure = -.5
+	    urlid = getPart("urlid");
+	    ullid = getPart("ullid");
+	    lrlid = getPart("lrlid");
+	    lllid = getPart("lllid");
 
 
-		var circleShape = new THREE.Shape();
-		circleShape.moveTo(0,0)
-		circleShape.arc(0,0,20,0,6.6, true)
+	    // eyelid flattening (au 7)
+	    lid_flattenr = .6*aus_r[7]
+	    lid_flattenl = .6*aus_l[7]
 
+	    lrlid.scale({y:lrlid.idle_scale.y*(1-lid_flattenr)},t);
+	    lllid.scale({y:lllid.idle_scale.y*(1-lid_flattenl)},t);
 
+	    // eyelid closing (aus 5,7,43)
+	    urlid_p = urlid.idle_pos.y;
+	    lrlid_p = lrlid.idle_pos.y;
+	    ullid_p = ullid.idle_pos.y;
+	    lllid_p = lllid.idle_pos.y;
+	    lid_width = ullid.idle_size.x/4;
+
+	    r_eye_width = (urlid_p-lrlid_p)+urlid.threedee.scale.y*lid_width+lrlid.threedee.scale.y*lid_width;
+	    l_eye_width = (ullid_p-lllid_p)+ullid.threedee.scale.y*lid_width+lllid.threedee.scale.y*lid_width;
+
+	    //[-.5,0]
+	    openr = -.5*aus_r[5]
+	    openl = -.5*aus_l[5]
+
+	    //[0,.6]
+	    closer = .6*aus_r[7]
+	    closel = .6*aus_l[7]
+
+	    //[-.5,1]
+	    closurer = (openr+closer)+aus_r[43]*(1-(openr+closer))
+	    closurel = (openl+closel)+aus_l[43]*(1-(openl+closel))
+
+	    urlid.pos({y:urlid_p-r_eye_width/2*(closurer)},t);
+	    lrlid.pos({y:lrlid_p+r_eye_width/2*(closurer)},t);
+	    ullid.pos({y:ullid_p-l_eye_width/2*(closurel)},t);
+	    lllid.pos({y:lllid_p+l_eye_width/2*(closurel)},t);
+
+	    // ***** NOSE *****
+
+	    // nose wrinkle (raise) (au 9)
+	    wrinkle_dist = 30*aus_l[9];
+	    nose = getPart("nose");
+	    nose.pos({y:nose.idle_pos.y+wrinkle_dist}, t);
+
+	    // nose width (aus 38,39)
+	    width_scale = 1+.35*aus_l[38]-.35*aus_l[39];
+	    nose = getPart("nose");
+	    nose.scale({x:nose.idle_scale.x*width_scale}, t);
+
+		}
     // ***** MOUTH *****
     ulip=getPart("ulip");
     llip=getPart("llip");
