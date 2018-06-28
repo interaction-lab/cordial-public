@@ -70,7 +70,7 @@ class PlayerServer():
                 s = f.read()
                 self._phrases = yaml.load(s)
             rospy.loginfo("Phrase file read.")
-        
+
         if self._use_tts:
             self._tts = CoRDialTTS(voice, ivona_access_key, ivona_secret_key)
 
@@ -82,8 +82,8 @@ class PlayerServer():
             rospy.sleep(0.5)
         rospy.loginfo("CoRdial Player waiting for behavior server..")
         self._behavior_client.wait_for_server()
-        rospy.loginfo("CoRDial Player connected to behavior server")       
-        
+        rospy.loginfo("CoRDial Player connected to behavior server")
+
         self._feedback.behavior = "none"
 
         rospy.loginfo("Starting CoRDial Player server...")
@@ -103,7 +103,7 @@ class PlayerServer():
         if not self._use_tts and not self._phrases:
             info+= " and with NO sound"
 
-            
+
         info += ". Delay time is " + str(self._speech_delay_time) + "s."
 
         self._server.start()
@@ -123,7 +123,7 @@ class PlayerServer():
             #TODO: more intelligent goal cancelling?
             rospy.loginfo("Stopping behaviors")
             self._behavior_client.cancel_all_goals()
-                        
+
 
         phrase_found = False
         if self._phrases:
@@ -146,7 +146,8 @@ class PlayerServer():
             phrase,behaviors=self._tts.extract_behaviors(goal.phrase)
 
         if self._phone_face:
-            visemes = ['AO_AW', 'CH_SH_ZH', 'R_ER', 'L', 'IDLE', 'AA_AH', 'EY', 'M_B_P', 'N_NG_D_Z', 'EH_AE_AY', 'OO']
+            # visemes = ['AO_AW', 'CH_SH_ZH', 'R_ER', 'L', 'IDLE', 'AA_AH', 'EY', 'M_B_P', 'N_NG_D_Z', 'EH_AE_AY', 'OO', 'F_V']
+            visemes = ["BILABIAL","LABIODENTAL","INTERDENTAL","DENTAL_ALVEOLAR","POSTALVEOLAR","VELAR_GLOTTAL","CLOSE_FRONT_VOWEL","OPEN_FRONT_VOWEL","MID_CENTRAL_VOWEL","OPEN_BACK_VOWEL","CLOSE_BACK_VOWEL", 'IDLE']
             viseme_behaviors = filter(lambda b: b["id"] in visemes, behaviors)
             behaviors = filter(lambda b: b["id"] not in visemes, behaviors)
 
@@ -161,16 +162,17 @@ class PlayerServer():
             viseme_ids = map(lambda b: b["id"], ordered_visemes)
             viseme_times = map(lambda b: b["start"], ordered_visemes)
             viseme_speed = 10
-            
+            # viseme_speed = map(lambda b: b["duration"], ordered_visemes)
+
             viseme_req = FaceRequest(visemes=viseme_ids, viseme_ms=viseme_speed, times=viseme_times)
-        
-        
-        
-        
-        
-        ordered_behaviors = sorted(behaviors, 
+
+
+
+
+
+        ordered_behaviors = sorted(behaviors,
                                  key=lambda behavior: behavior["start"])
-        
+
 
         speech_delay_time = self._speech_delay_time
 
@@ -197,7 +199,7 @@ class PlayerServer():
                 rospy.loginfo("Speech: playing wave file -- duration: " + str(self.speech_duration))
             t = Timer(speech_delay_time, speak)
             t.start()
-            
+
         else:
             def speak():
                 self.speech_duration = self._tts.say(phrase)
@@ -222,12 +224,12 @@ class PlayerServer():
             if self._server.is_preempt_requested():
                 preempted = True
                 break
-                
+
 
             if_conflict = BehaviorGoal.DROP
             if "interrupt" in a.keys():
                 if_conflict = BehaviorGoal.OVERRIDE
-            
+
             if "args" in a.keys():
                 args = a["args"]
             else:
@@ -248,7 +250,7 @@ class PlayerServer():
             else:
                 end_hold = rospy.Time()
 
-            goal = BehaviorGoal(behavior=a["id"], end_hold=end_hold, end_move=end_move, return_to_prior=not hold, if_conflict = if_conflict, args = args, wait_and_block = False) #old version 
+            goal = BehaviorGoal(behavior=a["id"], end_hold=end_hold, end_move=end_move, return_to_prior=not hold, if_conflict = if_conflict, args = args, wait_and_block = False) #old version
 
             self._behavior_client.send_goal(goal) #old version
             self._feedback.behavior = a["id"]
@@ -257,7 +259,7 @@ class PlayerServer():
         if preempted:
             rospy.loginfo("Preempted")
             self._behavior_client.cancel_all_goals()
-            
+
             if phrase_found:
                 self._sound_client.stopAll()
             else:
@@ -286,10 +288,10 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--phrase-file', help="Phrase file for pre-loaded speech", nargs="?", default=None)
     parser.add_argument('-t', '--use-tts', help="Enable text-to-speech (online)", action='store_true')
     args = parser.parse_known_args()[0]
-    
+
     rospy.init_node('cordial_player')
 
     PlayerServer(args.use_face, args.delay, args.phrase_file, args.use_tts,args.voice, args.ivona_access_key,args.ivona_secret_key)
-    
+
     while not rospy.is_shutdown():
         rospy.spin()
