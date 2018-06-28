@@ -82,7 +82,7 @@ function ros_init(ros_master_uri){
     });
 
     token_listener.subscribe(req_token);
-
+    
     refresh_listener = new ROSLIB.Topic({
         ros : ros,
 	name : '/CoRDial/tablet/reload/',
@@ -90,7 +90,7 @@ function ros_init(ros_master_uri){
     });
 
     refresh_listener.subscribe(refresh_screen);
-
+    
     area_listener = new ROSLIB.Topic({
         ros : ros,
 	name : '/CoRDial/tablet/areas',
@@ -165,7 +165,7 @@ function add_token(name, img_location, x, y, type, text,textsize){
 	sprite.on('mousedown', mousedownbutton_cb)
 	sprite.on('mousemove', mousemovebutton_cb)
 	sprite.on('mouseup', mouseupbutton_cb)
-    	sprite.on('touchend', mouseupbutton_cb)
+    	sprite.on('touchend', mouseupbutton_cb)	
     	sprite.on('touchstart', mousedownbutton_cb)
     	sprite.on('touchmove', mousemovebutton_cb)
     }
@@ -182,7 +182,7 @@ function add_token(name, img_location, x, y, type, text,textsize){
 	sprite_text.anchor.y = 0.5;
 
 
-
+	
 	sprite.graphics.beginFill(0xFFFFFF, 0);
 	sprite.graphics.drawRect(0,0,sprite_text.width+padding,sprite_text.height+padding);
 	sprite.graphics.endFill();
@@ -200,7 +200,7 @@ function add_token(name, img_location, x, y, type, text,textsize){
 
 	sprite_layer.addChild(sprite)
 	sprites.push(sprite)
-
+   
 	return sprite
     }
     //EVENT CALLED "click"
@@ -217,7 +217,7 @@ function add_token(name, img_location, x, y, type, text,textsize){
     sprite.status_cb = send_sprite_pose
 
     sprite_layer.addChild(sprite)
-
+    
     sprite_text= new PIXI.Text(text, {font : textsize+'px Helvetica'});
     sprite_text.x = 0
     sprite_text.y = 0
@@ -226,7 +226,7 @@ function add_token(name, img_location, x, y, type, text,textsize){
     sprite.addChild(sprite_text);
 
     sprites.push(sprite)
-
+   
     setTimeout(function(){update_locations(sprite,false)},300);
     return sprite
 };
@@ -285,14 +285,14 @@ function add_area(name, x, y,width, height, drawn, arrange, text, textx, texty, 
     	console.log("drawing rectangle")
 	graphics.cacheAsBitmap=true
     	graphics.lineStyle(5, 0x000000, 10);
-
+        
 	if(is_filled){
 	    graphics.beginFill(bkgd_color);
 	}
-
+		
     	graphics.drawRect(x,y,width,height);
     	var area_text= new PIXI.Text(text,{font : textsize+'px Helvetica'});
-
+            
     	area_text.x = x+textx+5;
     	area_text.y = y+texty+5;
 
@@ -310,13 +310,13 @@ function add_area(name, x, y,width, height, drawn, arrange, text, textx, texty, 
 	area_bkgd.y=y
 	area_layer.addChild(area_bkgd)
 	var area_text= new PIXI.Text(text,{font : textsize+'px Helvetica'});
-
+            
     	area_text.x = x+textx+5;
     	area_text.y = y+texty+5;
 
     	area_layer.addChild(area_text);
     }
-
+    
 }
 
 function send_locations(sprite, area_names){
@@ -329,12 +329,10 @@ function arrange_areas(relevant_areas){
 	var contained_sprites=[]
 	for(var i=0;i<sprites.length;i++){
 	    var bounds = sprites[i].getBounds()
-	    /*
-      if(area.contains(bounds.x,bounds.y)||
+	    /*if(area.contains(bounds.x,bounds.y)||
 	       area.contains(bounds.x+bounds.width,bounds.y)||
 	       area.contains(bounds.x+bounds.width,bounds.y+bounds.height)||
-	       area.contains(bounds.x,bounds.y+bounds.height)){
-         */
+	       area.contains(bounds.x,bounds.y+bounds.height)){*/
 	    if(area.contains(bounds.x+bounds.width/2,bounds.y+bounds.height/2)){
 		contained_sprites.push(sprites[i])
 	    }
@@ -343,33 +341,33 @@ function arrange_areas(relevant_areas){
 	function sort_by_pose(sprite1, sprite2){
 	    var bounds1 = sprite1.getBounds();
 	    var bounds2 = sprite2.getBounds();
-
+	    
 	    if(bounds1.y==bounds2.y){
 		return bounds1.x-bounds2.x
 	    }else{
 		return bounds1.y-bounds2.y
 	    }
 	}
-
+	
 	function sort_by_xpose(sprite1, sprite2){
 	    var bounds1 = sprite1.getBounds();
 	    var bounds2 = sprite2.getBounds();
-
+	    
 	    return bounds1.x-bounds2.x
 	}
 
-
+	
 	function sort_by_ypose(sprite1, sprite2){
 	    var bounds1 = sprite1.getBounds();
 	    var bounds2 = sprite2.getBounds();
-
+	    
 	    return bounds1.y-bounds2.y
 	}
 
 	if(area.arrange=="tile"){
 	    //console.log(contained_sprites)
 	    contained_sprites.sort(sort_by_pose)
-
+	    
 	    var maxw = 0
 	    var maxh = 0
 	    for(var i=0;i<contained_sprites.length;i++){
@@ -379,7 +377,7 @@ function arrange_areas(relevant_areas){
 	    }
 
 	    var nsprites = contained_sprites.length
-
+	    
 	    var preferred_spacing = 10
 	    var xpadding = area.xpadding
 	    var ypadding = area.ypadding
@@ -396,7 +394,7 @@ function arrange_areas(relevant_areas){
 			preferred_spacing = -maxw
 			done = true
 		    }
-		} else if(nrows == 1){
+		} else if(nrows == 1){    
 		    if(ncols*(maxw+preferred_spacing)+2*xpadding<area.width){
 			done = true
 		    } else if(preferred_spacing + maxw > 5){
@@ -410,14 +408,14 @@ function arrange_areas(relevant_areas){
 		}
 	    }
 
-
+	    
 	    ncols = contained_sprites.length
 	    nrows = 1
 	    if(maxw+preferred_spacing > 0){
 		ncols = Math.max(1,Math.floor((area.width-2*xpadding)/(maxw+preferred_spacing)))
 		nrows = Math.max(1,Math.ceil(nsprites/ncols))
-	    }
-
+	    } 
+	    
 	    for(var i= 0; i < contained_sprites.length; i++){
 		sprite = contained_sprites[i]
 		col = i%ncols
@@ -555,7 +553,7 @@ function update_locations(sprite, send_update){
 	   area.contains(bounds.x+bounds.width,bounds.y)||
 	   area.contains(bounds.x+bounds.width,bounds.y+bounds.height)||
 	   area.contains(bounds.x,bounds.y+bounds.height)){*/
-	if(area.contains(bounds.x+bounds.width/2,bounds.y+bounds.height/2)){
+	if(area.contains(bounds.x+bounds.width/2,bounds.y+bounds.height/2)){  
 	    relevant_areas.push(areas[j])
 	    area_names.push(areas[j].name)
 	}
@@ -588,7 +586,7 @@ function move_token(sprite,goal,t,publish_after,arrange_after){
     var t = createjs.Tween.get(target, {override:true}).to(goal,t*1000, createjs.Ease.getPowInOut(2))
     t.on("change", sprite_pose_update, null, false, {sprite:sprite})
     t.call(sprite_move_done, params=[sprite])
-
+    
     function sprite_pose_update(evt,data){
 	//console.log(evt)
 	data.sprite.status_cb()
@@ -615,7 +613,7 @@ function rotate_token(sprite,goal,t){
     var t = createjs.Tween.get(target, {override:true}).to({rotation:goal},t*1000, createjs.Ease.getPowInOut(2))
     t.on("change", sprite_pose_update, null, false, {sprite:sprite})
     t.call(sprite_move_done, params=[sprite])
-
+    
     function sprite_pose_update(evt,data){
 	//console.log(target)
 	//data.sprite.rotation=target
@@ -640,7 +638,7 @@ function mouseup_cb(mouseData){
 function mousedown_cb(mouseData){
     //this.tint = 0xBBBBBB
     createjs.Tween.removeTweens(this.position);
-    this.click=true
+    this.click=true    
     this.status_cb()
 
     // displays the image as "top" image
@@ -740,7 +738,7 @@ function mousedownbutton_cb(mouseData){
 };
 
 function mousemovebutton_cb(mouseData){
-
+    
 };
 
 function send_sprite_pose(){
@@ -771,7 +769,7 @@ function game_init(name){
     renderer.view.style.position = "absolute";
     renderer.view.style.display = "block";
     renderer.autoResize = true;
-
+    
     //TODO: allow for choice of tiles or color for background?
     //renderer.backgroundColor=0x008000
 
@@ -808,10 +806,10 @@ function game_init(name){
     sprite_layer = new PIXI.Container();
     game_layer.addChild(sprite_layer);
 
-
+    
     // add the renderer view element to the DOM
     document.body.appendChild(renderer.view);
-
+ 
     var request = new ROSLIB.ServiceRequest({
 	id : instance_name,
 	window_w : windowW,
@@ -824,7 +822,7 @@ function game_init(name){
 	    area.id = instance_name
 	    req_area(area)
 	}
-
+	
 	for(var i=0;i<setup.tokens.length;i++){
 	    var token=setup.tokens[i]
 	    token.id = instance_name
@@ -843,7 +841,7 @@ function game_init(name){
     createjs.Ticker.setFPS(60)
     requestAnimationFrame( animate );
 
-    setup_srv.callService(request,
+    setup_srv.callService(request, 
 			  setup_game,
 			  function(error){
 			      console.log(error)
@@ -892,11 +890,11 @@ function req_token(msg){
 	    break
 	}
     }
-
+    
     function msg_contains(str){
 	return msg.action.indexOf(str)>-1;
     }
-
+    
     if(msg_contains("add")){
 	if (!exists){
 	    console.log("Adding token: " + msg.name)
@@ -909,7 +907,7 @@ function req_token(msg){
 	console.log("Error: no such token: " + msg.name)
 	return
     }
-
+    
     /*while(!sprite.texture.baseTexture.hasLoaded){
 	console.log("Waiting on texture load...")
     }*/
@@ -955,7 +953,7 @@ function req_token(msg){
 function change_background(texture_img){
     var num = environment.getChildIndex(bkgd_texture);
     environment.removeChild(bkgd_texture);
-
+    
     // new background
     var texture = PIXI.Texture.fromImage('bkgd/'+texture_img)
     bkgd_texture = new PIXI.extras.TilingSprite(texture, renderer.width,renderer.height);
@@ -984,7 +982,7 @@ function req_banner(msg){
        	go_fish_arrange = true;
 
     }
-    else*/
+    else*/ 
     if(msg.action != "")
         display_message(msg, 180)
     else
