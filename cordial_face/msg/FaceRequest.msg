@@ -2,7 +2,7 @@
 # multiple AUs possible, but only one viseme
 
 #the numbers of the action units
-int32[] aus
+string[] aus
 #the degree to which to express the AU, in (0,1]
 float64[] au_degrees
 #the time to make the expression, in ms

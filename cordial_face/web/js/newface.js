@@ -1026,7 +1026,7 @@ function move_face(t, notViseme=true){
 			lbrow = getPart("lbrow")
 
 			var max_x = lBrowControlPoints[1].x
-			var max_y = lbrow.idle_pos.y/4
+			var max_y = lbrow.idle_pos.y/3
 
 			lInner = lBrowControlPoints[2].clone();
 			rInner = rBrowControlPoints[2].clone();
@@ -1173,23 +1173,18 @@ function get_goal(message) {
 	}
 	if(message.aus.length!=0){
 		console.log('Message received: aus: ' + message.aus + " degrees: " + message.au_degrees + " side: " + message.side)
-		side = "b"
-		if(message.side == 1){
-			side = 'r'
-		}
-		if(message.side == 2){
-			side = 'l'
-		}
 		for(a in message.aus){
-			this_au = parseInt(message.aus[a])
+			this_au = message.aus[a]
 			if(message.au_ms[a]<0){
 				console.log("Time cannot be less than zero!")
 			} else {
-				if(this_au == 1 ||this_au == 4||this_au==2||this_au==5 || this_au == 7 || this_au == 43){
-					au(this_au, message.au_degrees[a], side)
+				//if the au is unilateral, it will have an r or l at the end to indicate the side to move
+				if(this_au.slice(-1) == 'l' || this_au.slice(-1) == 'r'){
+					au(parseInt(this_au.slice(0,-1)), message.au_degrees[a], this_au.slice(-1))
 				}
-				else {
-					au(this_au, message.au_degrees[a], "b")
+				//otherwise assume bilateral movement
+				else{
+					au(parseInt(this_au), message.au_degrees[a])
 				}
 			}
 		}
