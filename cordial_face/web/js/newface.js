@@ -1031,17 +1031,17 @@ function move_face(t, notViseme=true){
 			lInner = lBrowControlPoints[2].clone();
 			rInner = rBrowControlPoints[2].clone();
 
-			lInner.y += max_y * (0.8*aus_l[1] + .1*aus_l[2] - 1.2*aus_l[4])
-			lInner.x -= max_x * (aus_l[1] + 0.5*aus_l[4])
-			rInner.y += max_y * (0.8*aus_r[1] + .1*aus_r[2] - 1.2*aus_r[4])
-			rInner.x += max_x * (aus_r[1]  + 0.5*aus_r[4])
+			lInner.y += max_y * (1.5*aus_l[1] + .1*aus_l[2] - 1.2*aus_l[4])
+			lInner.x -= max_x * (0.75*aus_l[1] + 0.5*aus_l[4])
+			rInner.y += max_y * (1.5*aus_r[1] + .1*aus_r[2] - 1.2*aus_r[4])
+			rInner.x += max_x * (0.75*aus_r[1]  + 0.5*aus_r[4])
 
 			lMid = lBrowControlPoints[1].clone();
 			rMid = rBrowControlPoints[1].clone();
 
-			lMid.y += max_y * (-0.3*aus_l[1] + aus_l[2] - 0.6*aus_l[4])
+			lMid.y += max_y * (0.1*aus_l[1] + aus_l[2] - 0.6*aus_l[4])
 			lMid.x -= max_x * (aus_l[1] + -0.5*aus_l[2] + aus_l[4])
-			rMid.y += max_y * (-0.3*aus_r[1] + aus_r[2]  - 0.6*aus_r[4])
+			rMid.y += max_y * (0.1*aus_r[1] + aus_r[2]  - 0.6*aus_r[4])
 			rMid.x += max_x * (aus_r[1] + -0.5*aus_r[2] + aus_r[4])
 
 			lOuter = lBrowControlPoints[0].clone();
@@ -1158,11 +1158,10 @@ function move_face(t, notViseme=true){
 }
 
 /**
-
-   Moving the face
-
+Receives and processes the FaceRequest Message sent from the face_keyframe_server
+message - a FaceRequest Message, which contains visemes and/or aus to send to the face.
+					the message also contains timing information and magnitude information.
 **/
-
 function get_goal(message) {
 	if(message.visemes.length!=0){
 		console.log('Message received: visemes: ' + message.visemes);
@@ -1178,7 +1177,7 @@ function get_goal(message) {
 			if(message.au_ms[a]<0){
 				console.log("Time cannot be less than zero!")
 			} else {
-				//if the au is unilateral, it will have an r or l at the end to indicate the side to move
+				//if the au is unilateral, it will have an 'r' or 'l' at the end to indicate the side to move
 				if(this_au.slice(-1) == 'l' || this_au.slice(-1) == 'r'){
 					au(parseInt(this_au.slice(0,-1)), message.au_degrees[a], this_au.slice(-1))
 				}
