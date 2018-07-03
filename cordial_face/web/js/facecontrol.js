@@ -1,3 +1,30 @@
+//------------------------------------------------------------------------------
+// GUI to Control Face, allowing for testing of AUs
+// Copyright (C) 2018 Nathaniel Steele Dennler and Gauri Jain
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//------------------------------------------------------------------------------
+
+// Last updated: 6/28/2018
+
+//refer to: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4157835/ for action units and their controlled muscles
+//see also: https://www.cs.cmu.edu/~face/facs.htm
+
+  /*
+  parameters are all the action units as well as the side to modify
+  look at dat.gui documentation for more understanding http://workshop.chromeexperiments.com/examples/gui/#1--Basic-Usage
+  */
 var bothVal = {
             AU1: 0,
             AU2: 0,

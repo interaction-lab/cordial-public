@@ -166,10 +166,6 @@ class PlayerServer():
 
             viseme_req = FaceRequest(visemes=viseme_ids, viseme_ms=viseme_speed, times=viseme_times)
 
-
-
-
-
         ordered_behaviors = sorted(behaviors,
                                  key=lambda behavior: behavior["start"])
 

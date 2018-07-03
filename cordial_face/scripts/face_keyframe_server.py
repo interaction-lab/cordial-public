@@ -67,7 +67,6 @@ class LookatServer:
             self._shared["target"] = ""
 
     #TODO: make playing face keyframes interruptable (action?)
-    #TODO: allow unilateral actions
     def keyframe_cb(self, goal):
         aus = map(lambda s: s[2:], goal.face_dofs)
         elapsed = 0
