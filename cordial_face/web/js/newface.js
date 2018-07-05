@@ -100,7 +100,7 @@ function startFace(bkgd_color,
 		   brow_width,
 		   brow_height,
 		   brow_thickness,
-		   brow_arch){
+		   brow_innersize){
 
           d = new Date();
           startup_time = d.getTime()
@@ -169,7 +169,7 @@ function startFace(bkgd_color,
       	     brow_width,
       	     brow_height,
       	     brow_thickness,
-      	     brow_arch)
+      	     brow_innersize)
 
           last_blink = 0;
           last_gaze = 0;
@@ -446,12 +446,14 @@ function constructBrowPoints(name, x, y, controlPoints){
 	  var curve = new THREE.CatmullRomCurve3( pointsArray);
 	  curve.curveType = 'catmullrom';
 
-	  var splinePoints = curve.getPoints( 10 );
+	  var splinePoints = curve.getSpacedPoints( 50 );
 	  var splineGeometry = new THREE.Geometry().setFromPoints( splinePoints );
 	  var line = new MeshLine();
-	  line.setGeometry( splineGeometry, function(p){return p;});
+	  line.setGeometry( splineGeometry, function(p){return p*0.7 + 0.3;});
 
 	  browObject.threedee.children[0].geometry = line.geometry;
+		browObject.threedee.children[1].position.x = x2
+		browObject.threedee.children[1].position.y = y2
 	}
 
 /*
@@ -625,7 +627,7 @@ function addLids(color, width, height, arch){
 /*
 Adds both brow objects. The brows are controlled by three points and taper at the ends
 */
-function addBrows(color, width, height, thickness, arch){
+function addBrows(color, width, height, thickness, innerSize){
 
 		rBrowControlPoints = [new THREE.Vector3(-1.2*width, 0, 0),new THREE.Vector3(-width/2, 3*thickness, 0), new THREE.Vector3(width, 2.2*thickness, 0)]
     lBrowControlPoints = [new THREE.Vector3(1.2*width, 0, 0),new THREE.Vector3(width/2,3*thickness, 0), new THREE.Vector3(-width, 2.2*thickness, 0)]
@@ -641,11 +643,17 @@ function addBrows(color, width, height, thickness, arch){
 
     var y = height
 
+		var circleShape = new THREE.Shape();
+		circleShape.moveTo(0,0)
+		circleShape.arc(0,0,innerSize,0,6.6, true)
+
     lbrow = new constructBrowPoints("lbrow", xl,y,lBrowControlPoints)
     addLine(lbrow.threedee, lCurve, color, thickness,0,0,55,0,0,0,1);
+		addShape(lbrow.threedee,circleShape, color,lBrowControlPoints[2].x, lBrowControlPoints[2].y, 53, 0, 0, 0, 1 );
 
     rbrow = new constructBrowPoints("rbrow", xr,y,rBrowControlPoints)
     addLine(rbrow.threedee, rCurve, color, thickness,0,0,55,0,0,0,1);
+		addShape(rbrow.threedee,circleShape, color, rBrowControlPoints[2].x, rBrowControlPoints[2].y, 53, 0, 0, 0, 1 );
 
 }
 
@@ -1025,7 +1033,7 @@ function move_face(t, notViseme=true){
 	    // ***** BROWS ***** (AU 1, 2, 4)
 			lbrow = getPart("lbrow")
 
-			var max_x = lBrowControlPoints[1].x
+			var max_x = lBrowControlPoints[1].x/2
 			var max_y = lbrow.idle_pos.y/3
 
 			lInner = lBrowControlPoints[2].clone();
