@@ -449,7 +449,7 @@ function constructBrowPoints(name, x, y, controlPoints){
 	  var splinePoints = curve.getSpacedPoints( 50 );
 	  var splineGeometry = new THREE.Geometry().setFromPoints( splinePoints );
 	  var line = new MeshLine();
-	  line.setGeometry( splineGeometry, function(p){return p*0.7 + 0.3;});
+	  line.setGeometry( splineGeometry, function(p){return p*0.55 + 0.45;});
 
 	  browObject.threedee.children[0].geometry = line.geometry;
 		browObject.threedee.children[1].position.x = x2
