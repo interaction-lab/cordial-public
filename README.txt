@@ -11,14 +11,14 @@ CoRDial Setup Instructions
 3. Install Prerequisites
 
 ~~~~
-sudo apt-get install nodejs
-sudo apt-get install npm
-sudo npm install http-server -g
+$ sudo apt-get install nodejs
+$ sudo apt-get install npm
+$ sudo npm install http-server -g
 
-ln -s /usr/bin/nodejs /usr/bin/node
-#fixes namespace issue (https://github.com/nodejs/node-v0.x-archive/issues/3911)
+$ ln -s /usr/bin/nodejs /usr/bin/node
 
-sudo apt-get install ros-kinetic-rosbridge-server vorbis-tools python-pygame python-requests python-serial ros-kinetic-tf python-gst0.10 python-scipy
+
+$ sudo apt-get install ros-kinetic-rosbridge-server vorbis-tools python-pygame python-requests python-serial ros-kinetic-tf python-gst0.10 python-scipy
 ~~~~
 5. Install the pololu maestro MCB software
 
@@ -28,7 +28,7 @@ sudo apt-get install ros-kinetic-rosbridge-server vorbis-tools python-pygame pyt
 8. Clone the repository
 
 ~~~~
-roscd
+$ roscd
 git clone https://github.com/interaction-lab/cordial-public.git
 ~~~~
 
