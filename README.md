@@ -62,8 +62,7 @@ sudo ufw allow 9090
         roslaunch cordial_example run.launch
         ~~~~
 
-    3. view face:
-      (In a new terminal window)
+    3. view face (In a new terminal window):
       
         ~~~~
         roscd cordial_face/web
@@ -71,9 +70,8 @@ sudo ufw allow 9090
         #Navigate to second address listed in web browser to view the robot face screen
         ~~~~
 
-    4. run example:
-      (In a new terminal window)
+    4. run example (In a new terminal window):
       
-      ~~~~
+        ~~~~
         rosrun cordial_example robot_only.py
-      ~~~~
+        ~~~~
