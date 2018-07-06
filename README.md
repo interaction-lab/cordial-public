@@ -74,9 +74,3 @@ sudo ufw allow 9090
       ~~~~
         rosrun cordial_example robot_only.py
       ~~~~
-
-    5. view tablet:
-      (in a new terminal window)
-        roscd cordial_tablet/web
-        http-server
-        Navigate to second address listed in web browser to view the tablet screen
