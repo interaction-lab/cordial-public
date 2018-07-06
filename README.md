@@ -51,10 +51,11 @@ sudo ufw allow 9090
 9. Test your installation
 
     1. generate audio files (only needs to be done once or when changes to speech are made):
-    ~~~~
+        
+        ~~~~
         roscd cordial_example/speech
         ./gen_audio.sh
-    ~~~~
+        ~~~~
 
     2. start "background" ROS nodes:
         ~~~~
@@ -63,14 +64,16 @@ sudo ufw allow 9090
 
     3. view face:
       (In a new terminal window)
+      
         ~~~~
         roscd cordial_face/web
         http-server
-        Navigate to second address listed in web browser to view the robot face screen
+        #Navigate to second address listed in web browser to view the robot face screen
         ~~~~
 
     4. run example:
       (In a new terminal window)
+      
       ~~~~
         rosrun cordial_example robot_only.py
       ~~~~
