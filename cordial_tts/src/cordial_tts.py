@@ -58,8 +58,7 @@ class CoRDialTTS():
         #filter out the emotes surrounded by asterisks, and surround text in speech tags
         tokens = re.split("(\*[^\*\*]*\*)", line)
         phrase = ''.join(filter(lambda s: "*" not in s, tokens))
-        #enclose phrase in speak tags to use Polly's ssml, and let polly know the language
-        phrase = '<speak><lang xml:lang="en-US">' + phrase + '</lang></speak>'
+
 
         def cond_split(s):
             if len(s)>=2 and s[-1]=="*" and s[0]=="*":
@@ -67,7 +66,7 @@ class CoRDialTTS():
             else:
                 return re.split("\s+",s)
 
-        tokens = map(lambda s: cond_split(s), tokens)
+        # tokens = map(lambda s: cond_split(s), tokens)
         words = []
 
         for t in tokens:
@@ -82,11 +81,13 @@ class CoRDialTTS():
                 actions.append([i,name,args])
             else:
                 i += 1
-        # print(phrase) #print out the phase to be converted to speech
+        print("PROCESSING: '{}'".format(phrase)) #print out the phase to be converted to speech
 
         #example server code for reference: https://docs.aws.amazon.com/polly/latest/dg/example-Python-server-code.html
         #use the interface to communicate with the Amazon Polly Client
         try:
+            #enclose phrase in speak tags to use Polly's ssml, and let polly know the language
+            phrase = '<speak><lang xml:lang="en-US">' + phrase + '</lang></speak>'
     	    response = self.tts.synthesize_speech(Text=phrase, TextType='ssml', OutputFormat="json", VoiceId=self.voice, SpeechMarkTypes =["viseme", "word"])
         except (BotoCoreError, ClientError) as error:
     	    print(error)
