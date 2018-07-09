@@ -20,7 +20,7 @@ $ ln -s /usr/bin/nodejs /usr/bin/node
 
 $ sudo apt-get install ros-kinetic-rosbridge-server vorbis-tools python-pygame python-requests python-serial ros-kinetic-tf python-gst0.10 python-scipy
 ~~~~
-4. Install the pololu maestro MCB software
+4. Install the pololu maestro MCB software (if using the spritebot)
 
     https://www.pololu.com/file/0J315/maestro-linux-150116.tar.gz
     installation instructions are in README.txt
@@ -51,32 +51,27 @@ sudo ufw allow 9090
 9. Test your installation
 
     1. generate audio files (only needs to be done once or when changes to speech are made):
-    ~~~~
+        
+        ~~~~
         roscd cordial_example/speech
         ./gen_audio.sh
-    ~~~~
+        ~~~~
 
     2. start "background" ROS nodes:
         ~~~~
-        roslaunch cordial_example run.launch
+        roslaunch cordial_example test_setup.launch
         ~~~~
 
-    3. view face:
-      (In a new terminal window)
+    3. view face (In a new terminal window):
+      
         ~~~~
         roscd cordial_face/web
         http-server
-        Navigate to second address listed in web browser to view the robot face screen
+        #Navigate to second address listed in web browser to view the robot face screen
         ~~~~
 
-    4. run example:
-      (In a new terminal window)
-      ~~~~
+    4. run example (In a new terminal window):
+      
+        ~~~~
         rosrun cordial_example robot_only.py
-      ~~~~
-
-    5. view tablet:
-      (in a new terminal window)
-        roscd cordial_tablet/web
-        http-server
-        Navigate to second address listed in web browser to view the tablet screen
+        ~~~~
