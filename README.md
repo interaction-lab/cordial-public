@@ -20,7 +20,7 @@ $ ln -s /usr/bin/nodejs /usr/bin/node
 
 $ sudo apt-get install ros-kinetic-rosbridge-server vorbis-tools python-pygame python-requests python-serial ros-kinetic-tf python-gst0.10 python-scipy
 ~~~~
-4. Install the pololu maestro MCB software
+4. Install the pololu maestro MCB software (if using the spritebot)
 
     https://www.pololu.com/file/0J315/maestro-linux-150116.tar.gz
     installation instructions are in README.txt
@@ -59,7 +59,7 @@ sudo ufw allow 9090
 
     2. start "background" ROS nodes:
         ~~~~
-        roslaunch cordial_example run.launch
+        roslaunch cordial_example test_setup.launch
         ~~~~
 
     3. view face (In a new terminal window):
