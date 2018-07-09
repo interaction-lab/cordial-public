@@ -1040,9 +1040,9 @@ function move_face(t, notViseme=true){
 			rInner = rBrowControlPoints[2].clone();
 
 			lInner.y += max_y * (1.5*aus_l[1] + .1*aus_l[2] - 1.2*aus_l[4])
-			lInner.x -= max_x * (0.75*aus_l[1] + 0.5*aus_l[4])
+			lInner.x -= max_x * (0.15*aus_l[1] + 0.5*aus_l[4])
 			rInner.y += max_y * (1.5*aus_r[1] + .1*aus_r[2] - 1.2*aus_r[4])
-			rInner.x += max_x * (0.75*aus_r[1]  + 0.5*aus_r[4])
+			rInner.x += max_x * (0.15*aus_r[1]  + 0.5*aus_r[4])
 
 			lMid = lBrowControlPoints[1].clone();
 			rMid = rBrowControlPoints[1].clone();
