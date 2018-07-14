@@ -53,6 +53,7 @@ var bothVal = {
             AU25: 0,
             AU26: 0,
             AU27: 0,
+            AU43: 0,
             left: false,
             right: false,
             both: true
@@ -85,6 +86,7 @@ var leftVal = {
             AU25: 0,
             AU26: 0,
             AU27: 0,
+            AU43: 0,
             left: true,
             right: false,
             both: false
@@ -117,6 +119,7 @@ var rightVal = {
             AU25: 0,
             AU26: 0,
             AU27: 0,
+            AU43: 0,
             left: false,
             right: true,
             both: false
@@ -149,6 +152,7 @@ var params = {
             AU25: 0,
             AU26: 0,
             AU27: 0,
+            AU43: 0,
             left: false,
             right: false,
             both: true
@@ -170,6 +174,7 @@ var params = {
   mid.add( params, 'AU6', 0, 1 ).name('AU6 - Raise Cheeks').step( 0.01 ).listen().onChange( function( value ) { au(6 , value, getSide()); move_face(1); getData()['AU6']=value; } );
   mid.add( params, 'AU7', 0, 1 ).name('AU7 - Raise Lower Lid').step( 0.01 ).listen().onChange( function( value ) { au(7 , value, getSide()); move_face(1); getData()['AU7']=value; } );
   mid.add( params, 'AU9', 0, 1 ).name('AU9 - Raise Nose').step( 0.01 ).listen().onChange( function( value ) { au(9 , value, getSide()); move_face(1); getData()['AU9']=value; } );
+  mid.add( params, 'AU43', 0, 1 ).name('AU43 - Blink').step( 0.01 ).listen().onChange( function( value ) { au(43 , value, getSide()); move_face(1); getData()['AU43']=value; } );
 
   //15 Mouth Action Units
   var mouth = gui.addFolder( 'Mouth Action Units' );

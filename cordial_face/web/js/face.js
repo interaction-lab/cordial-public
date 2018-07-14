@@ -856,31 +856,17 @@ function addEyes(white_color, iris_color, size, height, separation, iris_size, p
     var x_adj = (separation)*(size/camera_depth);
     var y_adj = height * (size/camera_depth);
 
-    // reye = new facePart("reye", -(separation/2)-x_adj, y_adj, -size);
-    // addSphere(reye.threedee, size, white_color,0 , 0, 0, 0, 0, 0, 1 );
-    // addShape(reye.threedee,circleShape, iris_color, 0, 0, size, 0, 0, 0, 1 );
-    // addShape(reye.threedee,pupilShape, 0x000000, 0, 0, size, 0, 0, 0, pupil_scale );
-    // reye.idle_size = reye.size()
-    //
-    // leye = new facePart("leye", (separation/2)+x_adj, y_adj, -size);
-    // addSphere(leye.threedee, size, white_color, 0, 0, 0, 0, 0, 0, 1 );
-    // addShape(leye.threedee,circleShape, iris_color, 0, 0, size, 0, 0, 0, 1 );
-    // addShape(leye.threedee,pupilShape, 0x000000, 0, 0, size, 0, 0, 0, pupil_scale );
-    // leye.idle_size = leye.size()
-
-	reye = new facePart("reye", -(separation/2)-x_adj, y_adj, -size);
-   addSphere(reye.threedee, size, white_color,0 , 0, 0, 0, 0, 0, 1 );
-   addShape(reye.threedee,circleShape, 0x187254, 0, 0, size, 0, 0, 0, 1 );
-   addShape(reye.threedee,pupilShape, 0x000000, 0, 0, size, 0, 0, 0, pupil_scale);
-   // addShape(reye.threedee,circleShape, 0xffffff, 0, 0, size, 0, 0, 0, 0.05);
-   reye.idle_size = reye.size()
-
-	 leye = new facePart("leye", (separation/2)+x_adj, y_adj, -size);
-   addSphere(leye.threedee, size, white_color, 0, 0, 0, 0, 0, 0, 1 );
-   addShape(leye.threedee,circleShape, 0x187254, 0, 0, size, 0, 0, 0, 1 );
-   addShape(leye.threedee,pupilShape, 0x000000, 0, 0, size, 0, 0, 0, pupil_scale);
-   // addShape(leye.threedee,circleShape, 0xffffff, 0, 0, size, 0, 0, 0, 0.05 );
-   leye.idle_size = leye.size()
+     reye = new facePart("reye", -(separation/2)-x_adj, y_adj, -size);
+     addSphere(reye.threedee, size, white_color,0 , 0, 0, 0, 0, 0, 1 );
+     addShape(reye.threedee,circleShape, iris_color, 0, 0, size, 0, 0, 0, 1 );
+     addShape(reye.threedee,pupilShape, 0x000000, 0, 0, size, 0, 0, 0, pupil_scale );
+     reye.idle_size = reye.size()
+    
+     leye = new facePart("leye", (separation/2)+x_adj, y_adj, -size);
+     addSphere(leye.threedee, size, white_color, 0, 0, 0, 0, 0, 0, 1 );
+     addShape(leye.threedee,circleShape, iris_color, 0, 0, size, 0, 0, 0, 1 );
+     addShape(leye.threedee,pupilShape, 0x000000, 0, 0, size, 0, 0, 0, pupil_scale );
+     leye.idle_size = leye.size()
 }
 
 

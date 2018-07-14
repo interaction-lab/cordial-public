@@ -35,6 +35,8 @@ var n_aus = 43;
 var upperLipControlPoints = []; lowerLipControlPoints = [];
 var lBrowControlPoints = []; rBrowControlPoints = [];
 
+var lockIdleUntil = 0; //variable to lock idling, if a behavioral blink is occuring
+
 var targetRotation = 0;
 var targetRotationOnMouseDown = 0;
 
@@ -480,7 +482,7 @@ function addEyes(white_color, iris_color, size, height, separation, iris_size, p
 
     if(pupil_shape=="round"){
 			pupilShape = circleShape;
-    } else if(pupil_shape="cat"){
+    } else if(pupil_shape=="cat"){
 			pupilShape = new THREE.Shape();
 			pupilShape.moveTo(0,0);
 			//pupilShape.arc(0,0,iris_size,0,6.6, true);
@@ -496,14 +498,18 @@ function addEyes(white_color, iris_color, size, height, separation, iris_size, p
    addSphere(reye.threedee, size-2, white_color,0 , 0, 0, 0, 0, 0, 1 );
    addShape(reye.threedee,circleShape, iris_color, 0, 0, size, 0, 0, 0, 1 );
    addShape(reye.threedee,pupilShape, 0x000000, 0, 0, size + 1, 0, 0, 0, pupil_scale);
-   addShape(reye.threedee,circleShape, 0xffffff, -iris_size*pupil_scale/2, iris_size*pupil_scale/1.6, size + 2, 0, 0, 0, 0.15);
+   if(pupil_shape=="round"){
+   	addShape(reye.threedee,circleShape, 0xffffff, -iris_size*pupil_scale/2, iris_size*pupil_scale/1.6, size + 2, 0, 0, 0, 0.15);
+   }
    reye.idle_size = reye.size()
 
 	 leye = new facePart("leye", (separation/2)+x_adj, y_adj, -size);
    addSphere(leye.threedee, size, white_color, 0, 0, 0, 0, 0, 0, 1 );
    addShape(leye.threedee,circleShape, iris_color, 0, 0, size, 0, 0, 0, 1 );
    addShape(leye.threedee,pupilShape, 0x000000, 0, 0, size + 1, 0, 0, 0, pupil_scale);
+   if(pupil_shape=="round"){
    addShape(leye.threedee,circleShape, 0xffffff, -iris_size*pupil_scale/2, iris_size*pupil_scale/1.6, size + 2, 0, 0, 0, 0.15 );
+   }
    leye.idle_size = leye.size()
 }
 
@@ -1193,6 +1199,11 @@ function get_goal(message) {
 				else{
 					au(parseInt(this_au), message.au_degrees[a])
 				}
+				if(parseInt(this_au) == 43){
+					lockIdleUntil = new Date().getTime() + message.au_ms + 500
+					console.log(new Date().getTime())
+					console.log(lockIdleUntil)
+				}
 			}
 		}
 		move_face(message.au_ms)
@@ -1395,7 +1406,9 @@ function animate() {
     //set_time()
     requestAnimationFrame( animate );
     //set_time()
-    doIdle();
+		if (typeof gui === "undefined" && new Date().getTime() > lockIdleUntil){
+    	doIdle();
+		}
     //print_elapsed()
     check_and_play_visemes()
     TWEEN.update();
