@@ -189,7 +189,7 @@ function startFace(bkgd_color,
 
           renderer = new THREE.WebGLRenderer({antialias:true, precision:'lowp'});
           renderer.setClearColor( background_color );
-          renderer.setSize( window.innerWidth, window.innerHeight );
+          renderer.setSize( window.innerWidth, window.innerHeight + 20);
           renderer.sortElements = false;
           container.appendChild( renderer.domElement );
 
