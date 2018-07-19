@@ -163,10 +163,10 @@ class CoRDialTTS():
         return data
 
     def say(self,phrase, wait=False, interrupt=False):
-        return self._tts.speak(phrase, wait, interrupt)
+        return self.tts.speak(phrase, wait, interrupt)
 
     def is_speaking(self):
-        self._tts.is_busy()
+        self.tts.is_busy()
 
     def shutup(self):
-        self._tts.shutup()
+        self.tts.shutup()

@@ -116,9 +116,11 @@ function startFace(bkgd_color,
           document.body.appendChild( container );
           viseme_adjustment=viseme_adj
           // camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
-          camera = new THREE.OrthographicCamera(window.innerWidth/-2, window.innerWidth/2, window.innerHeight/2, window.innerHeight/-2, 300, 1000)
+					var SCALING_FACTOR = 1.2
+          camera = new THREE.OrthographicCamera(window.innerWidth/-2 * SCALING_FACTOR,
+						window.innerWidth/2 * SCALING_FACTOR, window.innerHeight/2, window.innerHeight/-2 * SCALING_FACTOR, 300, 1000)
 
-          camera.position.set( 0, 0, camera_depth );
+          camera.position.set( 0, window.innerHeight/4*(1- SCALING_FACTOR), camera_depth );
 
           scene = new THREE.Scene();
           parts = []
@@ -189,7 +191,7 @@ function startFace(bkgd_color,
 
           renderer = new THREE.WebGLRenderer({antialias:true, precision:'lowp'});
           renderer.setClearColor( background_color );
-          renderer.setSize( window.innerWidth, window.innerHeight + 20);
+          renderer.setSize( window.innerWidth, window.innerHeight + 30);
           renderer.sortElements = false;
           container.appendChild( renderer.domElement );
 
