@@ -163,10 +163,12 @@ class CoRDialTTS():
         return data
 
     def say(self,phrase, wait=False, interrupt=False):
-        return self.tts.speak(phrase, wait, interrupt)
+        return self.tts.synthesize_speech(Text=phrase, TextType='ssml', OutputFormat="ogg_vorbis", VoiceId=self.voice)
 
     def is_speaking(self):
-        self.tts.is_busy()
+        pass
+        # self.tts.is_busy()
 
     def shutup(self):
-        self.tts.shutup()
+        pass
+        # self.tts.shutup()

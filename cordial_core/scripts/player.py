@@ -39,7 +39,7 @@ class PlayerServer():
     _result = PlayerResult()
 
     def __init__(self, phone_face, delay=0.0,phrase_file=None, use_tts=False, voice=None):
-        self._use_tts = use_tts
+        self._use_tts = use_tts in ['true', 'True', 'TRUE', '1']
 
         if phrase_file and not len(phrase_file)>0 and not use_tts:
             rospy.logerr("CoRDial Player Error: Must specify phrase file or allow tts! Continuing without sound...")
@@ -198,9 +198,11 @@ class PlayerServer():
 
         else:
             def speak():
-                self.speech_duration = self._tts.say(phrase)
+                ogg_file = self._tts.say(phrase)
+                self.speech_duration = 3.0
                 self.speech_start_time=rospy.Time.now()
                 rospy.loginfo("Speech: playing tts speech -- duration: " + str(self.speech_duration))
+                self._sound_client.playWave(ogg_file)
             t = Timer(speech_delay_time, speak)
             t.start()
 
@@ -282,10 +284,9 @@ if __name__ == '__main__':
     parser.add_argument('-k2', '--ivona-secret-key', help="Ivona secret key", nargs='?', default=None)
     parser.add_argument('-d', '--delay', help="How much should the speech be delayed by, in s", default=0.0, type=float)
     parser.add_argument('-p', '--phrase-file', help="Phrase file for pre-loaded speech", nargs="?", default=None)
-    parser.add_argument('-t', '--use-tts', help="Enable text-to-speech (online)", action='store_true')
+    parser.add_argument('-t', '--use-tts', help="Enable text-to-speech (online)", default=False)
     args = parser.parse_known_args()[0]
 
-    print('STARTING UP THAT SOUND NODE!')
     rospy.init_node('cordial_player')
 
     PlayerServer(args.use_face, args.delay, args.phrase_file, args.use_tts, args.voice)

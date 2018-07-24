@@ -1186,27 +1186,34 @@ function get_goal(message) {
 		// play_visemes(message.visemes, message.viseme_ms, message.times, message.start)
 		play_visemes(message.visemes, 35, message.times, message.start)
 	}
+
 	if(message.aus.length!=0){
 		console.log('Message received: aus: ' + message.aus + " degrees: " + message.au_degrees + " side: " + message.side)
 		for(a in message.aus){
 			this_au = message.aus[a]
+			console.log(this_au)
 			if(message.au_ms[a]<0){
 				console.log("Time cannot be less than zero!")
+
+			} else if(this_au == 'ZeroFace'){
+				zeroFace(message.au_ms)
+				console.log('clearing AUS')
+
 			} else {
 				//if the au is unilateral, it will have an 'r' or 'l' at the end to indicate the side to move
 				if(this_au.slice(-1) == 'l' || this_au.slice(-1) == 'r'){
 					au(parseInt(this_au.slice(0,-1)), message.au_degrees[a], this_au.slice(-1))
 				}
 				//otherwise assume bilateral movement
-				else{
+				else {
 					au(parseInt(this_au), message.au_degrees[a])
-				}
-				if(parseInt(this_au) == 43){
+				} if(parseInt(this_au) == 43){
 					lockIdleUntil = new Date().getTime() + message.au_ms + 500
 					console.log(new Date().getTime())
 					console.log(lockIdleUntil)
 				}
 			}
+
 		}
 		move_face(message.au_ms)
 	}
