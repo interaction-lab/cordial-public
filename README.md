@@ -4,7 +4,7 @@ CoRDial Setup Instructions
 
     http://releases.ubuntu.com/16.04/
 
-2. Install ROS kinetic
+2. Install ROS kinetic (full version)
 
     http://wiki.ros.org/kinetic/Installation/Ubuntu
 
@@ -24,31 +24,42 @@ $ sudo apt-get install ros-kinetic-rosbridge-server vorbis-tools python-pygame p
 
     https://www.pololu.com/file/0J315/maestro-linux-150116.tar.gz
     installation instructions are in README.txt
+    
+5. Set up AWS account following these steps (or request access to the lab account from a PhD): 
 
-5. Clone the repository
+Create an Amazon Web Services account. AWS has a 1 year free trial that includes a limited number of Polly usages. Keep this in mind so you do not get charged money at the end of the year.
+
+Once you've created an account, create an IAM user to access Polly.
+
+    Give the IAM user access permissions to AWS Polly.
+    Give the IAM user access keys. Be sure to save the secret key as you only have one chance to look at it.
+
+
+6. Clone the repository
 
 ~~~~
 $ roscd
 $ git clone https://github.com/interaction-lab/cordial-public.git
 ~~~~
 
-6. Make everything
+7. Make everything
 
 ~~~~
 $ rosmake cordial_sprite cordial_tablet
 ~~~~
 
-7. If you're on 16.10, add the rosbridge websocket port to your firewall's allowed list
+8. If you're on 16.10, add the rosbridge websocket port to your firewall's allowed list
 
 ~~~~
 $ sudo ufw allow 9090
 ~~~~
 
-8. Setup your ssh keys for git (optional)
+9. Setup your ssh keys for git (optional)
 
     https://help.github.com/articles/generating-an-ssh-key/
+    
 
-9. Test your installation
+10. Test your installation
 
     1. generate audio files (only needs to be done once or when changes to speech are made):
         
