@@ -27,12 +27,13 @@ $ sudo apt-get install ros-kinetic-rosbridge-server vorbis-tools python-pygame p
     
 5. Set up AWS account following these steps (or request access to the lab account from a PhD): 
 
-Create an Amazon Web Services account. AWS has a 1 year free trial that includes a limited number of Polly usages. Keep this in mind so you do not get charged money at the end of the year.
+    Create an Amazon Web Services account. AWS has a 1 year free trial that includes a limited number of Polly usages.
+    Keep this in mind so you do not get charged money at the end of the year.
 
-Once you've created an account, create an IAM user to access Polly.
+    Once you've created an account, create an IAM user to access Polly.
 
-    Give the IAM user access permissions to AWS Polly.
-    Give the IAM user access keys. Be sure to save the secret key as you only have one chance to look at it.
+      * Give the IAM user access permissions to AWS Polly.
+      * Give the IAM user access keys. Be sure to save the secret key as you only have one chance to look at it.
 
 
 6. Clone the repository
