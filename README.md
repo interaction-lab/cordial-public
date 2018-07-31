@@ -29,19 +29,19 @@ $ sudo apt-get install ros-kinetic-rosbridge-server vorbis-tools python-pygame p
 
 ~~~~
 $ roscd
-git clone https://github.com/interaction-lab/cordial-public.git
+$ git clone https://github.com/interaction-lab/cordial-public.git
 ~~~~
 
 6. Make everything
 
 ~~~~
-rosmake cordial_sprite cordial_tablet
+$ rosmake cordial_sprite cordial_tablet
 ~~~~
 
 7. If you're on 16.10, add the rosbridge websocket port to your firewall's allowed list
 
 ~~~~
-sudo ufw allow 9090
+$ sudo ufw allow 9090
 ~~~~
 
 8. Setup your ssh keys for git (optional)
@@ -53,25 +53,25 @@ sudo ufw allow 9090
     1. generate audio files (only needs to be done once or when changes to speech are made):
         
         ~~~~
-        roscd cordial_example/speech
-        ./gen_audio.sh
+        $ roscd cordial_example/speech
+        $ ./gen_audio.sh
         ~~~~
 
     2. start "background" ROS nodes:
         ~~~~
-        roslaunch cordial_example test_setup.launch
+        $ roslaunch cordial_example test_setup.launch
         ~~~~
 
     3. view face (In a new terminal window):
       
         ~~~~
-        roscd cordial_face/web
-        http-server
-        #Navigate to second address listed in web browser to view the robot face screen
+        $ roscd cordial_face/web
+        $ http-server
+        # Navigate to second address listed in web browser to view the robot face screen
         ~~~~
 
     4. run example (In a new terminal window):
       
         ~~~~
-        rosrun cordial_example robot_only.py
+        $ rosrun cordial_example robot_only.py
         ~~~~
