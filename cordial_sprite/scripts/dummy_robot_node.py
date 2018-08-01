@@ -16,7 +16,7 @@
 #------------------------------------------------------------------------------
 
 
-import roslib; roslib.load_manifest('cordial_ptbot')
+import roslib; roslib.load_manifest('cordial_sprite')
 import rospy
 import actionlib
 import sys
@@ -25,7 +25,6 @@ from cordial_face.msg import *
 import argparse
 import json
 import time
-from dynamixel_workbench_msgs.srv import *
 
 class DummyRobotServer:
     _feedback = BehaviorFeedback()
