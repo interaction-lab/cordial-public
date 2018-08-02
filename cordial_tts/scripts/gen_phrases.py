@@ -23,57 +23,60 @@
 
 
 import roslib; roslib.load_manifest('cordial_tts')
-import pyvona as iv
-import sys
 import yaml
-import re
+import argparse
 import os
-from cordial_tts import CoRDialTTS       
+import sys
+
+from cordial_tts import CoRDialTTS
 
 def process_script(filename, outdir, tts, file_format=".ogg"):
     out = {}
     with open(filename, 'r') as f:
         for line in f:
-            l = line.strip()
-            tokens = l.split(']')
-            p = tokens[0].strip("[")
-            l = tokens[1].strip()
-            data=tts.phrase_to_file(p,l,outdir)            
-            if p in out.keys():
-                print "Warning: phrase id: " + p + " in script file " + filename + " is overwriting a previous instance; check your files!"
-                
+            content = line.strip()
+            tokens = content.split(']')
+            phraseID = tokens[0].strip("[")
+            content = tokens[1].strip()
+            data = tts.phrase_to_file(phraseID, content, outdir)
+            if phraseID in out.keys():
+                print "Warning: phrase id: " + phraseID + " in script file " + filename + " is overwriting a previous instance; check your files!"
+
             data["file"]= data["file"].split(".")[0]+file_format
-            out[p]=data
+            out[phraseID]=data
     return out
 
 def main():
     if not len(sys.argv) >= 3:
-        print "Usage: gen_phrases.py [voice] [access key] [secret key] [target data dir] [target file] [script file 1] [script file 2] ... [script file n]"
-        print "Voices: Ivy, Justin, "
+        print "Usage: gen_phrases.py [voice] [target data dir] [target file] [script file 1] [script file 2] ... [script file n]"
+        print "Voices: Kimberly, Justin"
         exit()
-    
+
     data = {}
 
+    voice = sys.argv[1]
+    audio_dir = sys.argv[2]
 
-    access = sys.argv[2]
-    secret = sys.argv[3]
+    tts = CoRDialTTS(voice)
 
-    
-    tts = CoRDialTTS(sys.argv[1], access, secret)
+    # Make output directory if it does not exist
+    if not os.path.exists(audio_dir):
+        print "Making output directory: " + audio_dir
+        os.makedirs(audio_dir)
 
-    for f in sys.argv[6:len(sys.argv)]:
-        phs = process_script(f,sys.argv[4],tts,".wav")
+    for f in sys.argv[4:len(sys.argv)]:
+        fileNames = process_script(f, audio_dir, tts, ".wav")
 
-        for p in phs:
-            if p in data.keys():
+        for name in fileNames:
+            if name in data.keys():
                 print "Warning: phrase id: " + p + " in script file " + f + " is overwriting a previous instance; check your files!"
 
-        
-        data.update(phs)
 
-    with open(sys.argv[5], 'w') as f_out:
-        f_out.write("# Auto-generated phrase file for the dragonbot\n")
-        f_out.write("# Generated from files: "+ " ".join(sys.argv[3:len(sys.argv)]) + "\n\n")
+        data.update(fileNames)
+
+    with open(sys.argv[3], 'w') as f_out:
+        f_out.write("# Auto-generated phrase file using Amazon Polly\n")
+        f_out.write("# Generated from files: "+ " ".join(sys.argv[4:len(sys.argv)]) + "\n\n")
         yaml.dump(data,f_out,default_flow_style = False)
 
 

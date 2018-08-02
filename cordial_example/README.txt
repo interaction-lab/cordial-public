@@ -1,1 +1,1 @@
-You need to sign up for an Ivona account and put your key/secret key pair into the launch file and gen_phrases.py
+You need to sign up for an amazon web services account and set up boto3.

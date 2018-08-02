@@ -1,7 +1,7 @@
 {"idle":
    {
-     "dofs": ["z"],   
-     "keyframes": [	
+     "dofs": ["z"],
+     "keyframes": [
         {
         "pose": [2],
         "time": 0,
@@ -25,8 +25,8 @@
       	]},
 "test_speed":
    {
-     "dofs": ["z"],   
-     "keyframes": [	
+     "dofs": ["z"],
+     "keyframes": [
         {
         "pose": [2],
         "time": 0,
@@ -51,7 +51,7 @@
 "idle-expressive":
    {
      "dofs": ["x","y","z","ra","pa","ya"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [2,0,0,0,0,0],
     	"time": 2,
@@ -191,7 +191,7 @@
 "mischievous":
    {
      "dofs": ["x","y","z"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [2,0,0],
     	"time": 0.1,
@@ -220,7 +220,7 @@
 "angry":
    {
      "dofs": ["x","y","z", "au4", "au5", "au7", "au23"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [1,0,0,1,2,1,2],
     	"time": 0.5,
@@ -244,7 +244,7 @@
 "up":
    {
      "dofs": ["pa"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [10],
     	"time": 0,
@@ -259,7 +259,7 @@
 "down":
    {
      "dofs": ["pa"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [-10],
     	"time": 0,
@@ -274,7 +274,7 @@
 "up-down":
    {
      "dofs": ["pa"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [10],
     	"time": 0,
@@ -299,7 +299,7 @@
 "left":
    {
      "dofs": ["ya"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [10],
     	"time": 0,
@@ -314,7 +314,7 @@
 "right":
    {
      "dofs": ["ya"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [-10],
     	"time": 0,
@@ -329,7 +329,7 @@
 "tilt-left":
    {
      "dofs": ["ra"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [10],
     	"time": 0,
@@ -344,7 +344,7 @@
 "tilt-right":
    {
      "dofs": ["ra"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [-10],
     	"time": 0,
@@ -359,7 +359,7 @@
 "tilt-left-back":
    {
      "dofs": ["ra","z"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [10,-2],
     	"time": 0,
@@ -374,7 +374,7 @@
 "tilt-right-back":
    {
      "dofs": ["ra","x"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [-10,-2],
     	"time": 0,
@@ -389,7 +389,7 @@
 "look-down-left":
    {
      "dofs": ["ya","pa"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [-20,-20],
     	"time": 0,
@@ -404,7 +404,7 @@
 "look-down":
    {
      "dofs": ["pa"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [-20],
     	"time": 0,
@@ -419,7 +419,7 @@
 "look-down-right":
    {
      "dofs": ["ya","pa"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [20,-20],
     	"time": 0,
@@ -434,7 +434,7 @@
 "lift":
    {
      "dofs": ["z"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [2],
     	"time": 0,
@@ -449,7 +449,7 @@
 "drop":
    {
      "dofs": ["z"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [-2],
     	"time": 0,
@@ -464,7 +464,7 @@
 "lift-drop":
    {
      "dofs": ["z"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [2],
     	"time": 0,
@@ -484,7 +484,7 @@
 "lift-drop-lift-drop":
    {
      "dofs": ["z"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [2],
     	"time": 0,
@@ -514,7 +514,7 @@
 "forward":
    {
      "dofs": ["x"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [2],
     	"time": 0,
@@ -529,7 +529,7 @@
 "yes":
    {
      "dofs": ["ra","pa","au6","au25", "au12"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [0,0,2,1,1],
     	"time": 0.2,
@@ -569,7 +569,7 @@
 "yes1":
    {
      "dofs": ["ra","pa","au6","au25", "au12"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [0,0,2,1,1],
     	"time": 0.2,
@@ -594,7 +594,7 @@
 "no":
    {
      "dofs": ["ra","pa","ya", "au4","au12", "au14"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [0,0,0,1,1,1],
     	"time": 0.2,
@@ -634,7 +634,7 @@
 "surprised":
    {
      "dofs": ["x","z","au1", "au2", "au5", "au26"],
-     "keyframes": [	
+     "keyframes": [
       	{
 	"pose": [-3,0,1,1,1,1],
     	"time": 0.3,
@@ -659,7 +659,7 @@
 "frightened":
    {
      "dofs": ["x","z","ra","pa","ya","au1", "au2", "au4", "au5", "au7", "au15","au20", "au26"],
-     "keyframes": [	
+     "keyframes": [
       	{
 	"pose": [-3,3,0,-3,-2,1,1,1,1,1,1,1,1],
     	"time": 1,
@@ -674,7 +674,7 @@
 "think":
    {
      "dofs": ["ra","au2","au4","au20"],
-     "keyframes": [	
+     "keyframes": [
       	{
 	"pose": [10,1,2,1],
     	"time": 0.2,
@@ -689,7 +689,7 @@
 "yay":
    {
      "dofs": ["z","au1","au2","au6","au12","au25"],
-     "keyframes": [	
+     "keyframes": [
       	{
 	"pose": [3,1,1,1,2,2],
     	"time": 0.25,
@@ -724,7 +724,7 @@
 "lovestruck":
    {
      "dofs": ["z","ra"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [4,0],
     	"time": 0.5,
@@ -749,7 +749,7 @@
 "puppy":
    {
      "dofs": ["pa","au1","au4","au16","au18"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [-9,1,1,1,1],
     	"time": 0.3,
@@ -764,7 +764,7 @@
 "idunno":
    {
      "dofs": ["z","ra","au2","au9","au15","au44"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [3,0,1,1,1,1],
     	"time": 0.75,
@@ -794,7 +794,7 @@
 "disgusted":
    {
      "dofs": ["x","pa","au4","au9","au10","au26"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [-4,-3,1,1,1,1],
     	"time": 0.5,
@@ -809,7 +809,7 @@
 "sipping":
    {
      "dofs": ["pa","au8","au10","au25"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [9,1,1,1],
     	"time": 0.5,
@@ -824,7 +824,7 @@
 "sad":
    {
      "dofs": ["ra","pa","au1","au4"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [-5,-7,0.5,0.5],
     	"time": 0.5,
@@ -839,7 +839,7 @@
 "happy":
    {
      "dofs": ["z","ra","pa","x","au12","au13"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [2,5,7,0,0.5,0.5],
     	"time": 0.2,
@@ -864,8 +864,8 @@
 "blech":
    {
      "dofs": ["x","pa", "au4","au9","au10", "au25","au26"],
-     "keyframes": 
-		[	
+     "keyframes":
+		[
         {"pose": [-3,-3,1,1,1,1,1],
     	"time": 0.3,
     	"ending_action": false
@@ -875,12 +875,12 @@
     	"time": 2,
     	"ending_action": false
         }
-     ]	
+     ]
 },
 "bite":
    {
      "dofs": ["x","pa"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [2,0],
     	"time": 0.5,
@@ -905,7 +905,7 @@
 "meh":
    {
      "dofs": ["x","z","ra","pa","au1","au15","au44"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [-2,2,-4,0,1,1,1],
     	"time": 1,
@@ -920,7 +920,7 @@
 "interest":
    {
      "dofs": ["x","ra","au1","au5","au10"],
-     "keyframes": [	
+     "keyframes": [
       	{
 	"pose": [4,8,1,1,1],
     	"time": 0.5,
@@ -935,7 +935,7 @@
 "yawn":
    {
      "dofs": ["z","pa"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [3,5],
     	"time": 2,
@@ -955,7 +955,7 @@
 "wakeup":
    {
      "dofs": ["z","ra"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [0,5],
     	"time": 1,
@@ -980,7 +980,7 @@
 "anticipation":
    {
      "dofs": ["x","pa"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [3,5],
     	"time": 0.5,
@@ -995,7 +995,7 @@
 "mph":
    {
      "dofs": ["z","pa"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [5,0],
     	"time": 1,
@@ -1320,7 +1320,7 @@
 "monologue":
    {
      "dofs": ["x","y","z","ra","pa","ya"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [2,0,0,0,0,0],
     	"time": 0.5,
@@ -1385,13 +1385,318 @@
 "reset":
    {
      "dofs": ["x","y","z","ra","pa","ya"],
-     "keyframes": [	
+     "keyframes": [
         {
 	"pose": [0,0,0,0,0,0],
     	"time": 0.5,
     	"ending_action": false
         }
-      ]}
+      ]},
+"surprised":
+{
+  "dofs": ["au1", "au2", "au5", "au12", "au17", "au43"],
+  "keyframes": [
+    {
+      "pose": [0, 0, 0, 0, 0, 0],
+      "time": 0,
+      "ending_action": false
+    },
+    {
+      "pose": [0.75, 1.0, 0.3, 1.0, 0.75, 0],
+      "time": 0.2,
+      "ending_action": false
+    },
+    {
+      "pose": [0.75, 1.0, 0.3, 1.0, 0.75, 0],
+      "time": 1.5,
+      "ending_action": false
+    },
+    {
+      "pose": [0, 0, 0, 0, 0, 0],
+      "time": 1.7,
+      "ending_action": false
+    }
+  ]
+},
+"pensive":
+{
+  "dofs": ["au1", "au2", "au7", "au17", "au43"],
+  "keyframes": [
+    {
+      "pose": [0, 0, 0, 0, 0],
+      "time": 0,
+      "ending_action": false
+    },
+    {
+      "pose": [0.75, 0.25, 1.0, 0.6, 0],
+      "time": 0.2,
+      "ending_action": false
+    },
+    {
+      "pose": [0.75, 0.25, 1.0, 0.6, 0],
+      "time": 1,
+      "ending_action": false
+    },
+    {
+      "pose": [0, 0, 0, 0, 0],
+      "time": 1.2,
+      "ending_action": false
+    }
+  ]
+},
+"stern":
+  {
+    "dofs": ["au1", "au2", "au4", "au7", "au10", "au18", "au20", "au23"],
+    "keyframes": [
+       {
+           "pose": [0, 0, 0, 0, 0, 0, 0, 0],
+           "time": 0,
+           "ending_action": false
+       },
+       {
+           "pose": [0.48, 1, 1, 0.34, 0.59, 1, 0.4, 0.61],
+           "time": 0.75,
+           "ending_action": false
+       },
+       {
+           "pose": [0.48, 1, 1, 0.34, 0.59, 1, 0.4, 0.61],
+           "time": 1.5,
+           "ending_action": false
+       },
+       {
+           "pose": [0, 0, 0, 0, 0, 0, 0, 0],
+           "time": 1.7,
+           "ending_action": false
+       }
+   ]
+},
+"question1":
+  {
+    "dofs": ["au2"],
+    "keyframes": [
+       {
+           "pose": [0],
+           "time": 0,
+           "ending_action": false
+       },
+       {
+           "pose": [ 0.48],
+           "time": 0.75,
+           "ending_action": false
+       },
+       {
+           "pose": [0.48],
+           "time": 1.5,
+           "ending_action": false
+       },
+       {
+           "pose": [0],
+           "time": 1.75,
+           "ending_action": false
+       }
+   ]
+},
+"question2":
+  {
+    "dofs": ["au1", "au2"],
+    "keyframes": [
+       {
+           "pose": [ 0, 0],
+           "time": 0,
+           "ending_action": false
+       },
+       {
+           "pose": [0.59, 0.48],
+           "time": 0.75,
+           "ending_action": false
+       },
+       {
+           "pose": [0.59, 0.48],
+           "time": 1.5,
+           "ending_action": false
+       },
+       {
+           "pose": [0, 0],
+           "time": 1.75,
+           "ending_action": false
+       }
+   ]
+},
+"question3":
+  {
+    "dofs": ["au1", "au2"],
+    "keyframes": [
+       {
+           "pose": [0, 0],
+           "time": 0,
+           "ending_action": false
+       },
+       {
+           "pose": [0.76, 0.63],
+           "time": 0.75,
+           "ending_action": false
+       },
+       {
+           "pose": [0.76, 0.63],
+           "time": 1.5,
+           "ending_action": false
+       },
+       {
+           "pose": [0, 0],
+           "time": 1.75,
+           "ending_action": false
+       }
+   ]
+},
+"leftBrowRaise":
+  {
+    "dofs": ["au1l", "au2l"],
+    "keyframes": [
+       {
+           "pose": [0, 0],
+           "time": 0,
+           "ending_action": false
+       },
+       {
+           "pose": [0.5, 0.9],
+           "time": 0.75,
+           "ending_action": false
+       },
+       {
+           "pose": [0.5, 0.9],
+           "time": 1.5,
+           "ending_action": false
+       },
+       {
+           "pose": [0, 0],
+           "time": 1.9,
+           "ending_action": false
+       }
+   ]
+},
+"doubleBrowRaise":
+  {
+    "dofs": ["au1", "au2"],
+    "keyframes": [
+       {
+           "pose": [0, 0],
+           "time": 0,
+           "ending_action": false
+       },
+       {
+           "pose": [0.76, 0.9],
+           "time": 0.3,
+           "ending_action": false
+       },
+       {
+           "pose": [0, 0],
+           "time": 0.6,
+           "ending_action": false
+       },
+       {
+           "pose": [0.76, 0.9],
+           "time": 0.9,
+           "ending_action": false
+       },
+       {
+           "pose": [0, 0],
+           "time": 1.2,
+           "ending_action": false
+       }
+   ]
+},
+"loud":
+  {
+    "dofs": ["au1", "au2","au5"],
+    "keyframes": [
+       {
+           "pose": [0, 0, 0],
+           "time": 0,
+           "ending_action": false
+       },
+       {
+           "pose": [0.8, 0.6, 0.6],
+           "time": 0.2,
+           "ending_action": false
+       },
+       {
+           "pose": [0.8, 0.6, 0.6],
+           "time": 1.3,
+           "ending_action": false
+       },
+       {
+           "pose": [0, 0, 0],
+           "time": 1.5,
+           "ending_action": false
+       }
+   ]
+},
+"quiet":
+  {
+    "dofs": ["au4", "au1","au7"],
+    "keyframes": [
+       {
+           "pose": [0, 0, 0],
+           "time": 0,
+           "ending_action": false
+       },
+       {
+           "pose": [0.8, 0.6, 0.6],
+           "time": 0.2,
+           "ending_action": false
+       },
+       {
+           "pose": [0.8, 0.6, 0.6],
+           "time": 1.3,
+           "ending_action": false
+       },
+       {
+           "pose": [0, 0, 0],
+           "time": 1.5,
+           "ending_action": false
+       }
+   ]
+},
+"saucy":
+  {
+    "dofs": ["au1", "au2","au7","au13", "au18", "au23"],
+    "keyframes": [
+       {
+           "pose": [0, 0, 0, 0, 0, 0],
+           "time": 0,
+           "ending_action": false
+       },
+       {
+           "pose": [0.32, 0.68, 0.64, 1.0, 1.0, 1.0],
+           "time": 0.75,
+           "ending_action": false
+       },
+       {
+           "pose": [0, 0, 0, 0, 0, 0],
+           "time": 1.2,
+           "ending_action": false
+       }
+   ]
+},
+"breath":
+  {
+    "dofs": ["au1", "au27"],
+    "keyframes": [
+       {
+           "pose": [0, 0],
+           "time": 0,
+           "ending_action": false
+       },
+       {
+           "pose": [0.2, 0.8],
+           "time": 0.4,
+           "ending_action": false
+       },
+       {
+           "pose": [0, 0],
+           "time": 0.6,
+           "ending_action": false
+       }
+   ]
 }
-
-
+}

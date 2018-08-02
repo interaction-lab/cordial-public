@@ -67,18 +67,17 @@ class LookatServer:
             self._shared["target"] = ""
 
     #TODO: make playing face keyframes interruptable (action?)
-    #TODO: allow unilateral actions
     def keyframe_cb(self, goal):
-        aus = map(lambda s:int(s[2:]), goal.face_dofs)
+        aus = map(lambda s: s[2:], goal.face_dofs)
         elapsed = 0
         for i in range(len(goal.frames)):
             poses = goal.frames[i].positions
             time = int(goal.times[i]*1000)-elapsed
-            req = FaceRequest(aus=aus, au_degrees = poses, au_ms=time)
+            req = FaceRequest(aus=aus, au_degrees=poses, au_ms=time)
             self._face_pub.publish(req)
             rospy.sleep(time/1000.0)
             elapsed += time
-                    
+
 
 if __name__=='__main__':
     rospy.init_node('cordial_lookat')

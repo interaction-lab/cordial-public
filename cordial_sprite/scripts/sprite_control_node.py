@@ -46,13 +46,13 @@ import random
 DELTA_T = 0.1
 
 class SPRITEAnimator:
-   # create messages that are used to publish feedback/result   
+   # create messages that are used to publish feedback/result
    _feedback = cordial_sprite.msg.KeyframePlayerFeedback()
    _result   = cordial_sprite.msg.KeyframePlayerResult()
 
    def __init__(self, filename, port, robot_name, zeros):
       #start action server
-      
+
       self._base_topic = ""
       base_topic=self._base_topic
 
@@ -80,7 +80,7 @@ class SPRITEAnimator:
       self._current_pose = [0,0,0,0,0,0]
       self.move_robot([0,0,0,0,0,0], vlim=5)
       rospy.sleep(3.0)
-      
+
       self._thread_dict= {"lookat":False, "idle":False}
 
       self._tb = tf.TransformBroadcaster()
@@ -98,7 +98,7 @@ class SPRITEAnimator:
       self._server.start()
       rospy.loginfo("Keyframe player server started.")
 
-   def idle(self):   
+   def idle(self):
       current_pose= self._current_pose
       dofs = ['z','pa','ya']
       dof_i = [2,4,5]
@@ -110,14 +110,14 @@ class SPRITEAnimator:
             rospy.sleep(0.1)
          else:
             i = random.choice(range(len(dofs)))
-      
+
             target_dofs = [dofs[i]]
             target_positions = [[current_pose[dof_i[i]]+last_direction[i]*movements[i]]]
             last_direction[i]*=-1
 
             self.move_through_frames(target_positions,[1.0],dofs=target_dofs)
             rospy.sleep(random.randrange(50,400)/100)
-      
+
 
 
    def pose_pub(self):
@@ -138,11 +138,11 @@ class SPRITEAnimator:
       self.mc.set_v_all(vlim)
 
       frame = self.config_space(pose_6d)
-      
+
       for m in range(6):
          if m % 2 == 1:
             frame[m]=-frame[m]
-       
+
       for m in range(6):
          if self.mc.set_motor_angle(m, frame[m]):
             self._current_pose = pose_6d
@@ -197,7 +197,7 @@ class SPRITEAnimator:
 
    def stop_tracking(self):
       self._thread_dict["lookat"]=False
-      
+
 
    def adjust_timing(self, keyframes, times, max_v = 50): #max_v in deg/s
       for i in range(len(keyframes)-1):
@@ -206,15 +206,15 @@ class SPRITEAnimator:
 
          motors_s = self.config_space(start)
          motors_t = self.config_space(target)
-         
+
          d = [0,0,0,0,0,0]
-      
+
          for j in range(6):
             d[j] = abs(motors_t[j]-motors_s[j])
 
          min_t = max(map(lambda dist: dist/max_v, d))
 
-         if times[i+1]-times[i] < min_t: 
+         if times[i+1]-times[i] < min_t:
             time_adj = min_t-(times[i+1]-times[i])
             rospy.logwarn("Moving too quickly; adjusting frames after frame " + str(i) + " by " + str(time_adj) + " seconds")
             for j in range(i+1,len(times)):
@@ -229,7 +229,7 @@ class SPRITEAnimator:
       poses = self.i.get_poses(spline, dt)
       pre = poses[1:]
       post = poses[:-1]
-      
+
 
    def broadcast_move_start(self):
       self._thread_dict["moving"]=True
@@ -254,7 +254,7 @@ class SPRITEAnimator:
 
       # move to first pose TODO: LIMIT BY MOTOR SPEED
       start = self._current_pose
-      
+
       all_dofs = ["x","y","z","ra","pa","ya"]
       def fill_in_dofs(frame):
          outframe = [n for n in start]
@@ -263,7 +263,7 @@ class SPRITEAnimator:
          return outframe
 
       keyframes= map(lambda f: fill_in_dofs(f), keyframes)
-      
+
       keyframes = [start]+keyframes
       times = [0]+times
 
@@ -275,7 +275,7 @@ class SPRITEAnimator:
             rospy.logwarn("No movement needed; already at target")
             self.broadcast_move_end()
             return success
-      
+
       keyframes,times = self.adjust_timing(keyframes,times)
 
       try:
@@ -321,12 +321,12 @@ class SPRITEAnimator:
       frame = self.config_space(pose_6d)
       cur_frame=self.config_space(self._current_pose)
       #print "frame: " + str(cur_frame)
-      
+
       for m in range(6):
          if m % 2 == 1:
             frame[m]=-frame[m]
             cur_frame[m]=-cur_frame[m]
-       
+
       for m in range(6):
          speed = abs(cur_frame[m]-frame[m])/time
          #print cur_frame[m]-frame[m]
@@ -341,7 +341,7 @@ class SPRITEAnimator:
       self._thread_dict["idle"]=False
       #self.preempt_movement() #only necessary if using idle
       success=True
-      
+
       if goal.behavior == "lookat":
          l = LookatRequest(follow_frame=True, frameid=goal.args[0])
          self._face_lookat.publish(l)
@@ -430,7 +430,7 @@ class SPRITEAnimator:
          success = self.move_through_frames(body_frames, times, body_dofs)
       return success
 
-   
+
    #takes a 1D array of 6 elements (x,x,y,u,v,w) and converts to hexapod terms
    def config_space(self, pose):
       x = -pose[0]
@@ -443,10 +443,10 @@ class SPRITEAnimator:
       c = list(h.best_effort_ik(x,y,z,u,v,w))
       return c
 
-   #TODO - function needs 
+   #TODO - function needs
    def check_vel(x1, x2, dt):
       pass
-               
+
 if __name__ == '__main__':
    parser = argparse.ArgumentParser(description='Controller for the movement of the SPRITE robot')
    parser.add_argument('-p', '--port', help='Serial port robot is attached on')
@@ -455,7 +455,7 @@ if __name__ == '__main__':
    parser.add_argument('-z', '--zeros', nargs=6, help="Zero positions (in ticks) for the 6 motors on the SPRITE, separated by spaces")
 
    args = parser.parse_known_args()[0]
-    
+
    rospy.init_node('sprite_animator')
    port = args.port
    name = args.name
@@ -466,4 +466,3 @@ if __name__ == '__main__':
 
    while not rospy.is_shutdown():
       rospy.spin()
-

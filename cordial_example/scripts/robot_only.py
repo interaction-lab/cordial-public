@@ -29,5 +29,5 @@ from robot_manager import RobotManager
 if __name__=="__main__":
     rospy.init_node("CoRDial_example")
     rm = RobotManager("DB1")
-    for i in range(1,6):
+    for i in range(1,15):
         rm.say("statement{}".format(i),wait=True)
