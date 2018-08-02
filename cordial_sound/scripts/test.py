@@ -53,7 +53,7 @@ if __name__ == '__main__':
     soundhandle = SoundClient()
 
     rospy.sleep(1)
-    
+
     soundhandle.stopAll()
 
     print "This script will run continuously until you hit CTRL+C, testing various sound_node sound types."
@@ -62,15 +62,15 @@ if __name__ == '__main__':
     #print 'Try to play wave files that do not exist.'
     #soundhandle.playWave('17')
     #soundhandle.playWave('dummy')
-        
+
     #print 'say'
     #soundhandle.say('Hello world!')
     #sleep(3)
-    #    
+    #
     print 'wave'
-    soundhandle.playWave('say-beep.wav')
-    sleep(2)
-        
+    soundhandle.playWave('DanceSong.ogg')
+    sleep(4)
+
     print 'plugging'
     soundhandle.play(SoundRequest.NEEDS_PLUGGING)
     sleep(2)
