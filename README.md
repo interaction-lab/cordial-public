@@ -45,6 +45,7 @@ $ git clone https://github.com/interaction-lab/cordial-public.git
 7. Make everything
 
 ~~~~
+$ cd ..
 $ catkin_make clean
 $ catkin_make
 $ catkin_make install
