@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.4.6)
 
 project(cordial_sound)
 
+catkin_python_setup()
+
 find_package(catkin REQUIRED message_generation geometry_msgs)
 
 add_message_files(
