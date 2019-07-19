@@ -34,7 +34,14 @@ $ sudo apt-get install ros-kinetic-rosbridge-server vorbis-tools python-pygame p
 
       * Give the IAM user access permissions to AWS Polly.
       * Give the IAM user access keys. Be sure to save the secret key as you only have one chance to look at it.
-
+      
+    https://docs.aws.amazon.com/cli/latest/userguide/install-linux.html - Use this link to install the AWS CLI on your PC.
+    
+    Then, in the terminal,
+    ~~~~
+    $ aws configure
+    $ Enter the IAM user access and secret keys here.
+    ~~~~
 
 6. Clone the repository in <your_catkin_workspace>/src
 
