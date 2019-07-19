@@ -82,6 +82,7 @@ $ sudo ufw allow 9090
         $ roscd cordial_face/web
         $ http-server
         # Navigate to second address listed in web browser to view the robot face screen
+        # Go to any of the first 4 options - Kiwi GL/Kiwi/Chili GL/Chili
         ~~~~
 
     4. run example (In a new terminal window):
