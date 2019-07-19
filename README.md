@@ -40,7 +40,7 @@ $ sudo apt-get install ros-kinetic-rosbridge-server vorbis-tools python-pygame p
     Then, in the terminal,
     ~~~~
     $ aws configure
-    $ Enter the IAM user access and secret keys here.
+    # Enter the IAM user access and secret keys here.
     ~~~~
 
 6. Clone the repository in <your_catkin_workspace>/src
