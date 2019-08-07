@@ -34,19 +34,28 @@ $ sudo apt-get install ros-kinetic-rosbridge-server vorbis-tools python-pygame p
 
       * Give the IAM user access permissions to AWS Polly.
       * Give the IAM user access keys. Be sure to save the secret key as you only have one chance to look at it.
+      
+    https://docs.aws.amazon.com/cli/latest/userguide/install-linux.html - Use this link to install the AWS CLI on your PC.
+    
+    Then, in the terminal,
+    ~~~~
+    $ aws configure
+    # Enter the IAM user access and secret keys here.
+    ~~~~
 
-
-6. Clone the repository
+6. Clone the repository in <your_catkin_workspace>/src
 
 ~~~~
-$ roscd
 $ git clone https://github.com/interaction-lab/cordial-public.git
 ~~~~
 
 7. Make everything
 
 ~~~~
-$ rosmake cordial_sprite cordial_tablet
+$ cd ..
+$ catkin_make clean
+$ catkin_make
+$ catkin_make install
 ~~~~
 
 8. If you're on 16.10, add the rosbridge websocket port to your firewall's allowed list
@@ -80,6 +89,7 @@ $ sudo ufw allow 9090
         $ roscd cordial_face/web
         $ http-server
         # Navigate to second address listed in web browser to view the robot face screen
+        # Go to any of the first 4 options - Kiwi GL/Kiwi/Chili GL/Chili
         ~~~~
 
     4. run example (In a new terminal window):

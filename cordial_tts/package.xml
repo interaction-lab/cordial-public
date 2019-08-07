@@ -1,0 +1,17 @@
+<package>
+  <name>cordial_tts</name>
+  <version>0.1.2</version>
+  <description >
+
+     Interface to use CoRDial with Ivona Text-To-Speech
+
+  </description>
+  <author>Elaine Short</author>
+  <maintainer email="prmehta24@gmail.com">Parimal Mehta</maintainer>
+  <license>GPL</license>
+  <url>http://ros.org/wiki/cordial_tts</url>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rospy</build_depend>
+</package>
+
+

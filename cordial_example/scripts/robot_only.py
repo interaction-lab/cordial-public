@@ -4,7 +4,7 @@
 
 import roslib; roslib.load_manifest('cordial_example')
 import rospy
-from robot_manager import RobotManager
+from cordial_core import RobotManager
 
 #------------------------------------------------------------------------------
 # Example robot use with CoRDial
