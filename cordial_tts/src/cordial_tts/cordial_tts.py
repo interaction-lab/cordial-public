@@ -27,6 +27,9 @@ from botocore.exceptions import BotoCoreError, ClientError
 from contextlib import closing
 import pygame
 import tempfile
+import time
+
+MIN_VIS_THRESH=100
 
 class CoRDialTTS():
     def __init__(self, voice, **kwargs):
@@ -34,7 +37,7 @@ class CoRDialTTS():
         self.aws_polly = client("polly")
 
     def extract_behaviors(self,line):
-        vis_transl = {"p": "M_B_P",
+        '''vis_transl = {"p": "M_B_P",
                   "t": "N_NG_D_Z",
                   "S": "CH_SH_ZH",
                   "T": "N_NG_D_Z",
@@ -52,7 +55,7 @@ class CoRDialTTS():
                   "o": "AO_AW",
                   "O": "AA_AH",
                   "u": "AO_AW",
-                  "sil": "IDLE"}
+                  "sil": "IDLE"}'''
         
 
         tokens = re.split("(<[^<>]*>)", line)
@@ -115,11 +118,18 @@ class CoRDialTTS():
                          "args":args,
 			 "id": a[1]}) # End edits
 
-	visemes = map(lambda l: [l["time"],vis_transl[l["value"]]], filter(lambda l: l["type"]=="viseme",s))
-	for v in visemes:
-            data.append({"start":float(v[0]) / 1000.,  # convert ms to seconds
+	visemes = map(lambda l: [l["time"],l["value"]], filter(lambda l: l["type"]=="viseme",s))
+
+        prev_vis = -MIN_VIS_THRESH
+	for i in range(len(visemes)):
+            if visemes[i][0]-prev_vis<MIN_VIS_THRESH:
+                continue
+
+            data.append({"start":float(visemes[i][0]) / 1000.,  # convert ms to seconds
                          "type":"viseme",
-                         "id": v[1]})	
+                         "id":"viseme",
+                         "args":visemes[i][1]})
+            prev_vis = visemes[i][0]
 
 
         return phrase, data
@@ -180,7 +190,7 @@ class CoRDialTTS():
             else:
                 print("Could not stream audio")
                 sys.exit(-1)
-            
+
             f.seek(0)
 
             if not pygame.mixer.get_init():
@@ -190,11 +200,14 @@ class CoRDialTTS():
                     pygame.mixer.stop()
             channel = pygame.mixer.Channel(5)
             sound = pygame.mixer.Sound(f)
+
             channel.play(sound)
             if wait:
+                print "Waiting for audio to finish"
                 while channel.get_busy():
                     pass
                 return -1
+            print "Returning immediately; remaining sound time is {}".format(sound.get_length())
             return sound.get_length()
 	    
 
