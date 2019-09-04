@@ -1036,7 +1036,11 @@ Calculates the positions of all the facial features based on the current value o
 t - float representing the milliseconds it should take to move to the current AU set
 notViseme - flag to determine if the movement is a viseme. If it is, we only will modify the mouth shape
 */
-function move_face(t, notViseme=true){
+function move_face(t, notViseme){
+    if(notViseme == undefined){
+      notViseme = true
+    }
+
     if(notViseme){
       // ***** BROWS ***** (AU 1, 2, 4)
       lbrow = getPart("lbrow")
