@@ -21,7 +21,6 @@ A modification of the sound_play node. sound_play provides a ROS node that trans
   <build_depend>gstreamer0.10-plugins-ugly</build_depend>
   <build_depend>gstreamer0.10-plugins-good</build_depend>
 
-
   <export>
     <cpp cflags="-I${prefix}/include -I${prefix}/msg/cpp" />
   </export>
