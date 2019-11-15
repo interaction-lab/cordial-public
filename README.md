@@ -14,6 +14,7 @@ CoRDial Setup Instructions
 $ sudo apt-get install nodejs
 $ sudo apt-get install npm
 $ sudo npm install http-server -g
+$ sudo pip install boto3
 
 $ ln -s /usr/bin/nodejs /usr/bin/node
 
