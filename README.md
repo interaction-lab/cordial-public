@@ -15,7 +15,7 @@ $ sudo apt-get install nodejs
 $ sudo apt-get install npm
 $ sudo npm install http-server -g
 
-$ ln -s /usr/bin/nodejs /usr/bin/node
+$ sudo ln -s /usr/bin/nodejs /usr/bin/node
 
 
 $ sudo apt-get install ros-kinetic-rosbridge-server vorbis-tools python-pygame python-requests python-serial ros-kinetic-tf python-gst0.10 python-scipy
