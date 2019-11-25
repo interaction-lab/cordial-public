@@ -12,6 +12,8 @@
 
   <node name="cordial_sound" pkg="cordial_sound" type="soundplay_node.py" output ="screen" ns="$(arg robot_name)"/>
 
+  <node name="robot_only" pkg="cordial_example" type="robot_only.py" output="screen"/>
+  
   <include file="$(find cordial_face)/launch/face.launch">
       <arg name="name" value="$(arg robot_name)"/>
   </include>
