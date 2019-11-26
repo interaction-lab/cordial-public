@@ -22,6 +22,7 @@
 import roslib; roslib.load_manifest('cordial_core')
 import rospy
 from cordial_core.msg import *
+from std_msgs.msg import String
 import actionlib
 
 class RobotManager():
@@ -48,6 +49,7 @@ class RobotManager():
         rospy.loginfo("Saying: " + phrase_name)
         goal = PlayerGoal(phrase=phrase_name, interrupt=interrupt)
         self._speech_client.send_goal(goal)
+
         if wait:
             rospy.loginfo("Waiting for speech server result")
             self._speech_client.wait_for_result(rospy.Duration(60.0))

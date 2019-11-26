@@ -35,7 +35,6 @@
 #***********************************************************
 
 # Author: Blaise Gassend
-
 import rospy
 import os, sys
 from cordial_sound.msg import SoundRequest
