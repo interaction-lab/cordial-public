@@ -41,6 +41,8 @@ class PlayerServer():
     def __init__(self, phone_face, delay=0.0,phrase_file=None, use_tts=False, voice=None):
         self._use_tts = use_tts in ['true', 'True', 'TRUE', '1']
 
+        self.phrase_file = phrase_file
+
         if phrase_file and not len(phrase_file)>0 and not use_tts:
             rospy.logerr("CoRDial Player Error: Must specify phrase file or allow tts! Continuing without sound...")
             self._sound = False
@@ -128,6 +130,13 @@ class PlayerServer():
         phrase_found = False
         if self._phrases:
             try:
+                #added for a second
+                if self._use_tts:
+                    with open(self.phrase_file, 'r') as f:
+                        s = f.read()
+                        self._phrases = yaml.load(s)
+
+
                 behaviors = self._phrases[goal.phrase]["behaviors"]
                 phrase_found = True
             except KeyError as k:
