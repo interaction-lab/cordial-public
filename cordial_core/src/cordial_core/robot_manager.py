@@ -31,7 +31,6 @@ class RobotManager():
         base_topic = robot_name
 
         self._speech_client = actionlib.SimpleActionClient(base_topic+'/Player',PlayerAction)
-        self._play_publisher = rospy.Publisher('/qt_robot/audio/play', String)
 
         rospy.loginfo("Waiting for CoRDial Action Servers")
         rospy.loginfo(" --- Robot Behavior Controller")
@@ -50,9 +49,7 @@ class RobotManager():
         rospy.loginfo("Saying: " + phrase_name)
         goal = PlayerGoal(phrase=phrase_name, interrupt=interrupt)
         self._speech_client.send_goal(goal)
-        if not wait:
-            phrase_name = 'QT/' + phrase_name
-            self._play_publisher.publish(phrase_name)
+
         if wait:
             rospy.loginfo("Waiting for speech server result")
             self._speech_client.wait_for_result(rospy.Duration(60.0))
