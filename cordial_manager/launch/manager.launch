@@ -1,0 +1,16 @@
+<!-- This is an example launch file for how a ROS application could use a cordial_behavior -->
+<launch>
+	
+   	<arg name="robot_name" default="DB1"/>
+	<arg name="use_manager" default="true"/>
+  	<group if="$(arg use_manager)">
+    	<node pkg="cordial_manager" type="manager.py" name="manager" output="screen"/>
+		<include file="$(find cordial_lex)/launch/lex_demo.launch" />
+		<include file="$(find cordial_behavior)/launch/behaviors.launch" />
+		<include file="$(find cordial_tts)/launch/tts.launch" />
+		<include file="$(find cordial_face)/launch/face_client.launch">
+  		</include>
+  	</group>
+
+
+</launch>
