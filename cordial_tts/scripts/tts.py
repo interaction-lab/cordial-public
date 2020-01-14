@@ -33,8 +33,8 @@ class TTSManager():
 		rospy.spin()
 
 	def handle_tts_realtime(self, req):
-		#outdir = os.path.dirname(os.path.abspath("home/qtrobot/cordial-public-micol/cordial_lex/script/data/"))
-		outdir = "/home/qtrobot/test_ws/src/cordial-public-micol/cordial_lex/scripts/data"
+		#outdir = os.path.dirname(os.path.abspath("home/qtrobot/catkin_ws/cordial-public/cordial_lex/script/data/"))
+		outdir = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_lex/scripts/data"
 		voice = "Ivy"	
 		tts = CoRDialTTS(voice)
 		phraseID = "1"
