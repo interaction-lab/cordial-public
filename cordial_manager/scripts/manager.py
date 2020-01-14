@@ -21,10 +21,12 @@ class InteractionManager():
 		rospy.Subscriber(self.pi_topic+"/microphone_input", AudioData, self.handle_microphone_input)
 		rospy.Subscriber(self.pi_topic+"/state", String, self.handle_state)
 		rospy.Subscriber(self.nuc_topic+"/text_output", String, self.handle_text_output)
+		rospy.Subscriber(self.nuc_topic+"/gestures", String, self.handle_gestures)
 		rospy.Subscriber(self.nuc_topic+"/behavior", String, self.handle_behavior)
 		rospy.Subscriber(self.nuc_topic+"/face", String, self.handle_face)
 		rospy.Subscriber(self.nuc_topic+"/speaker_output/play", PlayRequest, self.handle_speaker_play)
 		rospy.Subscriber(self.pi_topic+"/speaker_state", Bool, self.handle_speaker_state)
+		self.gestures_pub = rospy.Publisher(self.pi_topic+"/gestures", String, queue_size=1)
 		self.microphone_input_pub = rospy.Publisher(self.nuc_topic+"/microphone_input", AudioData, queue_size = 5)
 		self.speaker_output = rospy.Publisher(self.pi_topic+"/speaker_output/play", PlayRequest, queue_size = 5)
 		self.state_pub = rospy.Publisher(self.nuc_topic+"/state", String, queue_size = 10)
@@ -33,6 +35,11 @@ class InteractionManager():
 		self.behavior_pub = rospy.Publisher(self.pi_topic+"/behavior", String, queue_size = 10)
 		self.face_pub = rospy.Publisher(self.pi_topic+"/face", String, queue_size = 10)
 		rospy.spin()
+
+
+	def handle_gestures(self, req):
+		self.gestures_pub.publish(req.data)
+		return
 
 
 	def handle_microphone_input(self, req):
