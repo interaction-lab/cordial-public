@@ -7,6 +7,7 @@ from std_msgs.msg import String
 from std_msgs.msg import Bool
 from audio_common_msgs.msg import AudioData
 from qt_robot_speaker.msg import PlayRequest
+from qt_robot_gestures.msg import Gesture
 
 class InteractionManager():
 	
@@ -21,12 +22,12 @@ class InteractionManager():
 		rospy.Subscriber(self.pi_topic+"/microphone_input", AudioData, self.handle_microphone_input)
 		rospy.Subscriber(self.pi_topic+"/state", String, self.handle_state)
 		rospy.Subscriber(self.nuc_topic+"/text_output", String, self.handle_text_output)
-		rospy.Subscriber(self.nuc_topic+"/gestures", String, self.handle_gestures)
+		rospy.Subscriber(self.nuc_topic+"/gestures", Gesture, self.handle_gestures)
 		rospy.Subscriber(self.nuc_topic+"/behavior", String, self.handle_behavior)
 		rospy.Subscriber(self.nuc_topic+"/face", String, self.handle_face)
 		rospy.Subscriber(self.nuc_topic+"/speaker_output/play", PlayRequest, self.handle_speaker_play)
 		rospy.Subscriber(self.pi_topic+"/speaker_state", Bool, self.handle_speaker_state)
-		self.gestures_pub = rospy.Publisher(self.pi_topic+"/gestures", String, queue_size=1)
+		self.gestures_pub = rospy.Publisher(self.pi_topic+"/gestures", Gesture, queue_size=1)
 		self.microphone_input_pub = rospy.Publisher(self.nuc_topic+"/microphone_input", AudioData, queue_size = 5)
 		self.speaker_output = rospy.Publisher(self.pi_topic+"/speaker_output/play", PlayRequest, queue_size = 5)
 		self.state_pub = rospy.Publisher(self.nuc_topic+"/state", String, queue_size = 10)
@@ -38,7 +39,7 @@ class InteractionManager():
 
 
 	def handle_gestures(self, req):
-		self.gestures_pub.publish(req.data)
+		self.gestures_pub.publish(req.gesture_timing, req.gesture_name)
 		return
 
 
