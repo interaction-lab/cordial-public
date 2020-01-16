@@ -28,7 +28,7 @@ class InteractionManager():
 		rospy.Subscriber(self.nuc_topic+"/face", String, self.handle_face)
 		rospy.Subscriber(self.nuc_topic+"/speaker_output/play", PlayRequest, self.handle_speaker_play)
 		rospy.Subscriber(self.pi_topic+"/speaker_state", Bool, self.handle_speaker_state)
-		self.qt_gesture_list_pub = Publisher(self.nuc_topic+"/gestures/list", String, queue_size = 5)
+		self.qt_gesture_list_pub = rospy.Publisher(self.nuc_topic+"/gestures/list", String, queue_size = 5)
 		self.gestures_pub = rospy.Publisher(self.pi_topic+"/gestures", Gesture, queue_size=1)
 		self.microphone_input_pub = rospy.Publisher(self.nuc_topic+"/microphone_input", AudioData, queue_size = 5)
 		self.speaker_output = rospy.Publisher(self.pi_topic+"/speaker_output/play", PlayRequest, queue_size = 5)

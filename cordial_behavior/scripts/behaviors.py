@@ -43,7 +43,7 @@ class BehaviorManager():
 		print("Handle gestures")
 		ordered_behaviors = sorted(gesture_behaviors, key=lambda behavior: behavior["start"])
 		timing_word_behaviors = word_timing + gesture_behaviors
-		ordered_timing_word_behaviors = sorted(timing_word_behaviors, key=lambda behavior: behavior["start"])
+		ordered_timing_word_behaviors = sorted(timing_word_behaviors, key=lambda behavior: behavior["start"]) # I dont know why is not sorted!!!!! CHECK IT
 		print(ordered_timing_word_behaviors)
 		start_time = rospy.Time.now()
 		for index, behav in enumerate(ordered_timing_word_behaviors[:-1]):
