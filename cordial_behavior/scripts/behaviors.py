@@ -12,7 +12,6 @@ from threading import Timer
 
 
 #data = "[{'start': 0.006, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.075, 'type': 'viseme', 'id': 'POSTALVEOLAR'}, {'start': 0.136, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 0.264, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.332, 'type': 'viseme', 'id': 'CLOSE_BACK_VOWEL'}, {'start': 0.383, 'type': 'viseme', 'id': 'VELAR_GLOTTAL'}, {'start': 0.463, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 0.535, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.571, 'type': 'viseme', 'id': 'MID_CENTRAL_VOWEL'}, {'start': 0.581, 'args': [], 'type': 'action', 'id': 'QT/emotions/angry'}, {'start': 0.611, 'type': 'viseme', 'id': 'BILABIAL'}, {'start': 0.689, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 0.73, 'type': 'viseme', 'id': 'VELAR_GLOTTAL'}, {'start': 0.829, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 0.951, 'type': 'viseme', 'id': 'LABIODENTAL'}, {'start': 1.009, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 1.076, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.174, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 1.254, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.307, 'type': 'viseme', 'id': 'INTERDENTAL'}, {'start': 1.337, 'type': 'viseme', 'id': 'MID_CENTRAL_VOWEL'}, {'start': 1.368, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.3780000000000001, 'args': [], 'type': 'action', 'id': 'QT/point_front'}, {'start': 1.51, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.617, 'type': 'viseme', 'id': 'BILABIAL'}, {'start': 1.699, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.804, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.857, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.903, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.977, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 2.107, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 2.281, 'type': 'viseme', 'id': 'IDLE'}]"
-gesture_timing = 2
 
 class BehaviorManager():
 
@@ -27,7 +26,6 @@ class BehaviorManager():
 		rospy.spin()
 	
 	def handle_behavior(self, data):
-		print("Handle behaviors")
 		data = literal_eval(data.data)
 		#data = literal_eval(data)
 		word_timing = filter(lambda b: b["type"] == "word", data)
@@ -40,20 +38,18 @@ class BehaviorManager():
 		
 	def handle_gestures(self, gesture_behaviors, word_timing):
 		#Handle Gesures
-		print("Handle gestures")
 		ordered_behaviors = sorted(gesture_behaviors, key=lambda behavior: behavior["start"])
 		timing_word_behaviors = word_timing + gesture_behaviors
 		ordered_timing_word_behaviors = sorted(timing_word_behaviors, key=lambda behavior: behavior["start"]) # I dont know why is not sorted!!!!! CHECK IT
-		print(ordered_timing_word_behaviors)
 		start_time = rospy.Time.now()
 		for index, behav in enumerate(ordered_timing_word_behaviors[:-1]):
-			print(behav["type"])
 			if behav["type"] != "word":
 				while rospy.Time.now()-start_time < rospy.Duration.from_sec(behav["start"]):
 					pass
-				gesture_timing = ordered_timing_word_behaviors[index + 1]["start"] - ordered_timing_word_behaviors[index]["start"] #you cannot have a behavior sets at the end of the sentence
-				print(gesture_timing)
-				rospy.loginfo("Play " + str(behav["id"]) + " at time:" + str(behav["start"] + "with a duration of: " + gesture_timing))
+				if index == len(ordered_timing_word_behaviors) - 1:
+					gesture_timing = ordered_timing_word_behaviors[index +1 ]["time"]
+				gesture_timing = float(ordered_timing_word_behaviors[index + 2]["start"] - ordered_timing_word_behaviors[index + 1]["start"])/1000 #you cannot have a behavior sets at the end of the sentence
+				rospy.loginfo("Play " + str(behav["id"]) + " at time:" + str(behav["start"]) + " with a duration of: " + str(gesture_timing))
 				self.gesture_publisher.publish(gesture_timing, behav["id"])
 
 	def handle_visemes(self, viseme_behaviors):
