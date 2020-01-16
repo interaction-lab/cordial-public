@@ -42,7 +42,7 @@ class BehaviorManager():
 		#Handle Gesures
 		print("Handle gestures")
 		ordered_behaviors = sorted(gesture_behaviors, key=lambda behavior: behavior["start"])
-		timing_word_behaviors = gesture_behaviors + word_timing
+		timing_word_behaviors = word_timing + gesture_behaviors
 		ordered_timing_word_behaviors = sorted(timing_word_behaviors, key=lambda behavior: behavior["start"])
 		print(ordered_timing_word_behaviors)
 		start_time = rospy.Time.now()
