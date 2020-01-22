@@ -91,7 +91,7 @@ class BehaviorManager():
 					pass
 				if index == len(ordered_timing_word_behaviors) - 1:
 					gesture_timing = ordered_timing_word_behaviors[index +1 ]["time"]
-				gesture_timing = float(ordered_timing_word_behaviors[index + 2]["start"] - ordered_timing_word_behaviors[index + 1]["start"])/1000 #you cannot have a behavior sets at the end of the sentence
+				gesture_timing = float(ordered_timing_word_behaviors[index +1]["time"]) #you cannot have a behavior sets at the end of the sentence
 				rospy.loginfo("Play " + str(behav["id"]) + " at time:" + str(behav["start"]) + " with a duration of: " + str(gesture_timing))
 				self.gesture_publisher.publish(gesture_timing, behav["id"])
 
