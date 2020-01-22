@@ -49,7 +49,7 @@ class InteractionManager():
 		rospy.spin()
 
 	def track_control(self, data):
-		print(self.track_state)
+		#print(self.track_state)
 		if(data.data):
 			if self.track_state == Track.NONE:
 				self.track_state = Track.INITIAL

@@ -67,16 +67,24 @@ class BehaviorManager():
 	def handle_facial_expression(self, facial_expression_behaviors):
 		rospy.loginfo(facial_expression_behaviors)
 		ordered_facial_behaviors = sorted(facial_expression_behaviors, key=lambda behavior: behavior["start"])
-		for f_expr in ordered_facial_behaviors:
-			f_expr_data = filter(lambda b: b["au_name"] in f_expr, self.face_expression_au)
-			for f in f_expr_data:
-				f_expr_req = FaceRequest(aus=f['aus'], au_degrees=f['au_degrees'], au_ms=f['au_ms'])
-				def send_facerequest():
-					print("Send face request")
-					self.face_publisher.publish(f_expr_req)
-				t = Timer(0.1, send_facerequest)
-				t.start()
-				start_time = rospy.Time.now()
+		validated_face_expr = []
+		for au in self.face_expression_au:
+			for fexp in  ordered_facial_behaviors:
+				if au['au_name'] == fexp['id']:
+					validated_face_expr.append(au)
+
+		for f in validated_face_expr:
+			aus = map(lambda s: s[2:], f['aus'])
+			au_ms = f['au_ms']*1000
+			print(str(aus), str(f['au_degrees']), str(au_ms))
+			f_expr_req = FaceRequest(aus=aus, au_degrees=f['au_degrees'], au_ms=au_ms)
+			def send_facerequest():
+				print("Send face request")
+				self.face_publisher.publish(f_expr_req)
+			rospy.sleep(0.5) #TODO: change that!
+			t = Timer(0.1, send_facerequest)
+			t.start()
+			start_time = rospy.Time.now()
 
 		
 	def handle_gestures(self, gesture_behaviors, word_timing):
@@ -112,7 +120,7 @@ class BehaviorManager():
 		def send_visemes():
 			print("Send viseme")
 			self.face_publisher.publish(viseme_req)
-		t = Timer(0.1, send_visemes)
+		t = Timer(0.01, send_visemes)
 		t.start()
 		start_time = rospy.Time.now()
 
