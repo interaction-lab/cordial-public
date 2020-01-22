@@ -23,6 +23,8 @@ class AudioInput():
 		#call the AudioConversationText service to send audio to Lex
 	   	rospy.Subscriber(self.nuc_topic+"/microphone_input", AudioData, self.send_audioToAWS_client)
 		rospy.Subscriber(self.nuc_topic+"/state", String, self.handle_state)
+		rospy.Subscriber('/cordial_lex/text_input', String, self.send_textToAWS)
+		self.audio_output_publisher = rospy.Publisher(self.nuc_topic+"/lex/audio_output", String, queue_size = 10)
 		rospy.spin()
 
 	def handle_lex_response(self,lex_response):
@@ -37,8 +39,6 @@ class AudioInput():
 
 	def send_audioToAWS_client(self,audiodatarequest):
 		#initialize the publisher to send response to be played from tts
-		print("Publish the ResponseAudio")
-		self.audio_output_publisher = rospy.Publisher(self.nuc_topic+"/lex/audio_output", String, queue_size = 10)
 		print("Starting client request..")
 		audiodata = audiodatarequest.data
 		rospy.wait_for_service("/lex_node/lex_conversation")
@@ -48,6 +48,20 @@ class AudioInput():
 		                           accept_type='text/plain; charset=utf-8',
 		                           text_request=None,
 		                           audio_request=AudioData(data=audiodata))
+			self.handle_lex_response(lex_response)
+		except rospy.ServiceException, e:
+			print "Service call failed: %s" %e
+
+	def send_textToAWS(self,textdatarequest):
+		print("Starting client request..")
+		textdata = textdatarequest.data
+		rospy.wait_for_service("/lex_node/lex_conversation")
+		try:
+			send_data_service = rospy.ServiceProxy("/lex_node/lex_conversation", AudioTextConversation)
+			lex_response = send_data_service(content_type='text/plain; charset=utf-8',
+		                           accept_type='text/plain; charset=utf-8',
+		                           text_request= textdata,
+		                           audio_request= AudioData(data=''))
 			self.handle_lex_response(lex_response)
 		except rospy.ServiceException, e:
 			print "Service call failed: %s" %e
