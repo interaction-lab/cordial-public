@@ -76,7 +76,7 @@ $ sudo ufw allow 9090
 
     https://help.github.com/articles/generating-an-ssh-key/
     
-10. Test your installation (Method 1)
+10. Test your installation (Classic Method)
 
     1. generate audio files (only needs to be done once or when changes to speech are made):
         
@@ -104,6 +104,20 @@ $ sudo ufw allow 9090
         ~~~~
         $ rosrun cordial_example robot_only.py
         
-11. Test your installation (Method 2)
+11. Test your installation (New Method)
 
-    ...
+    ...TBD
+
+--------------------------------------------
+
+1. Autostart install on QTrobot
+    
+    1. On the Pi (QTRP) and NUC (QTPC),  clone this repository to catkin_ws/src
+    1. catkin_make on each
+    1. [Pi] From the repo, copy ./autostart_scripts/start_cordial_face_pi.sh to ~/robot/autostart/
+    1. [Pi] Verify the script is executable (e.g. `ls -l` shows a -x at the end)
+    1. [Pi] Add the line `run_script start_cordial_face_pi.sh` to ~/robot/autostart/autostart_screens.sh below similar `run_script` lines.
+    1. [NUC] From the repo, copy ./autostart_scripts/start_cordial_face_nuc.sh to ~/robot/autostart/
+    1. [NUC] Verify the script is executable (e.g. `ls -l` shows a -x at the end)
+    1. [NUC] Add the line `run_script start_cordial_face_nuc.sh` to ~/robot/autostart/autostart_screens.sh below similar `run_script` lines 
+    
