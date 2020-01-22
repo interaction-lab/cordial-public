@@ -1,4 +1,4 @@
-{"surprised":
+{"surprised_face":
 {
   "dofs": ["au1", "au2", "au5", "au12", "au17", "au43"],
   "keyframes": [
@@ -24,7 +24,7 @@
     }
   ]
 },
-"pensive":
+"pensive_face":
 {
   "dofs": ["au1", "au2", "au7", "au17", "au43"],
   "keyframes": [
@@ -50,7 +50,7 @@
     }
   ]
 },
-"stern":
+"stern_face":
   {
     "dofs": ["au1", "au2", "au4", "au7", "au10", "au18", "au20", "au23"],
     "keyframes": [
@@ -154,7 +154,7 @@
        }
    ]
 },
-"leftBrowRaise":
+"leftBrowRaise_face":
   {
     "dofs": ["au1l", "au2l"],
     "keyframes": [
@@ -180,7 +180,7 @@
        }
    ]
 },
-"doubleBrowRaise":
+"doubleBrowRaise_face":
   {
     "dofs": ["au1", "au2"],
     "keyframes": [
@@ -211,7 +211,7 @@
        }
    ]
 },
-"loud":
+"loud_face":
   {
     "dofs": ["au1", "au2","au5"],
     "keyframes": [
@@ -237,7 +237,7 @@
        }
    ]
 },
-"quiet":
+"quiet_face":
   {
     "dofs": ["au4", "au1","au7"],
     "keyframes": [
@@ -263,7 +263,7 @@
        }
    ]
 },
-"saucy":
+"saucy_face":
   {
     "dofs": ["au1", "au2","au7","au13", "au18", "au23"],
     "keyframes": [
@@ -284,7 +284,7 @@
        }
    ]
 },
-"breath":
+"breath_face":
   {
     "dofs": ["au1", "au27"],
     "keyframes": [
@@ -305,7 +305,7 @@
        }
    ]
 },
-"happy":
+"happy_face":
    {
      "dofs": ["au12","au13"],
      "keyframes": [

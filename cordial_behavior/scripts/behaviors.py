@@ -12,7 +12,7 @@ from threading import Timer
 import os
 
 
-#data = "[{'start': 0.006, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.075, 'type': 'viseme', 'id': 'POSTALVEOLAR'}, {'start': 0.136, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 0.264, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.332, 'type': 'viseme', 'id': 'CLOSE_BACK_VOWEL'}, {'start': 0.383, 'type': 'viseme', 'id': 'VELAR_GLOTTAL'}, {'start': 0.463, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 0.535, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.571, 'type': 'viseme', 'id': 'MID_CENTRAL_VOWEL'}, {'start': 0.581, 'args': [], 'type': 'action', 'id': 'QT/emotions/angry'}, {'start': 0.611, 'type': 'viseme', 'id': 'BILABIAL'}, {'start': 0.689, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 0.73, 'type': 'viseme', 'id': 'VELAR_GLOTTAL'}, {'start': 0.829, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 0.951, 'type': 'viseme', 'id': 'LABIODENTAL'}, {'start': 1.009, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 1.076, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.174, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 1.254, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.307, 'type': 'viseme', 'id': 'INTERDENTAL'}, {'start': 1.337, 'type': 'viseme', 'id': 'MID_CENTRAL_VOWEL'}, {'start': 1.368, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.3780000000000001, 'args': [], 'type': 'action', 'id': 'QT/point_front'}, {'start': 1.51, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.617, 'type': 'viseme', 'id': 'BILABIAL'}, {'start': 1.699, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.804, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.857, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.903, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.977, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 2.107, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 2.281, 'type': 'viseme', 'id': 'IDLE'}]"
+#data = "[{'start': 0.006, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.075, 'type': 'viseme', 'id': 'POSTALVEOLAR'}, {'start': 0.136, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 0.264, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.332, 'type': 'viseme', 'id': 'CLOSE_BACK_VOWEL'}, {'start': 0.383, 'type': 'viseme', 'id': 'VELAR_GLOTTAL'}, {'start': 0.463, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 0.535, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.571, 'type': 'viseme', 'id': 'MID_CENTRAL_VOWEL'}, {'start': 0.581, 'args': [], 'type': 'action', 'id': 'breath_face'}, {'start': 0.611, 'type': 'viseme', 'id': 'BILABIAL'}, {'start': 0.689, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 0.73, 'type': 'viseme', 'id': 'VELAR_GLOTTAL'}, {'start': 0.829, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 0.951, 'type': 'viseme', 'id': 'LABIODENTAL'}, {'start': 1.009, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 1.076, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.174, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 1.254, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.307, 'type': 'viseme', 'id': 'INTERDENTAL'}, {'start': 1.337, 'type': 'viseme', 'id': 'MID_CENTRAL_VOWEL'}, {'start': 1.368, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.3780000000000001, 'args': [], 'type': 'action', 'id': 'happy_face'}, {'start': 1.51, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.617, 'type': 'viseme', 'id': 'BILABIAL'}, {'start': 1.699, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.804, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.857, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.903, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.977, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 2.107, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 2.281, 'type': 'viseme', 'id': 'IDLE'}]"
 
 class BehaviorManager():
 
@@ -24,16 +24,28 @@ class BehaviorManager():
 		self.face_publisher = rospy.Publisher('/DB1/face', FaceRequest, queue_size=10)
 		self.gesture_publisher = rospy.Publisher(self.nuc_topic+'/gestures', Gesture, queue_size=10)
 		self.get_facial_expressions_list()
+		#self.handle_behavior(data)
 		rospy.spin()
 
 	def get_facial_expressions_list(self):
 		self.facial_expression_list = []
+		self.face_expression_au = []
 		base_dir = os.path.dirname(__file__)
-		with open(base_dir + '/default_data/cordial_face_expression.json', "r") as json_file:
+		with open(base_dir + '/default_name/cordial_face_expression.json', "r") as json_file:
 			data = json.load(json_file)
 			for facial_expression in data:
-				facial_expression_list.append(facial_expression)
-				rospy.loginfo('AUs: ' + str(facial_expression))
+				self.facial_expression_list.append(facial_expression)
+				au_name = str(facial_expression)
+				aus = []
+				for dofs in data[facial_expression]['dofs']:
+					aus.append(str(dofs))
+				for keyframe in data[facial_expression]['keyframes']:
+					au_degrees = keyframe['pose']
+					au_ms = keyframe['time']
+					self.face_expression_au.append({ "au_name": au_name,
+								"aus": aus, 
+								"au_degrees": au_degrees,
+								"au_ms": au_ms})
 		
 
 	def handle_behavior(self, data):
@@ -41,17 +53,30 @@ class BehaviorManager():
 		#data = literal_eval(data)
 		word_timing = filter(lambda b: b["type"] == "word", data)
 		behav = filter(lambda b: b["type"] != "word", data)
+		facial_expression_list = self.facial_expression_list
 		visemes = ["BILABIAL","LABIODENTAL","INTERDENTAL","DENTAL_ALVEOLAR","POSTALVEOLAR","VELAR_GLOTTAL","CLOSE_FRONT_VOWEL","OPEN_FRONT_VOWEL","MID_CENTRAL_VOWEL","OPEN_BACK_VOWEL","CLOSE_BACK_VOWEL", 'IDLE']
-		gesture_behaviors = filter(lambda b: b["id"] not in visemes, behav)
+		all_gesture_behaviors = filter(lambda b: b["id"] not in visemes, behav)
+		gesture_behaviors = filter(lambda b: b["id"] not in facial_expression_list, all_gesture_behaviors)
 		viseme_behaviors = filter(lambda b: b["id"] in visemes, behav)
-		facial_expression_behaviors = filter(lambda b: b["id"] in self.facial_expression_list, behav)
+		facial_expression_behaviors = filter(lambda b: b["id"] in facial_expression_list, behav)
 		self.handle_visemes(viseme_behaviors)
 		self.handle_gestures(gesture_behaviors, word_timing)
-		#self.handle_facial_expression(facial_expression_behaviors)
+		self.handle_facial_expression(facial_expression_behaviors)
+
 
 	def handle_facial_expression(self, facial_expression_behaviors):
 		rospy.loginfo(facial_expression_behaviors)
 		ordered_facial_behaviors = sorted(facial_expression_behaviors, key=lambda behavior: behavior["start"])
+		for f_expr in ordered_facial_behaviors:
+			f_expr_data = filter(lambda b: b["au_name"] in f_expr, self.face_expression_au)
+			for f in f_expr_data:
+				f_expr_req = FaceRequest(aus=f['aus'], au_degrees=f['au_degrees'], au_ms=f['au_ms'])
+				def send_facerequest():
+					print("Send face request")
+					self.face_publisher.publish(f_expr_req)
+				t = Timer(0.1, send_facerequest)
+				t.start()
+				start_time = rospy.Time.now()
 
 		
 	def handle_gestures(self, gesture_behaviors, word_timing):
