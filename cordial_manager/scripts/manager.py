@@ -15,6 +15,11 @@ class Track:
 	TRIGGERED = 3 # track found and in use
 	LOST = 4 # lost track in the middle of processing
 
+class Conversation:
+	GOODBYE = 1 # no track found yet
+	WRONG = 2 # track found but not used
+	DIALOGUE = 3 # track found and in use
+
 class InteractionManager():
 	
 	def __init__(self, pi, nuc):
@@ -25,6 +30,8 @@ class InteractionManager():
 		self.pi_topic = pi
 		self.nuc_topic = nuc
 		self.track_state = Track.NONE
+		self.dialogue_state = Conversation.DIALOGUE
+		self.speaker_state = False
 		rospy.init_node("manager_node", anonymous=True)
 		rospy.Subscriber('face_detector', Bool, self.track_control)
 		rospy.Subscriber(self.pi_topic+"/gestures/list", String, self.handle_gestures_list)
@@ -84,8 +91,15 @@ class InteractionManager():
 	    return
 	
 	def handle_speaker_state(self, req):
-	    self.speaker_state_pub.publish(req.data)
-	    return
+		self.speaker_state = req.data
+		print("I'm speaking" +str(self.dialogue_state))
+		if not self.dialogue_state == Conversation.WRONG:
+			rospy.loginfo("Speaker status:" + str(self.speaker_state))
+			self.speaker_state_pub.publish(self.speaker_state)
+		elif self.dialogue_state == Conversation.WRONG:
+			self.speaker_state = False
+			self.speaker_state_pub.publish(self.speaker_state)
+		return
 
 	
 	def handle_state(self, req):
@@ -94,12 +108,28 @@ class InteractionManager():
 
 	def handle_text_output(self, req):
 		if "Goodbye" in req.data:
-			rospy.Timer(rospy.Duration(0.5), self.end_conversation)
+			rospy.Timer(rospy.Duration(0.2), self.end_conversation)
+		elif "Oops" in req.data:
+			self.dialogue_state = Conversation.WRONG
+			print("Speaker finished:" + str(self.speaker_state))
+			while not self.speaker_state:
+				rospy.loginfo("Wait until finish speaking")
+			self.speaker_state = False
+			self.speaker_state_pub.publish(False)
+			self.lex_text_input_pub.publish('Repeat name')
+			self.state_pub.publish("Speaking")
+			#rospy.sleep(1.5)
+		elif "repeat" in req.data:
+			self.speaker_state = False
+			self.dialogue_state = Conversation.DIALOGUE
+		else:
+			self.dialogue_state = Conversation.DIALOGUE
 		self.text_output_pub.publish(req.data)
 		return
 	
 	def end_conversation(self, timer):
-		self.state_pub.publish("Speaking")
+		self.dialogue_state = Conversation.GOODBYE
+		self.speaker_state_pub.publish(False)
 
 	def handle_behavior(self, req):
 		self.behavior_pub.publish(req.data)

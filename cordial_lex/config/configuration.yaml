@@ -3,7 +3,7 @@
 # in README.md included in the package for detailed descriptions of these parameters
 lex_configuration:
   # Unique per robot, signifies "who" is communicating with lex
-  user_id: "manuela_demo"
+  user_id: "manuela_demo_4"
   # The Lex Bot Name as seen on the lex console
   bot_name: "QTDemo"
   # The Lex Bot Alias as published
