@@ -93,8 +93,13 @@ class InteractionManager():
 		return
 
 	def handle_text_output(self, req):
+		if "Goodbye" in req.data:
+			rospy.Timer(rospy.Duration(0.5), self.end_conversation)
 		self.text_output_pub.publish(req.data)
 		return
+	
+	def end_conversation(self, timer):
+		self.state_pub.publish("Speaking")
 
 	def handle_behavior(self, req):
 		self.behavior_pub.publish(req.data)
