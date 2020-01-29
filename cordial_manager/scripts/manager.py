@@ -70,12 +70,13 @@ class InteractionManager():
 							if action_topic_type == "Bool":
 								while not rospy.is_shutdown():
 									rospy.loginfo("First step: the publisher is " + log_text)
+									rospy.sleep(1)
 									publisher.publish(bool(action_message_content))
 									if check_message_type == "Bool":
 										rospy.loginfo("Message type is Bool and the topic is:" + check_from_type_sub)
-										rospy.sleep(2)
 										msg = wait_for_message(check_from_type_sub, Bool, 1)
-										if msg == check_message_content:
+										print(str(msg))
+										if msg:
 											print("I received something!")
 											break
 									elif check_message_type == "String":
@@ -86,6 +87,7 @@ class InteractionManager():
 							elif action_topic_type == "String":
 								while not rospy.is_shutdown():
 									rospy.loginfo("The publisher is " + log_text)
+									rospy.sleep(1)
 									publisher.publish(str(action_message_content))
 									if check_message_type == "Bool":
 										msg = wait_for_message(check_from_type_sub, Bool, 1)
@@ -103,6 +105,7 @@ class InteractionManager():
 								if msg == wait_message_content:
 									while not rospy.is_shutdown():
 										rospy.loginfo("The publisher is " + log_text)
+										rospy.sleep(1)
 										publisher.publish(bool(action_message_content))
 										if check_message_type == "Bool":
 											msg = wait_for_message(check_from_type_sub, Bool, 1)
@@ -119,6 +122,7 @@ class InteractionManager():
 								if msg == wait_message_content:
 									while not rospy.is_shutdown():
 										rospy.loginfo("The publisher is " + log_text)
+										rospy.sleep(1)
 										publisher.publish(str(action_message_content))
 										if check_message_type == "Bool":
 											msg = wait_for_message(check_from_type_sub, Bool, 1)
