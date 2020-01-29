@@ -7,6 +7,8 @@ find_package(catkin REQUIRED
 roscpp
 std_msgs
 actionlib_msgs
+audio_common_msgs
+message_generation
 )
 
 
@@ -19,7 +21,20 @@ add_action_files(FILES
 Behavior.action
 ) 
 
-generate_messages(DEPENDENCIES actionlib_msgs)
+add_message_files(
+  FILES
+  Behavior.msg
+)
+
+
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  audio_common_msgs
+  actionlib_msgs
+)
+
 
 install(DIRECTORY scripts src
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}

@@ -5,9 +5,11 @@ import sys
 import actionlib
 import json
 from ast import literal_eval
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool
 from qt_robot_gestures.msg import Gesture
 from cordial_face.msg import FaceRequest
+from cordial_behavior.msg import Behavior
+from qt_robot_speaker.msg import PlayRequest
 from threading import Timer
 import os
 
@@ -16,15 +18,16 @@ import os
 
 class BehaviorManager():
 
-	def __init__(self, pi, nuc):
-		self.pi_topic = pi
-		self.nuc_topic = nuc
+	def __init__(self):
 		rospy.init_node("behavior_node", anonymous=True)
-		rospy.Subscriber(self.pi_topic+'/behavior', String, self.handle_behavior)
-		self.face_publisher = rospy.Publisher('/DB1/face', FaceRequest, queue_size=10)
-		self.gesture_publisher = rospy.Publisher(self.nuc_topic+'/gestures', Gesture, queue_size=10)
+		rospy.Subscriber('cordial/behavior', Behavior, self.handle_behavior)
+		rospy.Subscriber('cordial/speaker/done', Bool, self.handle_speaker_done)
+		self.face_publisher = rospy.Publisher('cordial/behavior/face/expressing', FaceRequest, queue_size=10) # this topic should be: cordial/behavior/face/expressing
+		self.gesture_publisher = rospy.Publisher('cordial/behavior/gesture/moving', Gesture, queue_size=10)
+		self.speaker_publisher = rospy.Publisher('cordial/speaker/playing', PlayRequest, queue_size=10)
+		self.behavior_ready_publisher = rospy.Publisher('cordial/behavior/ready', Bool, queue_size=10)
 		self.get_facial_expressions_list()
-		#self.handle_behavior(data)
+		#self.handle_behavior(data) FOR TESTING
 		rospy.spin()
 
 	def get_facial_expressions_list(self):
@@ -47,9 +50,16 @@ class BehaviorManager():
 								"au_degrees": au_degrees,
 								"au_ms": au_ms})
 		
+	def handle_speaker_done(self, data):
+		rospy.loginfo("The speaker has finished: " +str(data.data))
+		self.behavior_ready_publisher.publish(True)
+		# END SPEAKING
+		return
 
 	def handle_behavior(self, data):
-		data = literal_eval(data.data)
+		audio_frame = data.audio_frame
+		audio_data = data.audio_data
+		data = literal_eval(data.behavior_json)
 		#data = literal_eval(data)
 		word_timing = filter(lambda b: b["type"] == "word", data)
 		behav = filter(lambda b: b["type"] != "word", data)
@@ -59,9 +69,16 @@ class BehaviorManager():
 		gesture_behaviors = filter(lambda b: b["id"] not in facial_expression_list, all_gesture_behaviors)
 		viseme_behaviors = filter(lambda b: b["id"] in visemes, behav)
 		facial_expression_behaviors = filter(lambda b: b["id"] in facial_expression_list, behav)
+		self.handle_audio(audio_data, audio_frame)
 		self.handle_visemes(viseme_behaviors)
 		self.handle_gestures(gesture_behaviors, word_timing)
 		self.handle_facial_expression(facial_expression_behaviors)
+
+	def handle_audio(self, audio_data, audio_frame):
+		speaker_msg = PlayRequest()
+		speaker_msg.audio_frame = audio_frame
+		speaker_msg.data = audio_data
+		self.speaker_publisher.publish(speaker_msg)
 
 
 	def handle_facial_expression(self, facial_expression_behaviors):
@@ -127,9 +144,7 @@ class BehaviorManager():
 
 
 if __name__ == '__main__':
-	pi =  "qt_robot"
-	nuc = "qtpc"
-	BehaviorManager(pi, nuc)
+	BehaviorManager()
 
 
 

@@ -2,145 +2,190 @@
 
 import rospy
 import sys
-from lex_common_msgs.srv import *
-from std_msgs.msg import String
-from std_msgs.msg import Bool
-from audio_common_msgs.msg import AudioData
-from qt_robot_speaker.msg import PlayRequest
-from qt_robot_gestures.msg import Gesture
+import os
+import json
+import time
+from std_msgs.msg import String, Bool
 
-class Track:
-	NONE = 1 # no track found yet
-	INITIAL = 2 # track found but not used
-	TRIGGERED = 3 # track found and in use
-	LOST = 4 # lost track in the middle of processing
-
-class Conversation:
-	GOODBYE = 1 # no track found yet
-	WRONG = 2 # track found but not used
-	DIALOGUE = 3 # track found and in use
 
 class InteractionManager():
 	
-	def __init__(self, pi, nuc):
-		"""
-		Subscriber: topic names are chosen according to where the message comes from (nuc or pi).
-		Publisher: topic names are chosen according to where the message is addressed (nuc or pi).
-		"""
-		self.pi_topic = pi
-		self.nuc_topic = nuc
-		self.track_state = Track.NONE
-		self.dialogue_state = Conversation.DIALOGUE
-		self.speaker_state = False
-		rospy.init_node("manager_node", anonymous=True)
-		rospy.Subscriber('face_detector', Bool, self.track_control)
-		rospy.Subscriber(self.pi_topic+"/gestures/list", String, self.handle_gestures_list)
-		rospy.Subscriber(self.pi_topic+"/microphone_input", AudioData, self.handle_microphone_input)
-		rospy.Subscriber(self.pi_topic+"/state", String, self.handle_state)
-		rospy.Subscriber(self.nuc_topic+"/text_output", String, self.handle_text_output)
-		rospy.Subscriber(self.nuc_topic+"/gestures", Gesture, self.handle_gestures)
-		rospy.Subscriber(self.nuc_topic+"/behavior", String, self.handle_behavior)
-		rospy.Subscriber(self.nuc_topic+"/face", String, self.handle_face)
-		rospy.Subscriber(self.nuc_topic+"/speaker_output/play", PlayRequest, self.handle_speaker_play)
-		rospy.Subscriber(self.pi_topic+"/speaker_state", Bool, self.handle_speaker_state)
-		self.lex_text_input_pub = rospy.Publisher('/cordial_lex/text_input', String, queue_size=5)
-		self.qt_gesture_list_pub = rospy.Publisher(self.nuc_topic+"/gestures/list", String, queue_size = 5)
-		self.gestures_pub = rospy.Publisher(self.pi_topic+"/gestures", Gesture, queue_size=1)
-		self.microphone_input_pub = rospy.Publisher(self.nuc_topic+"/microphone_input", AudioData, queue_size = 5)
-		self.speaker_output = rospy.Publisher(self.pi_topic+"/speaker_output/play", PlayRequest, queue_size = 5)
-		self.state_pub = rospy.Publisher(self.nuc_topic+"/state", String, queue_size = 10)
-		self.speaker_state_pub = rospy.Publisher(self.nuc_topic+"/speaker_state", Bool, queue_size = 10)
-		self.text_output_pub = rospy.Publisher(self.nuc_topic+"/tts/text_output", String, queue_size = 10)
-		self.behavior_pub = rospy.Publisher(self.pi_topic+"/behavior", String, queue_size = 10)
-		self.face_pub = rospy.Publisher(self.pi_topic+"/face", String, queue_size = 10)
+	def __init__(self):
+		self.pub_dic = {}
+		self.interaction_data = {}
+		self.action_data = {}
+		self.tracked = False
+		rospy.init_node("interaction_controller_node", anonymous=True)
+		#rospy.Subscriber('/cordial/interacting', String, self.handle_interacting)
+		self.read_interactions()
+		self.handle_interacting("greeting1") #FOR TESTING
 		rospy.spin()
 
-	def track_control(self, data):
-		#print(self.track_state)
-		if(data.data):
-			if self.track_state == Track.NONE:
-				self.track_state = Track.INITIAL
-				#Start conversation
-				self.lex_text_input_pub.publish('Hey')
-				self.track_state = Track.TRIGGERED
-			elif self.track_state == Track.LOST:
-				self.track_state = Track.TRIGGERED
-				#"Oh welcome back!"
-		elif self.track_state == Track.TRIGGERED:
-			self.track_state = Track.LOST
-			#"Where are you? Take a seat please!"
+	def read_interactions(self):
+		base_dir = os.path.dirname(__file__)
+		with open(base_dir + '/data/interactions.json', "r") as json_file:
+			self.interaction_data = json.load(json_file)
+		with open(base_dir + '/data/actions.json', "r") as json_file:
+			self.action_data = json.load(json_file)
+			for action in self.action_data:
+				if  self.action_data[action]['type'] == "Bool":
+					self.pub_dic[self.action_data[action]['topic']] = rospy.Publisher(self.action_data[action]['topic'], Bool, queue_size=1)
+				elif self.action_data[action]['type'] == "String":
+					self.pub_dic[self.action_data[action]['topic']] = rospy.Publisher(self.action_data[action]['topic'], String, queue_size=1)
 
 
-	def handle_gestures_list(self, req):
-		self.qt_gesture_list_pub.publish(req.data)
-		return
+	def handle_user_lost(self, data):
+		print(data.data)
+		#what to do when the user is lost. Likely send a message to the DM to update the interaction
 
 
-	def handle_gestures(self, req):
-		self.gestures_pub.publish(req.gesture_timing, req.gesture_name)
-		return
+	def handle_interacting(self, data):
+		for interaction in self.interaction_data:
+			#if data.data == interaction:
+			if data == interaction: #FOR TESTING 
+				steps = self.interaction_data[interaction]['steps']
+				parameters = self.interaction_data[interaction]['parameters']
+				for step in steps:
+					wait_from_type_sub = str(step['wait']['from'])
+					wait_message_type = str(step['wait']['message_type'])
+					wait_message_content = str(step['wait']['for'])
+					wait_min_time = int(step['wait']['min_wait'])
+					wait_max_time = int(step['wait']['max_wait'])
+					check_from_type_sub = str(step['check']['from'])
+					check_message_type = str(step['check']['message_type'])
+					check_message_content = str(step['check']['for'])
+					check_min_time = int(step['check']['min_wait'])
+					check_max_time = int(step['check']['max_wait'])
+					name = str(step['name'])
+					log_text = str(step['description'])
+					type_sub = str(step['type'])
+
+					action_message_content = str(self.action_data[name]['message_content'])
+					action_topic = str(self.action_data[name]['topic'])
+					action_topic_type = str(self.action_data[name]['type'])
+					rospy.sleep(wait_min_time)
+					if type_sub == "Topic":
+						publisher = self.pub_dic[action_topic]
+						if wait_from_type_sub == '':
+							if action_topic_type == "Bool":
+								while not rospy.is_shutdown():
+									rospy.loginfo("First step: the publisher is " + log_text)
+									publisher.publish(bool(action_message_content))
+									if check_message_type == "Bool":
+										rospy.loginfo("Message type is Bool and the topic is:" + check_from_type_sub)
+										rospy.sleep(2)
+										msg = wait_for_message(check_from_type_sub, Bool, 1)
+										if msg == check_message_content:
+											print("I received something!")
+											break
+									elif check_message_type == "String":
+										msg = wait_for_message(check_from_type_sub, String, 1)
+										if msg == check_message_content:
+											print("I received something!")
+											break
+							elif action_topic_type == "String":
+								while not rospy.is_shutdown():
+									rospy.loginfo("The publisher is " + log_text)
+									publisher.publish(str(action_message_content))
+									if check_message_type == "Bool":
+										msg = wait_for_message(check_from_type_sub, Bool, 1)
+										if msg == check_message_content:
+											print("I received something!")
+											break
+									elif check_message_type == "String":
+										msg = wait_for_message(check_from_type_sub, String, 1)
+										if msg == check_message_content:
+											print("I received something!")
+											break
+						else:
+							if action_topic_type == "Bool":
+								msg = wait_for_message(wait_from_type_sub, Bool, wait_max_time)
+								if msg == wait_message_content:
+									while not rospy.is_shutdown():
+										rospy.loginfo("The publisher is " + log_text)
+										publisher.publish(bool(action_message_content))
+										if check_message_type == "Bool":
+											msg = wait_for_message(check_from_type_sub, Bool, 1)
+											if msg == check_message_content:
+												print("I received something!")
+												break
+										elif check_message_type == "String":
+											msg = wait_for_message(check_from_type_sub, String, 1)
+											if msg == check_message_content:
+												print("I received something!")
+												break
+							elif action_topic_type == "String":
+								msg = wait_for_message(wait_from_type_sub, String, wait_max_time)
+								if msg == wait_message_content:
+									while not rospy.is_shutdown():
+										rospy.loginfo("The publisher is " + log_text)
+										publisher.publish(str(action_message_content))
+										if check_message_type == "Bool":
+											msg = wait_for_message(check_from_type_sub, Bool, 1)
+											if msg == check_message_content:
+												print("I received something!")
+												break
+										elif check_message_type == "String":
+											msg = wait_for_message(check_from_type_sub, String, 1)
+											if msg == check_message_content:
+												print("I received something!")
+												break
 
 
-	def handle_microphone_input(self, req):
-		self.microphone_input_pub.publish(req.data)
-		return
+						
 
-	def handle_speaker_play(self, req):
-	    print(req.audio_frame)
-	    self.speaker_output.publish(req.audio_frame, req.data)
-	    return
-	
-	def handle_speaker_state(self, req):
-		self.speaker_state = req.data
-		print("I'm speaking" +str(self.dialogue_state))
-		if not self.dialogue_state == Conversation.WRONG:
-			rospy.loginfo("Speaker status:" + str(self.speaker_state))
-			self.speaker_state_pub.publish(self.speaker_state)
-		elif self.dialogue_state == Conversation.WRONG:
-			self.speaker_state = False
-			self.speaker_state_pub.publish(self.speaker_state)
-		return
+					#print(wait_from_type_sub, wait_min_time, name, log_text, message_content,topic)
+					
+						
+		#check which interaction starts! read the json in the init!
+		#publish the text to lex to start the interaction (lex_text_input_pub) or start the microphone (listening_pub) or stop everything!!
 
-	
-	def handle_state(self, req):
-		self.state_pub.publish(req.data)
-		return
+class _WFM(object):
+    def __init__(self):
+        self.msg = None
+    def cb(self, msg):
+        if self.msg is None:
+            self.msg = msg
 
-	def handle_text_output(self, req):
-		if "Goodbye" in req.data:
-			rospy.Timer(rospy.Duration(0.2), self.end_conversation)
-		elif "Oops" in req.data:
-			self.dialogue_state = Conversation.WRONG
-			print("Speaker finished:" + str(self.speaker_state))
-			while not self.speaker_state:
-				rospy.loginfo("Wait until finish speaking")
-			self.speaker_state = False
-			self.speaker_state_pub.publish(False)
-			self.lex_text_input_pub.publish('Repeat name')
-			self.state_pub.publish("Speaking")
-			#rospy.sleep(1.5)
-		elif "repeat" in req.data:
-			self.speaker_state = False
-			self.dialogue_state = Conversation.DIALOGUE
-		else:
-			self.dialogue_state = Conversation.DIALOGUE
-		self.text_output_pub.publish(req.data)
-		return
-	
-	def end_conversation(self, timer):
-		self.dialogue_state = Conversation.GOODBYE
-		self.speaker_state_pub.publish(False)
+def wait_for_message(topic, topic_type, timeout=None):
+    """
+    Receive one message from topic.
+    
+    This will create a new subscription to the topic, receive one message, then unsubscribe.
 
-	def handle_behavior(self, req):
-		self.behavior_pub.publish(req.data)
-		return
+    @param topic: name of topic
+    @type  topic: str
+    @param topic_type: topic type
+    @type  topic_type: L{rospy.Message} class
+    @param timeout: timeout time in seconds
+    @type  timeout: double
+    @return: Message
+    @rtype: L{rospy.Message}
+    @raise ROSException: if specified timeout is exceeded
+    @raise ROSInterruptException: if shutdown interrupts wait
+    """
+    wfm = _WFM()
+    s = None
+    try:
+        s = rospy.topics.Subscriber(topic, topic_type, wfm.cb)
+        if timeout is not None:
+            timeout_t = time.time() + timeout
+            while not rospy.core.is_shutdown() and wfm.msg is None:
+                rospy.rostime.wallsleep(0.01)
+                if time.time() >= timeout_t:
+                    #raise rospy.exceptions.ROSException("timeout exceeded while waiting for message on topic %s"%topic)
+                    return False
 
-	def handle_face(self, req):
-		self.face_pub.publish(req.data)
-		return
+        else:
+            while not rospy.core.is_shutdown() and wfm.msg is None:
+                rospy.rostime.wallsleep(0.01)            
+    finally:
+        if s is not None:
+            s.unregister()
+    if rospy.core.is_shutdown():
+        raise rospy.exceptions.ROSInterruptException("rospy shutdown")
+    return wfm.msg
 	
 if __name__ == '__main__':
-	pi =  "qt_robot"
-	nuc = "qtpc"
-    	InteractionManager(pi, nuc)
+	InteractionManager()
 

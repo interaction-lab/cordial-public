@@ -1,0 +1,130 @@
+{
+	"greeting1": {
+		"steps": [
+                    {
+                        "name":"start_tracking",
+                        "description": "Starting the tracking",
+                        "wait":{
+                            "for":"",
+                            "from":"",
+                            "message_type":"",
+                            "min_wait":0,
+                            "max_wait":0
+                        },
+                        "check":{
+                            "for": "True",
+                            "from":"/cordial/detector/tracking/started",
+                            "message_type":"Bool",
+                            "min_wait":0,
+                            "max_wait":0
+                        },
+                        "type":"Topic"
+                    },
+                    {
+                        "name":"start_dialogue",
+                        "description": "Waiting for qt_tracker to find the user to start the conversation",
+                        "wait":{
+                            "for":"True",
+                            "from":"/cordial/detector/faces",
+                            "message_type":"Bool",
+                            "min_wait":0,
+                            "max_wait":10
+                        },
+                        "check":{
+                            "for":"",
+                            "from":"",
+                            "message_type":"",
+                            "min_wait":0,
+                            "max_wait":0
+                        },
+                        "type":"Topic"
+                    }
+                    ,
+					{
+                        "name":"stop_behavior",
+                        "description": "Stopping the behavior",
+                        "wait":{
+                            "for":"True",
+                            "from":"/cordial/behavior/behaving",
+                            "message_type":"Bool",
+                            "min_wait":0,
+                            "max_wait":10
+                        },
+                        "check":{
+                            "for":"",
+                            "from":"",
+                            "message_type":"",
+                            "min_wait":0,
+                            "max_wait":0
+                        },
+                        "type":"Action"
+                    }
+                ],
+		"parameters": {
+			"emergency": "finishinteraction",
+			"loop": "False"
+		}
+	},
+	"dialogue1": {
+		"steps": [{
+            "startmicrophone": [
+                {
+                
+                    "message_content": "True",
+                    "timing": "start",
+                    "topic":"/cordial/listening"
+                }
+            ]
+        },
+        {
+            "finishbehavior": [
+                {
+                    "message_content": "True",
+                    "timing": "end",
+                    "topic":"/cordial/behavior/stopping"
+                }
+            ]
+        }
+    ],
+    "parameters": {
+        "emergency": "finishinteraction",
+        "loop": "False"
+        }
+	},
+	"goodbye1": {
+		"steps":[{
+            "finishdialogue": [
+                {
+                
+                    "message_content": "Bye",
+                    "timing": "start",
+                    "topic":"/cordial/dialogue/dialoging"
+                }
+            ]
+        },
+        {
+            "finishbehavior": [
+                {
+                    "message_content": "True",
+                    "timing": "end",
+                    "topic":"/cordial/behavior/stopping"
+                }
+            ]
+        },
+        {
+            "finishtracking": [
+                {
+                    "message_content": "False",
+                    "timing": "end",
+                    "topic":"/cordial/detector/faces/tracking"
+                }
+            ]
+        }
+
+    ],
+		"parameters": {
+			"emergency": "finishinteraction",
+			"loop": "False"
+		}
+	}
+}

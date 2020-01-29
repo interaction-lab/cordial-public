@@ -12,16 +12,6 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
-add_message_files(
-  FILES
-  PlayRequest.msg
-)
-
-
-add_service_files(
-  FILES
-  PlayAudio.srv
-)
 
 generate_messages(
   DEPENDENCIES
