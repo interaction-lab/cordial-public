@@ -50,17 +50,14 @@ class DetectorServer():
 
 class DetectorManager():
 	def __init__(self):
-		rospy.init_node("detector_node", anonymous=True)
-		rospy.Subscriber('cordial/detector/faces/done', Bool, self.handle_face_detecting_done)
 		self.face_detector_publisher = rospy.Publisher("cordial/detector/faces/detecting", Bool, queue_size=1)
-		rospy.spin()
-
+		
 	def handle_face_detecting_start(self, data):
 		self.face_detector_publisher.publish(data)
 
-	def handle_face_detecting_done(self,data):
-		DETECTING_DONE = data.data #it will be true just when all the detections finish!
-
 if __name__ == '__main__':
+	rospy.init_node("detector_node", anonymous=True)
     DetectorManager()
 	DetectorServer("detecting")
+	rospy.spin()
+

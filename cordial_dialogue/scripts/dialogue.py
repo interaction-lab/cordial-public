@@ -53,11 +53,10 @@ class DialogueServer():
 
 class DialogueManager():
 	def __init__(self):
-		rospy.init_node("dialogue_node", anonymous=True)
 	   	rospy.Subscriber('/cordial/microphone/audio', AudioData, self.handle_audio_data)
 		self.text_publisher = rospy.Publisher('cordial/dialogue/script', String, queue_size=10)
 		#self.send_textToAWS("Hey") # FOR TESTING
-		rospy.spin()
+		
 
 	def handle_audio_data(self, data):
 		PROMPT_MESSAGE = data
@@ -108,8 +107,10 @@ class DialogueManager():
 	
 
 if __name__ == '__main__':
+	rospy.init_node("dialogue_node", anonymous=True)
     DialogueManager()
 	DialogueServer("dialoging")
+	rospy.spin()
     
     
 

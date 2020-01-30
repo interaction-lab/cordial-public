@@ -79,12 +79,11 @@ class SensorsServer():
 
 class SensorsManager():
 	def __init__(self):
-		rospy.init_node("sensor_node", anonymous=True)
 		rospy.Subscriber('cordial/listening/done', Bool, self.handle_listening_done)
 		self.microphone_publisher = rospy.Publisher("cordial/listening", Bool, queue_size=1)
 		self.camera_record_publisher = rospy.Publisher("cordial/recording/video", Bool, queue_size=1)
 		self.microphone_record_publisher = rospy.Publisher("cordial/recording/audio", Bool, queue_size=1)
-		rospy.spin()
+		
 
 	def handle_listening_start(self, data):
 		self.microphone_publisher.publish(data)
@@ -93,6 +92,8 @@ class SensorsManager():
 		LISTENING_DONE = data.data
 
 if __name__ == '__main__':
+	rospy.init_node("sensor_node", anonymous=True)
     SensorsManager()
 	SensorsServer("sensing")
 	LongSensorsServer("long_sensing")
+	rospy.spin()

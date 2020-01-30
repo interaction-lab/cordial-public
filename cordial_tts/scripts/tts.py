@@ -59,11 +59,11 @@ class SynthesizeServer():
 
 class TTSManager():
 	def __init__(self):
-		rospy.init_node("tts_node", anonymous=True)
+		
 		rospy.Subscriber('cordial/dialogue/script', String, self.handle_dialogue_message)
 		self.behavior_publisher = rospy.Publisher("cordial/behavior", Behavior, queue_size=10)
 		#self.handle_tts_realtime("Hello *QT/bye* I am QT *happy_face*") FOR TESTING
-		rospy.spin()
+		
 
 	def handle_dialogue_message(self, data):
 		DIALOGUE_MESSAGE = data
@@ -94,5 +94,7 @@ class TTSManager():
 		SYNTHESIZE_DONE = True
 
 if __name__ == '__main__':
+	rospy.init_node("tts_node", anonymous=True)
     TTSManager()
 	SynthesizeServer("synthesizing")
+	rospy.spin()
