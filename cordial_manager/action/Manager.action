@@ -1,0 +1,11 @@
+# goal definition
+# name of the behavior
+string action_block
+string optional_data
+---
+# result definition
+bool action_block_success
+string error_message
+---
+# feedback
+string action_block_state

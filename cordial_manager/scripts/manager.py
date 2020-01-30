@@ -29,30 +29,6 @@ class InteractionManager():
         for topic_name in topics:
             self.action_clients[topic_name] = actionlib.SimpleActionClient(topic_name, InteractionAction)
             self.action_clients[topic_name].wait_for_server()
-        # # Behavior
-        # self.action_clients['behaving']
-        # self.behavior_client = actionlib.SimpleActionClient("behaving", BehaviorAction)
-        # self.behavior_client.wait_for_server()
-
-        # # Behavior Long Running
-        # self.long_running_behavior_client = actionlib.SimpleActionClient("long_behaving", BehaviorAction)
-        # self.long_running_behavior_client.wait_for_server()
-
-        # # Text-to-Speech (Polly)
-        # self.tts_client = actionlib.SimpleActionClient("synthesizing", BehaviorAction)
-        # self.tts_client.wait_for_server()
-
-        # # Dialogue Handler (Lex)
-        # self.dialogue_client = actionlib.SimpleActionClient("dialoging", BehaviorAction)
-        # self.dialogue_client.wait_for_server()
-
-        # # Sensors Handler
-        # self.sensor_client = actionlib.SimpleActionClient("sensing", BehaviorAction)
-        # self.sensor_client.wait_for_server()
-
-        # # Detectors Handler
-        # self.detector_client = actionlib.SimpleActionClient("detecting", BehaviorAction)
-        # self.detector_client.wait_for_server()
 
         self.read_interactions()
         self.handle_interacting("greeting1")  # FOR TESTING

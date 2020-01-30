@@ -1,0 +1,11 @@
+# goal definition
+# name of the behavior
+string interacting_action
+string optional_data
+---
+# result definition
+bool interacting_success
+string error_message
+---
+# feedback
+string interaction_state
