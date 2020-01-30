@@ -16,6 +16,8 @@ from cordial_manager.msg import *
 
 PROMPT_MESSAGE = ''
 DIALOGUE_PROCESSING_DONE = False
+FEEDBACK_MESSAGE = ''
+ERROR_MESSAGE = ''
 
 class DialogueServer():
 	_feedback = InteractionFeedback()
@@ -26,18 +28,26 @@ class DialogueServer():
 		self.action.start()
 
 	def execute_goal(self, goal):
+		goal_name = goal.interacting_action
 		success = True
 		if goal.optional_data != '':
 			PROMPT_MESSAGE = optional_data
 			DialogueManager.send_textToAWS(PROMPT_MESSAGE)
 		else:
 			DialogueManager.send_audioToAWS_client(PROMPT_MESSAGE)
+		self._feedback.interacting_action = goal_name
+		self._feedback.interacting_state = FEEDBACK_MESSAGE
+		## Decide when to send the feedback
+		# self.action.publish_feedback(self._feedback)
 		while not DIALOGUE_PROCESSING_DONE:
 			if self.action.is_preempt_requested():
 					self.action.set_preempted()
 					success = False
 		if success:
 			self._result.interacting_success = True
+			self._result.interacting_action = goal_name
+			self._result.error_message = ERROR_MESSAGE
+			self.action.set_succeeded(self._result)
 
 
 class DialogueManager():

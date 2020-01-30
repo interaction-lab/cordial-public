@@ -12,6 +12,8 @@ from cordial_manager.msg import *
 
 FACE_DETECTING_MESSAGE = ''
 DETECTING_DONE = False
+FEEDBACK_MESSAGE = ''
+ERROR_MESSAGE = ''
 
 
 class DetectorServer():
@@ -23,17 +25,25 @@ class DetectorServer():
 		self.action.start()
 
 	def execute_goal(self, goal):
+		goal_name = goal.interacting_action
 		success = True
 		FACE_DETECTING_MESSAGE = True
 		if goal.optional_data != '':
 			FACE_DETECTING_MESSAGE = optional_data
 		DetectorManager.handle_face_detecting_start(FACE_DETECTING_MESSAGE)
+		self._feedback.interacting_action = goal_name
+		self._feedback.interacting_state = FEEDBACK_MESSAGE
+		## Decide when to send the feedback
+		# self.action.publish_feedback(self._feedback)
 		while not DETECTING_DONE:
 			if self.action.is_preempt_requested():
 					self.action.set_preempted()
 					success = False
 		if success:
 			self._result.interacting_success = True
+			self._result.interacting_action = goal_name
+			self._result.error_message = ERROR_MESSAGE
+			self.action.set_succeeded(self._result)
 
 
 class DetectorManager():

@@ -14,6 +14,8 @@ LISTENING_MESSAGE = ''
 RECORDING_MESSAGE = ''
 LISTENING_DONE = False
 RECORDING_DONE = False
+FEEDBACK_MESSAGE = ''
+ERROR_MESSAGE = ''
 
 class LongSensorsServer():
 	_feedback = InteractionFeedback()
@@ -24,16 +26,24 @@ class LongSensorsServer():
 		self.action.start()
 
 	def execute_goal(self, goal):
+		goal_name = goal.interacting_action
 		success = True
 		if goal.optional_data != '':
 			LISTENING_MESSAGE = optional_data
 		SensorsManager.handle_listening_start(LISTENING_MESSAGE)
+		self._feedback.interacting_action = goal_name
+		self._feedback.interacting_state = FEEDBACK_MESSAGE
+		## Decide when to send the feedback
+		# self.action.publish_feedback(self._feedback)
 		while not LISTENING_DONE:
 			if self.action.is_preempt_requested():
 					self.action.set_preempted()
 					success = False
 		if success:
 			self._result.interacting_success = True
+			self._result.interacting_action = goal_name
+			self._result.error_message = ERROR_MESSAGE
+			self.action.set_succeeded(self._result)
 
 class SensorsServer():
 	_feedback = InteractionFeedback()
@@ -44,17 +54,25 @@ class SensorsServer():
 		self.action.start()
 
 	def execute_goal(self, goal):
+		goal_name = goal.interacting_action
 		success = True
 		LISTENING_MESSAGE = True
 		if goal.optional_data != '':
 			LISTENING_MESSAGE = optional_data
 		SensorsManager.handle_listening_start(LISTENING_MESSAGE)
+		self._feedback.interacting_action = goal_name
+		self._feedback.interacting_state = FEEDBACK_MESSAGE
+		## Decide when to send the feedback
+		# self.action.publish_feedback(self._feedback)
 		while not LISTENING_DONE:
 			if self.action.is_preempt_requested():
 					self.action.set_preempted()
 					success = False
 		if success:
 			self._result.interacting_success = True
+			self._result.interacting_action = goal_name
+			self._result.error_message = ERROR_MESSAGE
+			self.action.set_succeeded(self._result)
 
 
 class SensorsManager():

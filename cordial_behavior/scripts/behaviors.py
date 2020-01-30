@@ -14,11 +14,13 @@ from threading import Timer
 import os
 
 
-data = "[{'start': 0.006, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.075, 'type': 'viseme', 'id': 'POSTALVEOLAR'}, {'start': 0.136, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 0.264, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.332, 'type': 'viseme', 'id': 'CLOSE_BACK_VOWEL'}, {'start': 0.383, 'type': 'viseme', 'id': 'VELAR_GLOTTAL'}, {'start': 0.463, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 0.535, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.571, 'type': 'viseme', 'id': 'MID_CENTRAL_VOWEL'}, {'start': 0.581, 'args': [], 'type': 'action', 'id': 'breath_face'}, {'start': 0.611, 'type': 'viseme', 'id': 'BILABIAL'}, {'start': 0.689, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 0.73, 'type': 'viseme', 'id': 'VELAR_GLOTTAL'}, {'start': 0.829, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 0.951, 'type': 'viseme', 'id': 'LABIODENTAL'}, {'start': 1.009, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 1.076, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.174, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 1.254, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.307, 'type': 'viseme', 'id': 'INTERDENTAL'}, {'start': 1.337, 'type': 'viseme', 'id': 'MID_CENTRAL_VOWEL'}, {'start': 1.368, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.3780000000000001, 'args': [], 'type': 'action', 'id': 'happy_face'}, {'start': 1.51, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.617, 'type': 'viseme', 'id': 'BILABIAL'}, {'start': 1.699, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.804, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.857, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.903, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.977, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 2.107, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 2.281, 'type': 'viseme', 'id': 'IDLE'}]"
+#data = "[{'start': 0.006, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.075, 'type': 'viseme', 'id': 'POSTALVEOLAR'}, {'start': 0.136, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 0.264, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.332, 'type': 'viseme', 'id': 'CLOSE_BACK_VOWEL'}, {'start': 0.383, 'type': 'viseme', 'id': 'VELAR_GLOTTAL'}, {'start': 0.463, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 0.535, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.571, 'type': 'viseme', 'id': 'MID_CENTRAL_VOWEL'}, {'start': 0.581, 'args': [], 'type': 'action', 'id': 'breath_face'}, {'start': 0.611, 'type': 'viseme', 'id': 'BILABIAL'}, {'start': 0.689, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 0.73, 'type': 'viseme', 'id': 'VELAR_GLOTTAL'}, {'start': 0.829, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 0.951, 'type': 'viseme', 'id': 'LABIODENTAL'}, {'start': 1.009, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 1.076, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.174, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 1.254, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.307, 'type': 'viseme', 'id': 'INTERDENTAL'}, {'start': 1.337, 'type': 'viseme', 'id': 'MID_CENTRAL_VOWEL'}, {'start': 1.368, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.3780000000000001, 'args': [], 'type': 'action', 'id': 'happy_face'}, {'start': 1.51, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.617, 'type': 'viseme', 'id': 'BILABIAL'}, {'start': 1.699, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.804, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.857, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.903, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.977, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 2.107, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 2.281, 'type': 'viseme', 'id': 'IDLE'}]"
 TTS_MESSAGE = ''
 DETECTOR_MESSAGE = ''
 SPEAKER_DONE = False
 TRACKER_DONE = False
+FEEDBACK_MESSAGE = ''
+ERROR_MESSAGE = ''
 
 class LongBehaviorServer():
 	_feedback = InteractionFeedback()
@@ -30,16 +32,24 @@ class LongBehaviorServer():
 		self.action.start()
 
 	def execute_goal(self, goal):
+		goal_name = goal.interacting_action
 		success = True
 		if goal.optional_data != '':
 			DETECTOR_MESSAGE = optional_data
 		BehaviorManager.handle_tracker(DETECTOR_MESSAGE)
+		self._feedback.interacting_action = goal_name
+		self._feedback.interacting_state = FEEDBACK_MESSAGE
+		## Decide when to send the feedback
+		# self.action.publish_feedback(self._feedback)
 		while not TRACKER_DONE:
 			if self.action.is_preempt_requested():
 					self.action.set_preempted()
 					success = False
 		if success:
 			self._result.interacting_success = True
+			self._result.interacting_action = goal_name
+			self._result.error_message = ERROR_MESSAGE
+			self.action.set_succeeded(self._result)
 
 
 class BehaviorServer():
@@ -51,16 +61,24 @@ class BehaviorServer():
 		self.action.start()
 
 	def execute_goal(self, goal):
+		goal_name = goal.interacting_action
 		success = True
 		if goal.optional_data != '':
 			TTS_MESSAGE = optional_data
 		BehaviorManager.handle_behavior(TTS_MESSAGE)
+		self._feedback.interacting_action = goal_name
+		self._feedback.interacting_state = FEEDBACK_MESSAGE
+		## Decide when to send the feedback
+		# self.action.publish_feedback(self._feedback)
 		while not SPEAKER_DONE:
 			if self.action.is_preempt_requested():
 					self.action.set_preempted()
 					success = False
 		if success:
 			self._result.interacting_success = True
+			self._result.interacting_action = goal_name
+			self._result.error_message = ERROR_MESSAGE
+			self.action.set_succeeded(self._result)
 		
 
 class BehaviorManager():
@@ -76,7 +94,7 @@ class BehaviorManager():
 		self.speaker_publisher = rospy.Publisher('cordial/speaker/playing', PlayRequest, queue_size=10)
 		self.tracker_publisher = rospy.Publisher('cordial/behavior/tracking', Bool, queue_size=1)
 		self.get_facial_expressions_list()
-		self.handle_behavior(data) #FOR TESTING
+		#self.handle_behavior(data) #FOR TESTING
 		rospy.spin()
 
 	def handle_tracking_done(self, data):
@@ -123,7 +141,7 @@ class BehaviorManager():
 		audio_frame = data.audio_frame
 		audio_data = data.audio_data
 		data = literal_eval(data.behavior_json)
-		#data = literal_eval(data)
+		#data = literal_eval(data) #FOR TESTING
 		word_timing = filter(lambda b: b["type"] == "word", data)
 		behav = filter(lambda b: b["type"] != "word", data)
 		facial_expression_list = self.facial_expression_list
