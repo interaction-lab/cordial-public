@@ -1,0 +1,11 @@
+#goal definition
+# name of the behavior
+string long_behaving
+string optional_data
+---
+#result definition
+bool long_behaving_success
+string error_message
+---
+#feedback
+string long_behaving_state

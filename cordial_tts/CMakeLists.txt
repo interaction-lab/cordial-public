@@ -3,11 +3,33 @@ project(cordial_tts)
 
 catkin_python_setup()
 
-catkin_package()
+
+find_package(catkin REQUIRED
+std_msgs
+actionlib_msgs
+message_generation
+)
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
 )
+
+
+add_action_files(
+  FILES 
+  Synthesize.action
+) 
+
+
+
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  actionlib_msgs
+)
+
+catkin_package()
 
 install(DIRECTORY scripts src
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}

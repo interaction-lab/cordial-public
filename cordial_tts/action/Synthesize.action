@@ -1,0 +1,11 @@
+#goal definition
+# name of the goal
+string synthesizing
+string optional_data
+---
+#result definition
+bool synthesizing_success
+string error_message
+---
+#feedback
+string synthesizing_state

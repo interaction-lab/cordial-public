@@ -17,8 +17,10 @@ include_directories(
 )
 
 
-add_action_files(FILES 
-BehaviorAction.action
+add_action_files(
+  FILES 
+  Behaviors.action
+  LongBehavior.action
 ) 
 
 add_message_files(

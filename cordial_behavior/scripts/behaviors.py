@@ -16,12 +16,35 @@ import os
 
 #data = "[{'start': 0.006, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.075, 'type': 'viseme', 'id': 'POSTALVEOLAR'}, {'start': 0.136, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 0.264, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.332, 'type': 'viseme', 'id': 'CLOSE_BACK_VOWEL'}, {'start': 0.383, 'type': 'viseme', 'id': 'VELAR_GLOTTAL'}, {'start': 0.463, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 0.535, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.571, 'type': 'viseme', 'id': 'MID_CENTRAL_VOWEL'}, {'start': 0.581, 'args': [], 'type': 'action', 'id': 'breath_face'}, {'start': 0.611, 'type': 'viseme', 'id': 'BILABIAL'}, {'start': 0.689, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 0.73, 'type': 'viseme', 'id': 'VELAR_GLOTTAL'}, {'start': 0.829, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 0.951, 'type': 'viseme', 'id': 'LABIODENTAL'}, {'start': 1.009, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 1.076, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.174, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 1.254, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.307, 'type': 'viseme', 'id': 'INTERDENTAL'}, {'start': 1.337, 'type': 'viseme', 'id': 'MID_CENTRAL_VOWEL'}, {'start': 1.368, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.3780000000000001, 'args': [], 'type': 'action', 'id': 'happy_face'}, {'start': 1.51, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.617, 'type': 'viseme', 'id': 'BILABIAL'}, {'start': 1.699, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.804, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.857, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.903, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.977, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 2.107, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 2.281, 'type': 'viseme', 'id': 'IDLE'}]"
 TTS_MESSAGE = ''
+DETECTOR_MESSAGE = ''
 SPEAKER_DONE = False
+TRACKER_DONE = False
+
+class LongBehaviorServer():
+	_feedback = LongBehaviorFeedback()
+	_result = LongBehaviorResult()
+
+	def __init__(self, name):
+		self.action_name = name
+		self.action = actionlib.SimpleActionServer(self.action_name, LongBehaviorAction, self.execute_cb, False)
+		self.action.start()
+
+	def execute_cb(self, goal):
+		success = True
+		if goal.optional_data != '':
+			DETECTOR_MESSAGE = optional_data
+		BehaviorManager.handle_tracker()
+		while not TRACKER_DONE:
+			if self.action.is_preempt_requested()
+					self.action.set_preempted()
+					success = False
+		if success:
+			self._result.long_behaving_success = True
+
 
 class BehaviorServer():
-	_feedback = BehaviorActionFeedback()
-	_result = BehaviorActionResult()
-
+	_feedback = BehaviorFeedback()
+	_result = BehaviorResult()
 	def __init__(self, name):
 		self.action_name = name
 		self.action = actionlib.SimpleActionServer(self.action_name, BehaviorAction, self.execute_cb, False)
@@ -29,7 +52,7 @@ class BehaviorServer():
 
 	def execute_cb(self, goal):
 		success = True
-		if optional_data != '':
+		if goal.optional_data != '':
 			TTS_MESSAGE = optional_data
 		BehaviorManager.handle_behavior(TTS_MESSAGE)
 		while not SPEAKER_DONE:
@@ -45,17 +68,26 @@ class BehaviorManager():
 	def __init__(self):
 		rospy.init_node("behavior_node", anonymous=True)
 		rospy.Subscriber('cordial/behavior', Behavior, self.handle_tts_message)
-		rospy.Subscriber('cordial/speaker/done', Bool, self.handle_speaker_done)
-		self.face_publisher = rospy.Publisher('cordial/behavior/face/expressing', FaceRequest, queue_size=10) # this topic should be: cordial/behavior/face/expressing
+		rospy.Subscriber('cordial/speaker/done', Bool, self.handle_speaker_message)
+		rospy.Subscriber('cordial/detector/faces', String, self.handle_detector_message) # I dont know if it is a string!
+		self.face_publisher = rospy.Publisher('cordial/behavior/face/expressing', FaceRequest, queue_size=10)
 		self.gesture_publisher = rospy.Publisher('cordial/behavior/gesture/moving', Gesture, queue_size=10)
 		self.speaker_publisher = rospy.Publisher('cordial/speaker/playing', PlayRequest, queue_size=10)
-		self.behavior_ready_publisher = rospy.Publisher('cordial/behavior/ready', Bool, queue_size=10)
 		self.get_facial_expressions_list()
 		#self.handle_behavior(data) FOR TESTING
 		rospy.spin()
 
 	def handle_tts_message(self, data):
 		TTS_MESSAGE = data
+
+			
+	def handle_speaker_message(self, data):
+		SPEAKER_DONE = data.data
+		rospy.loginfo("The speaker has finished: " +str(data.data))
+
+	def handle_detector_message(self, data):
+		DETECTOR_MESSAGE = data
+		
 
 	def get_facial_expressions_list(self):
 		self.facial_expression_list = []
@@ -76,12 +108,7 @@ class BehaviorManager():
 								"aus": aus, 
 								"au_degrees": au_degrees,
 								"au_ms": au_ms})
-		
-	def handle_speaker_done(self, data):
-		rospy.loginfo("The speaker has finished: " +str(data.data))
-		self.behavior_ready_publisher.publish(True)
-		# END SPEAKING
-		return
+
 
 	def handle_behavior(self, data):
 		audio_frame = data.audio_frame
@@ -173,6 +200,7 @@ class BehaviorManager():
 if __name__ == '__main__':
 	BehaviorManager()
 	#BehaviorServer("behaving")
+	#LongBehaviorServer("tracking")
 
 
 
