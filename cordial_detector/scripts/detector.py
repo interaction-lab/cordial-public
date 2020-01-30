@@ -12,8 +12,10 @@ from cordial_manager.msg import *
 
 FACE_DETECTING_MESSAGE = ''
 DETECTING_DONE = False
+
 FEEDBACK_MESSAGE = ''
-ERROR_MESSAGE = ''
+INTERACTION_MESSAGE = ''
+INTERACTION_CONTINUE = True
 
 
 class DetectorServer():
@@ -40,9 +42,9 @@ class DetectorServer():
 					self.action.set_preempted()
 					success = False
 		if success:
-			self._result.interacting_success = True
+			self._result.interaction_continue = INTERACTION_CONTINUE
 			self._result.interacting_action = goal_name
-			self._result.error_message = ERROR_MESSAGE
+			self._result.message = INTERACTION_MESSAGE
 			self.action.set_succeeded(self._result)
 
 
