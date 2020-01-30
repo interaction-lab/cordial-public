@@ -10,6 +10,13 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   audio_common_msgs
   message_generation
+  genmsg 
+  actionlib_msgs
+)
+
+add_action_files(DIRECTORY action FILES 
+Interaction.action
+Manager.action
 )
 
 
@@ -17,6 +24,7 @@ generate_messages(
   DEPENDENCIES
   std_msgs
   audio_common_msgs
+  actionlib_msgs
 )
 
 
