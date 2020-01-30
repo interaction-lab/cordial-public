@@ -1,0 +1,11 @@
+#goal definition
+# name of the behavior
+string behaving
+string optional_data
+---
+#result definition
+bool behaving_success
+string error_message
+---
+#feedback
+string behaving_state
