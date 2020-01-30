@@ -8,23 +8,53 @@ import pyaudio
 import wave
 import struct
 import rospy
+import actionlib
 from lex_common_msgs.srv import *
 from std_msgs.msg import String
 from audio_common_msgs.msg import AudioData
+from cordial_manager.msg import *
+
+PROMPT_MESSAGE = ''
+DIALOGUE_PROCESSING_DONE = False
+
+class DialogueServer():
+	_feedback = InteractionFeedback()
+	_result = InteractionResult()
+	def __init__(self, name):
+		self.action_name = name
+		self.action = actionlib.SimpleActionServer(self.action_name, InteractionAction, self.execute_goal, False)
+		self.action.start()
+
+	def execute_goal(self, goal):
+		success = True
+		if goal.optional_data != '':
+			PROMPT_MESSAGE = optional_data
+			DialogueManager.send_textToAWS(PROMPT_MESSAGE)
+		else:
+			DialogueManager.send_audioToAWS_client(PROMPT_MESSAGE)
+		while not DIALOGUE_PROCESSING_DONE:
+			if self.action.is_preempt_requested():
+					self.action.set_preempted()
+					success = False
+		if success:
+			self._result.interacting_success = True
 
 
 class DialogueManager():
 	def __init__(self):
 		rospy.init_node("dialogue_node", anonymous=True)
-	   	rospy.Subscriber('/cordial/microphone/audio', AudioData, self.send_audioToAWS_client)
-		rospy.Subscriber('/cordial/dialogue/dialoging', String, self.send_textToAWS)
+	   	rospy.Subscriber('/cordial/microphone/audio', AudioData, self.handle_audio_data)
 		self.text_publisher = rospy.Publisher('cordial/dialogue/script', String, queue_size=10)
-		self.send_textToAWS("Hey") # FOR TESTING
+		#self.send_textToAWS("Hey") # FOR TESTING
 		rospy.spin()
+
+	def handle_audio_data(self, data):
+		PROMPT_MESSAGE = data
 
 	def handle_lex_response(self,lex_response):
 		if len(lex_response.text_response) > 0:
 			self.text_publisher.publish(lex_response.text_response)
+			DIALOGUE_PROCESSING_DONE = True
 
 	def send_audioToAWS_client(self,audiodatarequest):
 		print("Starting client request..")
@@ -60,6 +90,7 @@ class DialogueManager():
 
 if __name__ == '__main__':
     DialogueManager()
+	DialogueServer("dialoging")
     
     
 

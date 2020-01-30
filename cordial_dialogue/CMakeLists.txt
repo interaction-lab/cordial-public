@@ -3,7 +3,6 @@ project(cordial_dialogue)
 
 catkin_python_setup()
 
-catkin_package()
 
 find_package(catkin REQUIRED COMPONENTS
   aws_common
@@ -13,6 +12,14 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   lex_node
+  actionlib_msgs
+  message_generation
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  actionlib_msgs
 )
 
 catkin_package(

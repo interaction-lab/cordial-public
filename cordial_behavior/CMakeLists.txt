@@ -16,13 +16,6 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-
-add_action_files(
-  FILES 
-  Behaviors.action
-  LongBehavior.action
-) 
-
 add_message_files(
   FILES
   Behavior.msg

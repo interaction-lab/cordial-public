@@ -10,10 +10,11 @@ import json
 import time
 import random
 import numpy as np
+import actionlib
 from std_msgs.msg import String
 from cordial_tts import CoRDialTTS
 from cordial_behavior.msg import Behavior
-from cordial_tts.msg import *
+from cordial_manager.msg import *
 import soundfile as sf
 
 
@@ -24,24 +25,24 @@ SYNTHESIZE_DONE = False
 
 
 class SynthesizeServer():
-	_feedback = SynthesizeFeedback()
-	_result = SynthesizeResult()
+	_feedback = InteractionFeedback()
+	_result = InteractionResult()
 	def __init__(self, name):
 		self.action_name = name
-		self.action = actionlib.SimpleActionServer(self.action_name, SynthesizeAction, self.execute_cb, False)
+		self.action = actionlib.SimpleActionServer(self.action_name, InteractionAction, self.execute_goal, False)
 		self.action.start()
 
-	def execute_cb(self, goal):
+	def execute_goal(self, goal):
 		success = True
 		if goal.optional_data != '':
 			DIALOGUE_MESSAGE = optional_data
 		TTSManager.handle_tts_realtime(DIALOGUE_MESSAGE)
 		while not SYNTHESIZE_DONE:
-			if self.action.is_preempt_requested()
+			if self.action.is_preempt_requested():
 					self.action.set_preempted()
 					success = False
 		if success:
-			self._result.synthesizing_success = True
+			self._result.interacting_success = True
 
 
 class TTSManager():
@@ -82,3 +83,4 @@ class TTSManager():
 
 if __name__ == '__main__':
     TTSManager()
+	SynthesizeServer("synthesizing")

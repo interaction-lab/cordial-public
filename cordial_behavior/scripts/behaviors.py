@@ -8,59 +8,59 @@ from ast import literal_eval
 from std_msgs.msg import String, Bool
 from qt_robot_gestures.msg import Gesture
 from cordial_face.msg import FaceRequest
-from cordial_behavior.msg import *
+from cordial_manager.msg import *
 from qt_robot_speaker.msg import PlayRequest # Rename it! PlayAudio
 from threading import Timer
 import os
 
 
-#data = "[{'start': 0.006, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.075, 'type': 'viseme', 'id': 'POSTALVEOLAR'}, {'start': 0.136, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 0.264, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.332, 'type': 'viseme', 'id': 'CLOSE_BACK_VOWEL'}, {'start': 0.383, 'type': 'viseme', 'id': 'VELAR_GLOTTAL'}, {'start': 0.463, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 0.535, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.571, 'type': 'viseme', 'id': 'MID_CENTRAL_VOWEL'}, {'start': 0.581, 'args': [], 'type': 'action', 'id': 'breath_face'}, {'start': 0.611, 'type': 'viseme', 'id': 'BILABIAL'}, {'start': 0.689, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 0.73, 'type': 'viseme', 'id': 'VELAR_GLOTTAL'}, {'start': 0.829, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 0.951, 'type': 'viseme', 'id': 'LABIODENTAL'}, {'start': 1.009, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 1.076, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.174, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 1.254, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.307, 'type': 'viseme', 'id': 'INTERDENTAL'}, {'start': 1.337, 'type': 'viseme', 'id': 'MID_CENTRAL_VOWEL'}, {'start': 1.368, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.3780000000000001, 'args': [], 'type': 'action', 'id': 'happy_face'}, {'start': 1.51, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.617, 'type': 'viseme', 'id': 'BILABIAL'}, {'start': 1.699, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.804, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.857, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.903, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.977, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 2.107, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 2.281, 'type': 'viseme', 'id': 'IDLE'}]"
+data = "[{'start': 0.006, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.075, 'type': 'viseme', 'id': 'POSTALVEOLAR'}, {'start': 0.136, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 0.264, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.332, 'type': 'viseme', 'id': 'CLOSE_BACK_VOWEL'}, {'start': 0.383, 'type': 'viseme', 'id': 'VELAR_GLOTTAL'}, {'start': 0.463, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 0.535, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.571, 'type': 'viseme', 'id': 'MID_CENTRAL_VOWEL'}, {'start': 0.581, 'args': [], 'type': 'action', 'id': 'breath_face'}, {'start': 0.611, 'type': 'viseme', 'id': 'BILABIAL'}, {'start': 0.689, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 0.73, 'type': 'viseme', 'id': 'VELAR_GLOTTAL'}, {'start': 0.829, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 0.951, 'type': 'viseme', 'id': 'LABIODENTAL'}, {'start': 1.009, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 1.076, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.174, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 1.254, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.307, 'type': 'viseme', 'id': 'INTERDENTAL'}, {'start': 1.337, 'type': 'viseme', 'id': 'MID_CENTRAL_VOWEL'}, {'start': 1.368, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.3780000000000001, 'args': [], 'type': 'action', 'id': 'happy_face'}, {'start': 1.51, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.617, 'type': 'viseme', 'id': 'BILABIAL'}, {'start': 1.699, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.804, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.857, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.903, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.977, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 2.107, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 2.281, 'type': 'viseme', 'id': 'IDLE'}]"
 TTS_MESSAGE = ''
 DETECTOR_MESSAGE = ''
 SPEAKER_DONE = False
 TRACKER_DONE = False
 
 class LongBehaviorServer():
-	_feedback = LongBehaviorFeedback()
-	_result = LongBehaviorResult()
+	_feedback = InteractionFeedback()
+	_result = InteractionResult()
 
 	def __init__(self, name):
 		self.action_name = name
-		self.action = actionlib.SimpleActionServer(self.action_name, LongBehaviorAction, self.execute_cb, False)
+		self.action = actionlib.SimpleActionServer(self.action_name, InteractionAction, self.execute_goal, False)
 		self.action.start()
 
-	def execute_cb(self, goal):
+	def execute_goal(self, goal):
 		success = True
 		if goal.optional_data != '':
 			DETECTOR_MESSAGE = optional_data
-		BehaviorManager.handle_tracker()
+		BehaviorManager.handle_tracker(DETECTOR_MESSAGE)
 		while not TRACKER_DONE:
-			if self.action.is_preempt_requested()
+			if self.action.is_preempt_requested():
 					self.action.set_preempted()
 					success = False
 		if success:
-			self._result.long_behaving_success = True
+			self._result.interacting_success = True
 
 
 class BehaviorServer():
-	_feedback = BehaviorFeedback()
-	_result = BehaviorResult()
+	_feedback = InteractionFeedback()
+	_result = InteractionResult()
 	def __init__(self, name):
 		self.action_name = name
-		self.action = actionlib.SimpleActionServer(self.action_name, BehaviorAction, self.execute_cb, False)
+		self.action = actionlib.SimpleActionServer(self.action_name, InteractionAction, self.execute_goal, False)
 		self.action.start()
 
-	def execute_cb(self, goal):
+	def execute_goal(self, goal):
 		success = True
 		if goal.optional_data != '':
 			TTS_MESSAGE = optional_data
 		BehaviorManager.handle_behavior(TTS_MESSAGE)
 		while not SPEAKER_DONE:
-			if self.action.is_preempt_requested()
+			if self.action.is_preempt_requested():
 					self.action.set_preempted()
 					success = False
 		if success:
-			self._result.behaving_success = True
+			self._result.interacting_success = True
 		
 
 class BehaviorManager():
@@ -70,12 +70,17 @@ class BehaviorManager():
 		rospy.Subscriber('cordial/behavior', Behavior, self.handle_tts_message)
 		rospy.Subscriber('cordial/speaker/done', Bool, self.handle_speaker_message)
 		rospy.Subscriber('cordial/detector/faces', String, self.handle_detector_message) # I dont know if it is a string!
+		rospy.Subscriber('cordial/behavior/tracking/done', Bool, self.handle_tracking_done) 
 		self.face_publisher = rospy.Publisher('cordial/behavior/face/expressing', FaceRequest, queue_size=10)
 		self.gesture_publisher = rospy.Publisher('cordial/behavior/gesture/moving', Gesture, queue_size=10)
 		self.speaker_publisher = rospy.Publisher('cordial/speaker/playing', PlayRequest, queue_size=10)
+		self.tracker_publisher = rospy.Publisher('cordial/behavior/tracking', Bool, queue_size=1)
 		self.get_facial_expressions_list()
-		#self.handle_behavior(data) FOR TESTING
+		self.handle_behavior(data) #FOR TESTING
 		rospy.spin()
+
+	def handle_tracking_done(self, data):
+		TRACKER_DONE = data.data
 
 	def handle_tts_message(self, data):
 		TTS_MESSAGE = data
@@ -87,6 +92,10 @@ class BehaviorManager():
 
 	def handle_detector_message(self, data):
 		DETECTOR_MESSAGE = data
+
+	def handle_tracker(self, data):
+		self.tracker_publisher.publish(True)
+
 		
 
 	def get_facial_expressions_list(self):
@@ -199,8 +208,8 @@ class BehaviorManager():
 
 if __name__ == '__main__':
 	BehaviorManager()
-	#BehaviorServer("behaving")
-	#LongBehaviorServer("tracking")
+	BehaviorServer("behaving")
+	LongBehaviorServer("long_behaving")
 
 
 
