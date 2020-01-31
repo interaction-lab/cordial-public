@@ -1,0 +1,13 @@
+{
+    "greeting1": {
+        "steps": [
+            {
+                "name": "start_dialogue",
+                "description": "Starting the dialogue",
+                "running_option": "loop",
+                "action": "dialoging",
+                "goal": "greeting"
+            }
+        ]
+    }
+}

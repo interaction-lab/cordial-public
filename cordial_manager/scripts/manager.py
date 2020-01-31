@@ -19,7 +19,7 @@ class InteractionManager():
         rospy.init_node("interaction_controller_node", anonymous=True)
 
         # Setup server for decision manager to call
-        self.interaction_server = actionlib.SimpleActionServer('do_interaction', Manager,
+        self.interaction_server = actionlib.SimpleActionServer('do_interaction', ManagerAction,
                                                                self.handle_interacting, False)
         self.interaction_server.start()
         self._feedback = ManagerFeedback()
@@ -32,7 +32,7 @@ class InteractionManager():
         topics = ["behaving", "long_behaving", "synthesizing", "dialoging", "sensing", "detecting"]
         for topic_name in topics:
             self.action_clients[topic_name] = actionlib.SimpleActionClient(topic_name, InteractionAction)
-            self.action_clients[topic_name].wait_for_server()
+            #self.action_clients[topic_name].wait_for_server()
             self.action_result[topic_name] = {
                 "interaction_continue": False,
                 "message": ""}
@@ -45,50 +45,71 @@ class InteractionManager():
 
     def read_interactions(self):
         base_dir = os.path.dirname(__file__)
-        with open(base_dir + '/data/interactions.json', "r") as json_file:
+        with open(base_dir + '/data/test.json', "r") as json_file:
             self.interaction_data = json.load(json_file)
 
     def action_done_callback(self, terminal_state, result):
-        self.action_result[result.interaction_action]["interacting_success"] = result.interacting_success
-        self.action_result[result.interaction_action]["error_message"] = result.error_message
+        print("Heard back from: "+ result.interacting_action, terminal_state, result)
+        self.action_result[result.interacting_action]["interaction_continue"] = result.interaction_continue
+        self.action_result[result.interacting_action]["message"] = result.message
         return
 
     def action_feedback_callback(self, feedback):
-        self.action_feedback[feedback.interaction_action]["interaction_state"] = feedback.interaction_state
+        self.action_feedback[feedback.interacting_action]["interaction_state"] = feedback.interaction_state
         return
 
     def handle_interacting(self, data):
         # Load interaction block specified by the manager
+        print(data)
         interaction = self.interaction_data[data]  # TODO update to be data.something?
-        interaction_steps = self.interaction_data[interaction]['steps']
+        interaction_steps = self.interaction_data[data]['steps']
         max_wait_time = rospy.Duration.from_sec(60.0)  # TODO parameterize
 
         # Iterate through block of steps
         for action in interaction_steps:
 
             # Do Action
-            print(action["description"])
-            goal = InteractionActionGoal(interaction_action=action["name"], optional_data="")
-            self.action_clients[action].send_goal(goal,
-                                                  done_cb=action_done_callback,
-                                                  feedback_cb=action_feedback_callback)
+            print("Begining action step:" + action["description"])
+            goal = InteractionGoal()
+            goal.interacting_action = action["action"]
+            goal.optional_data = action["goal"]
+            self.action_clients[action["action"]].send_goal(goal,
+                                                  done_cb=self.action_done_callback,
+                                                  feedback_cb=self.action_feedback_callback)
 
             # Wait if blocking
             if action["running_option"] == "block":
+                print("Waiting for action step to complete")
                 self.action_clients[action["action"]].wait_for_result(max_wait_time)
 
             # Enter loop if dialoging
             if action["running_option"] == "loop":
-                while not rospy.is_shutdown:  # dialoguing loops continue until interaction_continue is false
+                print("Entering action loop")
+                while not rospy.is_shutdown():  # dialoguing loops continue until interaction_continue is false
                     # do loop (synthesize->behave->sense->dialoging)
                     # expected behavior is to start looping after starting a dialogue
-                    for loop_action in ["synthesizing", "behaving" "sensing", "dialoging"]:
-                        goal = InteractionActionGoal(interaction_action=loop_action, optional_data="")
+                    for loop_action in ["synthesizing", "behaving" , "sensing", "dialoging"]:
+                        print("sending out instruction to start - " + loop_action)
+                        goal = InteractionGoal(interacting_action=loop_action, optional_data="")
+                        print("goal message:", goal)
                         self.action_clients[loop_action].send_goal(goal,
-                                                                   done_cb=action_done_callback,
-                                                                   feedback_cb=action_feedback_callback)
+                                                                   done_cb=self.action_done_callback,
+                                                                   feedback_cb=self.action_feedback_callback)
                         self.action_clients[loop_action].wait_for_result(max_wait_time)
                         if not self.action_result[loop_action]["interaction_continue"]:
+                            print("received instructions to stop - do not continue")
+                            # Check if error, if not error--finish synth and behave
+                            message = self.action_result[loop_action]["message"]
+                            status = message.split('_')[0]
+                            if status == "success":
+                                for loop_action in ["synthesizing", "behaving"]:
+                                    print("sending out instruction to start - " + loop_action)
+                                    goal = InteractionGoal(interacting_action=loop_action, optional_data="")
+                                    print("goal message:", goal)
+                                    self.action_clients[loop_action].send_goal(goal,
+                                                                            done_cb=self.action_done_callback,
+                                                                            feedback_cb=self.action_feedback_callback)
+                                    self.action_clients[loop_action].wait_for_result(max_wait_time)
                             break  # the for loop
                     else:
                         continue
@@ -102,18 +123,20 @@ class InteractionManager():
                         continue
                     else:
                         error = message.split('_')[1]
+                        print("Do not continue error said:", error)
                         self._result.action_block_success = False
                         self._result.error_message = error
                         self.interaction_server.set_aborted(self._result)
                         return()
 
-            if not self.action_result[action]["interaction_continue"]:
-                message = self.action_result[action]["message"]
+            if not self.action_result[action["action"]]["interaction_continue"]:
+                message = self.action_result[action["action"]]["message"]
                 status = message.split('_')[0]
                 if status == "success":
                     continue
                 else:
                     error = message.split('_')[1]
+                    print("Do not continue error(main loop) said:", error)
                     self._result.action_block_success = False
                     self._result.error_message = error
                     self.interaction_server.set_aborted(self._result)

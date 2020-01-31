@@ -6,6 +6,7 @@ import actionlib
 import json
 from ast import literal_eval
 from std_msgs.msg import String, Bool
+from cordial_behavior.msg import Behavior
 from qt_robot_gestures.msg import Gesture
 from cordial_face.msg import FaceRequest
 from cordial_manager.msg import InteractionFeedback, InteractionAction, InteractionResult
@@ -14,11 +15,13 @@ from threading import Timer
 import os
 
 RATE_FEEDBACK =""
-data = "[{'start': 0.006, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.075, 'type': 'viseme', 'id': 'POSTALVEOLAR'}, {'start': 0.136, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 0.264, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.332, 'type': 'viseme', 'id': 'CLOSE_BACK_VOWEL'}, {'start': 0.383, 'type': 'viseme', 'id': 'VELAR_GLOTTAL'}, {'start': 0.463, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 0.535, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 0.571, 'type': 'viseme', 'id': 'MID_CENTRAL_VOWEL'}, {'start': 0.581, 'args': [], 'type': 'action', 'id': 'breath_face'}, {'start': 0.611, 'type': 'viseme', 'id': 'BILABIAL'}, {'start': 0.689, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 0.73, 'type': 'viseme', 'id': 'VELAR_GLOTTAL'}, {'start': 0.829, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 0.951, 'type': 'viseme', 'id': 'LABIODENTAL'}, {'start': 1.009, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 1.076, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.174, 'type': 'viseme', 'id': 'CLOSE_FRONT_VOWEL'}, {'start': 1.254, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.307, 'type': 'viseme', 'id': 'INTERDENTAL'}, {'start': 1.337, 'type': 'viseme', 'id': 'MID_CENTRAL_VOWEL'}, {'start': 1.368, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.3780000000000001, 'args': [], 'type': 'action', 'id': 'happy_face'}, {'start': 1.51, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.617, 'type': 'viseme', 'id': 'BILABIAL'}, {'start': 1.699, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.804, 'type': 'viseme', 'id': 'OPEN_FRONT_VOWEL'}, {'start': 1.857, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.903, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 1.977, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 2.107, 'type': 'viseme', 'id': 'DENTAL_ALVEOLAR'}, {'start': 2.281, 'type': 'viseme', 'id': 'IDLE'}]"
+#data = "[{'start': 0.075, 'time': 2,'type': 'action', 'id': 'QT/bye'},{'start': 0.075, 'time': 2,'type': 'action', 'id': 'QT/point_front'}, {'start': 0.075,'time': 2, 'type': 'viseme', 'id': 'POSTALVEOLAR'},{'start': 0.006, 'time': 2,  'type': 'action', 'id': 'happy_face'}]"
 TTS_MESSAGE = ''
-DETECTOR_MESSAGE = ''
 SPEAKER_DONE = False
+TRACKER_STATE = ''
 TRACKER_DONE = False
+DETECTOR_MESSAGE = ''
+
 
 FEEDBACK_MESSAGE = ''
 INTERACTION_MESSAGE = ''
@@ -34,13 +37,15 @@ class LongBehaviorServer():
 		self.action.start()
 
 	def execute_goal(self, goal):
+		global DETECTOR_MESSAGE , DETECTOR_MESSAGE, TRACKER_STATE
 		goal_name = goal.interacting_action
 		success = True
 		if goal.optional_data != '':
-			DETECTOR_MESSAGE = optional_data
-		BehaviorManager.handle_tracker(DETECTOR_MESSAGE)
+			DETECTOR_MESSAGE = goal.optional_data
+		bm = BehaviorManager()
+		bm.handle_tracker(DETECTOR_MESSAGE)
 		self._feedback.interacting_action = goal_name
-		self._feedback.interacting_state = FEEDBACK_MESSAGE
+		self._feedback.interaction_state = FEEDBACK_MESSAGE
 		## Decide when to send the feedback
 		RATE_FEEDBACK = rospy.Rate(10)
 		while not TRACKER_DONE:
@@ -48,12 +53,15 @@ class LongBehaviorServer():
 					self.action.set_preempted()
 					success = False
 			self.action.publish_feedback(self._feedback)
-			RATE_FEEDBACK.sleep()
+			rospy.Rate(10)
 
 		if success:
 			self._result.interaction_continue = INTERACTION_CONTINUE
 			self._result.interacting_action = goal_name
 			self._result.message = INTERACTION_MESSAGE
+			TRACKER_STATE = ''
+			TRACKER_DONE = False
+			DETECTOR_MESSAGE = ''
 			self.action.set_succeeded(self._result)
 
 
@@ -66,23 +74,28 @@ class BehaviorServer():
 		self.action.start()
 
 	def execute_goal(self, goal):
+		global TTS_MESSAGE, SPEAKER_DONE
 		goal_name = goal.interacting_action
 		success = True
 		if goal.optional_data != '':
-			TTS_MESSAGE = optional_data
-		BehaviorManager.handle_behavior(TTS_MESSAGE)
+			TTS_MESSAGE = goal.optional_data
+		bm = BehaviorManager()
+		bm.handle_behavior(TTS_MESSAGE)
 		self._feedback.interacting_action = goal_name
-		self._feedback.interacting_state = FEEDBACK_MESSAGE
+		self._feedback.interaction_state = FEEDBACK_MESSAGE
 		## Decide when to send the feedback
 		# self.action.publish_feedback(self._feedback)
 		while not SPEAKER_DONE:
 			if self.action.is_preempt_requested():
 					self.action.set_preempted()
 					success = False
+			rospy.Rate(10)
 		if success:
 			self._result.interaction_continue = INTERACTION_CONTINUE
 			self._result.interacting_action = goal_name
 			self._result.message = INTERACTION_MESSAGE
+			SPEAKER_DONE = False
+			TTS_MESSAGE = ''
 			self.action.set_succeeded(self._result)
 		
 
@@ -98,21 +111,26 @@ class BehaviorManager():
 		self.speaker_publisher = rospy.Publisher('cordial/speaker/playing', PlayRequest, queue_size=10)
 		self.tracker_publisher = rospy.Publisher('cordial/behavior/tracking', Bool, queue_size=1)
 		self.get_facial_expressions_list()
-		self.handle_behavior(data) #FOR TESTING
+		#self.handle_behavior(data) #FOR TESTING
 		
 
 	def handle_tracking_state(self, data):
+		global TRACKER_STATE
 		TRACKER_STATE = data.data
 
 	def handle_tts_message(self, data):
+		global TTS_MESSAGE
 		TTS_MESSAGE = data
+		print("The message received from the TTS is:", TTS_MESSAGE)
 
 			
 	def handle_speaker_message(self, data):
+		global SPEAKER_DONE
 		SPEAKER_DONE = data.data
 		rospy.loginfo("The speaker has finished: " +str(data.data))
 
 	def handle_detector_message(self, data):
+		global DETECTOR_MESSAGE
 		DETECTOR_MESSAGE = data
 
 	def handle_tracker(self, data):
@@ -142,10 +160,11 @@ class BehaviorManager():
 
 
 	def handle_behavior(self, data):
-		#audio_frame = data.audio_frame
-		#audio_data = data.audio_data
-		#data = literal_eval(data.behavior_json)
-		data = literal_eval(data) #FOR TESTING
+		print("The behaviors data are:", data)
+		audio_frame = data.audio_frame
+		audio_data = data.audio_data
+		data = literal_eval(data.behavior_json)
+		#data = literal_eval(data) #FOR TESTING
 		word_timing = filter(lambda b: b["type"] == "word", data)
 		behav = filter(lambda b: b["type"] != "word", data)
 		facial_expression_list = self.facial_expression_list
@@ -154,7 +173,7 @@ class BehaviorManager():
 		gesture_behaviors = filter(lambda b: b["id"] not in facial_expression_list, all_gesture_behaviors)
 		viseme_behaviors = filter(lambda b: b["id"] in visemes, behav)
 		facial_expression_behaviors = filter(lambda b: b["id"] in facial_expression_list, behav)
-		#self.handle_audio(audio_data, audio_frame)
+		self.handle_audio(audio_data, audio_frame)
 		self.handle_visemes(viseme_behaviors)
 		self.handle_gestures(gesture_behaviors, word_timing)
 		self.handle_facial_expression(facial_expression_behaviors)
@@ -163,6 +182,7 @@ class BehaviorManager():
 		speaker_msg = PlayRequest()
 		speaker_msg.audio_frame = audio_frame
 		speaker_msg.data = audio_data
+		print("The speaker message is:" , speaker_msg)
 		self.speaker_publisher.publish(speaker_msg)
 
 
