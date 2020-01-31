@@ -4,8 +4,10 @@ string action_block
 string optional_data
 ---
 # result definition
-bool action_block_success
-string error_message
+string action_block
+bool action_block_continue
+string message
 ---
 # feedback
+string action_block
 string action_block_state

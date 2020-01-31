@@ -9,22 +9,20 @@ import sys
 import actionlib
 import rospy
 import roslib
-roslib.load_manifest('cordial_manager')
 
 
 class InteractionManager():
-
+    _feedback = ManagerFeedback()
+    _result = ManagerResult()
     def __init__(self):
-        # Node startup
-        rospy.init_node("interaction_controller_node", anonymous=True)
-
+        # Read interactions from json file
+        self.read_interactions()
         # Setup server for decision manager to call
         self.interaction_server = actionlib.SimpleActionServer('do_interaction', ManagerAction,
                                                                self.handle_interacting, False)
         self.interaction_server.start()
-        self._feedback = ManagerFeedback()
-        self._result = ManagerResult()
-
+        print("The server starts")
+        
         # Setup clients for all of the different nodes
         self.action_clients = {}
         self.action_feedback = {}
@@ -39,9 +37,8 @@ class InteractionManager():
             self.action_feedback[topic_name] = {
                 "interaction_state": ""}
 
-        self.read_interactions()
-        self.handle_interacting("greeting1")  # FOR TESTING
-        rospy.spin()
+        #self.handle_interacting("greeting1")  # FOR TESTING
+   
 
     def read_interactions(self):
         base_dir = os.path.dirname(__file__)
@@ -58,9 +55,11 @@ class InteractionManager():
         self.action_feedback[feedback.interacting_action]["interaction_state"] = feedback.interaction_state
         return
 
-    def handle_interacting(self, data):
+    def handle_interacting(self, goal_data):
         # Load interaction block specified by the manager
-        print(data)
+        data = goal_data.action_block
+        optional_data = goal_data.optional_data
+        print("The interaction manager received the following command block:", data)
         interaction = self.interaction_data[data]  # TODO update to be data.something?
         interaction_steps = self.interaction_data[data]['steps']
         max_wait_time = rospy.Duration.from_sec(60.0)  # TODO parameterize
@@ -124,8 +123,8 @@ class InteractionManager():
                     else:
                         error = message.split('_')[1]
                         print("Do not continue error said:", error)
-                        self._result.action_block_success = False
-                        self._result.error_message = error
+                        self._result.action_block_continue = False
+                        self._result.message = error
                         self.interaction_server.set_aborted(self._result)
                         return()
 
@@ -137,18 +136,20 @@ class InteractionManager():
                 else:
                     error = message.split('_')[1]
                     print("Do not continue error(main loop) said:", error)
-                    self._result.action_block_success = False
-                    self._result.error_message = error
+                    self._result.action_block_continue = False
+                    self._result.message = error
                     self.interaction_server.set_aborted(self._result)
 
         # When the block has been successfully completed
-        self._result.action_block_success = True
-        self._result.error_message = ""
+        self._result.action_block_continue = True
+        self._result.message = ""
         self.interaction_server.set_succeeded(self._result)
 
 
 if __name__ == '__main__':
+    rospy.init_node("interaction_controller_node", anonymous=True)
     InteractionManager()
+    rospy.spin()
 
 
 # EXAMPLE:
