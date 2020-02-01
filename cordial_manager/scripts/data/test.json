@@ -10,4 +10,43 @@
             }
         ]
     }
+,
+
+    "greeting1b": {
+        "steps": [
+            {
+                "name": "start_dialogue",
+                "description": "Starting the dialogue",
+                "running_option": "loop",
+                "action": "dialoging",
+                "goal": "greeting"
+            }
+        ]
+    }
+,
+
+    "greeting2": {
+        "steps": [
+            {
+                "name": "start_dialogue",
+                "description": "Starting the dialogue",
+                "running_option": "loop",
+                "action": "dialoging",
+                "goal": "greeting"
+            }
+        ]
+    }
+,
+
+    "greeting2b": {
+        "steps": [
+            {
+                "name": "start_dialogue",
+                "description": "Starting the dialogue",
+                "running_option": "loop",
+                "action": "dialoging",
+                "goal": "greeting"
+            }
+        ]
+    }
 }
