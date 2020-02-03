@@ -20,26 +20,28 @@ class DecisionManager():
     def __init__(self):
         #Initialize the state variable
         self.state = DecistionState.SUCCESS
+        self.index = 0
         self.failure_counter = 0
+        self.action_feedback = {}
+        self.action_result = {}
         # Setup clients for all of the different interaction blocks
         topic_name = "do_interaction"
         self.action_client = actionlib.SimpleActionClient(topic_name, ManagerAction)
         print("Waiting for the server")
         self.action_client.wait_for_server()
         print("Server is ready")
-        self.action_result = {
-                "action_block_continue": False,
-                "message": ""}
-        self.action_feedback = {
-                "action_block_state": ""}
-        success_action_name = ["greeting1", 'greeting2']
-        failure_action_name = ["greeting1b", 'greeting2b']
-        for i in range(len(success_action_name)):
-            if self.state == DecistionState.SUCCESS:
-                self.send_request_to_interaction_manager(success_action_name[i])
-            if self.state == DecistionState.FAILURE:
-                while self.failure_counter < 3:
-                    self.send_request_to_interaction_manager(failure_action_name[i])
+        self.success_action_name = ['greeting1', 'greeting2']
+        self.failure_action_name = ['greeting1b', 'greeting2b']
+        topics = self.success_action_name + self.failure_action_name
+        for topic_name in topics:
+            self.action_result[topic_name] = {
+                    "action_block":"",
+                    "action_block_continue": False,
+                    "message": ""}
+            self.action_feedback[topic_name] = {
+                    "action_block":"",
+                    "action_block_state": ""}
+        self.send_request_to_interaction_manager(self.success_action_name[self.index])
        
 
     def send_request_to_interaction_manager(self, action_name):
@@ -56,13 +58,19 @@ class DecisionManager():
         print("Heard back from: "+ result.action_block, terminal_state, result)
         self.action_result[result.action_block]["action_block_continue"] = result.action_block_continue
         self.action_result[result.action_block]["message"] = result.message
+
         if self.action_result[result.action_block]["action_block_continue"]:
             self.failure_counter = 0
+            self.index += 1
             self.state = DecistionState.SUCCESS
+            self.send_request_to_interaction_manager(self.success_action_name[self.index])
         else:
-            if message == 'falure':
+            if message == 'failure':
                 self.failure_counter += 1
+                self.index = self.index
                 self.state = DecisionState.FAILURE
+                while self.failure_counter < 4: # 3 re-entry allowed
+                    self.send_request_to_interaction_manager(self.failure_action_name[self.index])
             elif message == 'emergency':
                 self.state = DecistionState.EMERGENCY
         return

@@ -30,7 +30,8 @@ class InteractionManager():
         topics = ["behaving", "long_behaving", "synthesizing", "dialoging", "sensing", "detecting"]
         for topic_name in topics:
             self.action_clients[topic_name] = actionlib.SimpleActionClient(topic_name, InteractionAction)
-            #self.action_clients[topic_name].wait_for_server()
+            print("Waiting for module servers")
+            self.action_clients[topic_name].wait_for_server()
             self.action_result[topic_name] = {
                 "interaction_continue": False,
                 "message": ""}
@@ -57,21 +58,22 @@ class InteractionManager():
 
     def handle_interacting(self, goal_data):
         # Load interaction block specified by the manager
-        data = goal_data.action_block
-        optional_data = goal_data.optional_data
-        print("The interaction manager received the following command block:", data)
-        interaction = self.interaction_data[data]  # TODO update to be data.something?
-        interaction_steps = self.interaction_data[data]['steps']
+        print("Manager action received is:", goal_data)
+        action_data = goal_data.action_block
+        print("The interaction manager received the following command block:", action_data)
+        interaction = self.interaction_data[action_data]  # TODO update to be data.something?
+        interaction_steps = self.interaction_data[action_data]['steps']
         max_wait_time = rospy.Duration.from_sec(60.0)  # TODO parameterize
-
+        print("The interaction steps are:", interaction_steps)
         # Iterate through block of steps
         for action in interaction_steps:
-
+            print("The action is:", action)
             # Do Action
             print("Begining action step:" + action["description"])
             goal = InteractionGoal()
             goal.interacting_action = action["action"]
             goal.optional_data = action["goal"]
+            print("goal message:", goal)
             self.action_clients[action["action"]].send_goal(goal,
                                                   done_cb=self.action_done_callback,
                                                   feedback_cb=self.action_feedback_callback)
@@ -123,6 +125,7 @@ class InteractionManager():
                     else:
                         error = message.split('_')[1]
                         print("Do not continue error said:", error)
+                        self._result.action_block = action_data
                         self._result.action_block_continue = False
                         self._result.message = error
                         self.interaction_server.set_aborted(self._result)
@@ -136,11 +139,13 @@ class InteractionManager():
                 else:
                     error = message.split('_')[1]
                     print("Do not continue error(main loop) said:", error)
+                    self._result.action_block = action_data
                     self._result.action_block_continue = False
                     self._result.message = error
                     self.interaction_server.set_aborted(self._result)
 
         # When the block has been successfully completed
+        self._result.action_block = action_data
         self._result.action_block_continue = True
         self._result.message = ""
         self.interaction_server.set_succeeded(self._result)

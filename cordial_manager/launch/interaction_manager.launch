@@ -4,7 +4,6 @@
 	<arg name="use_manager" default="true"/>
   	<group if="$(arg use_manager)">
 		<node pkg="cordial_manager" type="interaction_manager.py" name="interaction_manager" output="screen"/>
-		<node pkg="cordial_manager" type="decision_manager.py" name="decision_manager" output="screen"/>
   	</group>
 
 
