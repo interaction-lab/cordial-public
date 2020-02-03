@@ -19,7 +19,7 @@
                 "description": "Starting the dialogue",
                 "running_option": "loop",
                 "action": "dialoging",
-                "goal": "greeting"
+                "goal": "Repeat Name"
             }
         ]
     }

@@ -10,7 +10,7 @@ import actionlib
 import rospy
 import roslib
 
-class DecistionState():
+class DecisionState():
     SUCCESS = 0
     FAILURE = 1
     EMERGENCY = 2
@@ -19,7 +19,7 @@ class DecisionManager():
 
     def __init__(self):
         #Initialize the state variable
-        self.state = DecistionState.SUCCESS
+        self.state = DecisionState.SUCCESS
         self.index = 0
         self.failure_counter = 0
         self.action_feedback = {}
@@ -62,17 +62,18 @@ class DecisionManager():
         if self.action_result[result.action_block]["action_block_continue"]:
             self.failure_counter = 0
             self.index += 1
-            self.state = DecistionState.SUCCESS
-            self.send_request_to_interaction_manager(self.success_action_name[self.index])
+            self.state = DecisionState.SUCCESS
+            if self.index < len(self.success_action_name):
+                self.send_request_to_interaction_manager(self.success_action_name[self.index])
         else:
-            if message == 'failure':
+            if self.action_result[result.action_block]["message"] == 'understanding':
                 self.failure_counter += 1
                 self.index = self.index
                 self.state = DecisionState.FAILURE
-                while self.failure_counter < 4: # 3 re-entry allowed
+                if self.failure_counter < 4: # 3 re-entry allowed
                     self.send_request_to_interaction_manager(self.failure_action_name[self.index])
-            elif message == 'emergency':
-                self.state = DecistionState.EMERGENCY
+            elif self.action_result[result.action_block]["message"] == 'emergency':
+                self.state = DecisionState.EMERGENCY
         return
         
     
