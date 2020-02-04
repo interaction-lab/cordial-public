@@ -20,8 +20,6 @@ class InteractionManager():
         # Setup server for decision manager to call
         self.interaction_server = actionlib.SimpleActionServer('do_interaction', ManagerAction,
                                                                self.handle_interacting, False)
-        self.interaction_server.start()
-        print("The server starts")
         
         # Setup clients for all of the different nodes
         self.action_clients = {}
@@ -37,6 +35,8 @@ class InteractionManager():
                 "message": ""}
             self.action_feedback[topic_name] = {
                 "interaction_state": ""}
+        self.interaction_server.start()
+        print("The server starts")
 
         #self.handle_interacting("greeting1")  # FOR TESTING
    

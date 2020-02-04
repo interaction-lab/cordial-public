@@ -106,7 +106,11 @@ $ sudo ufw allow 9090
         
 11. Test your installation (New Method)
 
-    ...TBD
+    ~~~~
+        $ roslaunch cordial_manager modules.launch
+        $ roslaunch cordial_manager interaction_manager.launch
+        $ roslaunch cordial_manager decision_manager.launch
+    ~~~~
 
 --------------------------------------------
 
@@ -115,6 +119,9 @@ $ sudo ufw allow 9090
     1. On the Pi (QTRP) and NUC (QTPC),  clone this repository to catkin_ws/src
     1. catkin_make on each
     1. [Pi] From the repo, copy ./autostart_scripts/start_cordial_face_pi.sh to ~/robot/autostart/
+    1. [Pi] From the repo, copy ./autostart_scripts/start_audio.sh to ~/robot/autostart/
+    1. [Pi] From the repo, copy ./autostart_scripts/start_microphone.sh to ~/robot/autostart/
+    1. [Pi] From the repo, copy ./autostart_scripts/start_read_gestures.sh to ~/robot/autostart/
     1. [Pi] Verify the script is executable (e.g. `ls -l` shows a -x at the end)
     1. [Pi] Add the line `run_script start_cordial_face_pi.sh` to ~/robot/autostart/autostart_screens.sh below similar `run_script` lines.
     1. [NUC] From the repo, copy ./autostart_scripts/start_cordial_face_nuc.sh to ~/robot/autostart/
