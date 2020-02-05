@@ -53,7 +53,7 @@ class InteractionManager():
 
     def action_done_callback(self, terminal_state, result):
         """Save action results"""
-        rospy.logdebug("Heard back from: "+ result.action, terminal_state, result)
+        rospy.logdebug("Heard back from: "+ result.action +" terminal state: "  + str(terminal_state) +" and result : "  + str(result))
         self.action_result[result.action]["do_continue"] = result.do_continue
         self.action_result[result.action]["message"] = result.message
         return
@@ -72,11 +72,11 @@ class InteractionManager():
         interaction_block_label = goal_data.action
         rospy.loginfo("The interaction manager received the following command block:"+ str(interaction_block_label))
         interaction_steps = self.interaction_data[interaction_block_label]['steps']
-        rospy.logdebug("The interaction steps are:", interaction_steps)
+        rospy.logdebug("The interaction steps are:" + str(interaction_steps))
 
         # Iterate through block of steps
         for action in interaction_steps:
-            rospy.logdebug("The action is:", action)
+            rospy.logdebug("The action is:" + str(action))
             rospy.loginfo("Beginning action step:" + action["description"])
             self._send_goal_(action["action"], 
                             optional=action["goal"], 
@@ -89,7 +89,7 @@ class InteractionManager():
 
                 # After exiting the loop check if loop action failed
                 if not self.action_result[loop_action]["do_continue"]:
-                    action_success, error_message = self._check_result_status_()
+                    action_success, error_message = self._check_result_status_(loop_action)
                     if action_success:
                         continue
                     else:
@@ -98,7 +98,7 @@ class InteractionManager():
 
             # At the end of the a step check if the step failed
             if not self.action_result[action["action"]]["do_continue"]:
-                action_success, error_message = self._check_result_status_()
+                action_success, error_message = self._check_result_status_(action["action"])
                 if action_success:
                     continue
                 else:
@@ -110,8 +110,8 @@ class InteractionManager():
         return
 
 
-    def _check_result_status_(self):
-        message = self.action_result[loop_action]["message"]
+    def _check_result_status_(self, action):
+        message = self.action_result[action]["message"]
         status = message.split('_')[0]
         if status == "success":
             return(True, "")
@@ -127,7 +127,7 @@ class InteractionManager():
         if action_continue:
             self.interaction_server.set_succeeded(self._result)     
         else:
-            rospy.loginfo("Do not continue, error said:", error)
+            rospy.loginfo("Do not continue, error said:"+ message)
             self.interaction_server.set_aborted(self._result)
         return 
 
@@ -147,7 +147,7 @@ class InteractionManager():
                     # Still need to finish behaving after dialogue indicates success
                     if status == "success":
                         for loop_action in ["synthesizing", "behaving"]:
-                            _send_goal_(loop_action)
+                            self._send_goal_(loop_action)
                     break  # the for loop
             else:
                 continue

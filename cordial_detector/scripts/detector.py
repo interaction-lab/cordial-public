@@ -20,7 +20,8 @@ INTERACTION_CONTINUE = True
 class DetectorServer():
 	_feedback = CordialFeedback()
 	_result = CordialResult()
-	def __init__(self, name):
+	def __init__(self, name, manager):
+		self.dm = manager
 		self.action_name = name
 		self.action = actionlib.SimpleActionServer(self.action_name, CordialAction, self.execute_goal, False)
 		self.action.start()
@@ -32,8 +33,7 @@ class DetectorServer():
 		FACE_DETECTING_MESSAGE = True
 		if goal.optional_data != '':
 			FACE_DETECTING_MESSAGE = goal.optional_data
-		dm = DetectorManager()
-		dm.handle_face_detecting_start(FACE_DETECTING_MESSAGE)
+		self.dm.handle_face_detecting_start(FACE_DETECTING_MESSAGE)
 		self._feedback.action = goal_name
 		self._feedback.state = FEEDBACK_MESSAGE
 		## Decide when to send the feedback
@@ -64,7 +64,7 @@ class DetectorManager():
 
 if __name__ == '__main__':
 		rospy.init_node("detector_node", anonymous=True)
-		DetectorManager()
-		DetectorServer("detecting")
+		dm = DetectorManager()
+		DetectorServer("detecting", dm)
 		rospy.spin()
 

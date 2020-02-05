@@ -21,7 +21,8 @@ INTERACTION_CONTINUE = True
 class LongSensorsServer():
 	_feedback = CordialFeedback()
 	_result = CordialResult()
-	def __init__(self, name):
+	def __init__(self, name, manager):
+		self.sm = manager
 		self.action_name = name
 		self.action = actionlib.SimpleActionServer(self.action_name, CordialAction, self.execute_goal, False)
 		self.action.start()
@@ -32,8 +33,7 @@ class LongSensorsServer():
 		success = True
 		if goal.optional_data != '':
 			LISTENING_MESSAGE = goal.optional_data
-		sm = SensorsManager()
-		sm.handle_listening_start(LISTENING_MESSAGE)
+		self.sm.handle_listening_start(LISTENING_MESSAGE)
 		self._feedback.action = goal_name
 		self._feedback.state = FEEDBACK_MESSAGE
 		## Decide when to send the feedback
@@ -57,7 +57,8 @@ class LongSensorsServer():
 class SensorsServer():
 	_feedback = CordialFeedback()
 	_result = CordialResult()
-	def __init__(self, name):
+	def __init__(self, name, manager):
+		self.sm = manager
 		self.action_name = name
 		self.action = actionlib.SimpleActionServer(self.action_name, CordialAction, self.execute_goal, False)
 		self.action.start()
@@ -69,8 +70,7 @@ class SensorsServer():
 		LISTENING_MESSAGE = True
 		if goal.optional_data != '':
 			LISTENING_MESSAGE = goal.optional_data
-		sm = SensorsManager()
-		sm.handle_listening_start(LISTENING_MESSAGE)
+		self.sm.handle_listening_start(LISTENING_MESSAGE)
 		self._feedback.action = goal_name
 		self._feedback.state = FEEDBACK_MESSAGE
 		## Decide when to send the feedback
@@ -94,7 +94,7 @@ class SensorsServer():
 
 class SensorsManager():
 	def __init__(self):
-		rospy.Subscriber('cordial/listening/done', Bool, self.handle_listening_done)
+		rospy.Subscriber('cordial/listening/done', Bool, self.handle_listening_done, queue_size=1)
 		self.microphone_publisher = rospy.Publisher("cordial/listening", Bool, queue_size=1)
 		self.camera_record_publisher = rospy.Publisher("cordial/recording/video", Bool, queue_size=1)
 		self.microphone_record_publisher = rospy.Publisher("cordial/recording/audio", Bool, queue_size=1)
@@ -109,7 +109,7 @@ class SensorsManager():
 
 if __name__ == '__main__':
 		rospy.init_node("sensor_node", anonymous=True)
-		SensorsManager()
-		SensorsServer("sensing")
-		LongSensorsServer("long_sensing")
+		sm = SensorsManager()
+		SensorsServer("sensing", sm)
+		LongSensorsServer("long_sensing", sm)
 		rospy.spin()

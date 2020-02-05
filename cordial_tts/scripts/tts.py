@@ -30,7 +30,8 @@ INTERACTION_CONTINUE = True
 class SynthesizeServer():
 	_feedback = CordialFeedback()
 	_result = CordialResult()
-	def __init__(self, name):
+	def __init__(self, name, manager):
+		self.ttsm = manager
 		self.action_name = name
 		self.action = actionlib.SimpleActionServer(self.action_name, CordialAction, self.execute_goal, False)
 		self.action.start()
@@ -42,10 +43,9 @@ class SynthesizeServer():
 		if goal.optional_data != '':
 			DIALOGUE_MESSAGE = goal.optional_data
 		while DIALOGUE_MESSAGE == '':
-			print("Wait until dialogue message is updated")
+			#print("Wait until dialogue message is updated")
 			rospy.Rate(10)
-		ttsm = TTSManager()
-		ttsm.handle_tts_realtime(DIALOGUE_MESSAGE)
+		self.ttsm.handle_tts_realtime(DIALOGUE_MESSAGE)
 		print("The dialogue message is:" + DIALOGUE_MESSAGE)
 		self._feedback.action = goal_name
 		self._feedback.state = FEEDBACK_MESSAGE
@@ -70,16 +70,21 @@ class SynthesizeServer():
 
 class TTSManager():
 	def __init__(self):
-		
-		rospy.Subscriber('cordial/dialogue/script', String, self.handle_dialogue_message)
-		self.behavior_publisher = rospy.Publisher("cordial/behavior", Behavior, queue_size=10)
+		self.counter = 0
+		rospy.Subscriber('cordial/dialogue/script', String, self.handle_dialogue_message, queue_size=1)
+		self.behavior_publisher = rospy.Publisher("cordial/behavior", Behavior, queue_size=1)
 		#self.handle_tts_realtime("Hello *QT/bye* I am QT *happy_face*") #FOR TESTING
 		
 
 	def handle_dialogue_message(self, data):
+		print("---------------------------------dfjklsfjsdklfjdklj")
+		print(data)
 		global DIALOGUE_MESSAGE
 		DIALOGUE_MESSAGE = data.data
+		self.counter += 1
 		print("TTS Heard from Lex: " + DIALOGUE_MESSAGE)
+		print("The counter is ", self.counter)
+		return
 
 	def handle_tts_realtime(self, data):
 		global SYNTHESIZE_DONE
@@ -93,7 +98,7 @@ class TTSManager():
 		print("The text content is: " + text_content)
 		#text_content = req #FOR TESTING
 		file_saved = tts.phrase_to_file(phraseID, text_content, outdir)
-		print("The output from the TTS is: ", file_saved)
+		#print("The output from the TTS is: ", file_saved)
 		behaviours = sorted(file_saved["behaviors"], key = lambda i: i['start']) # sorting the behaviours
 		path_audio_file = file_saved["file"] # path of audiofile.ogg
 		data, samplerate = sf.read(outdir + '/'+phraseID+'.ogg')
@@ -113,6 +118,6 @@ class TTSManager():
 
 if __name__ == '__main__':
 		rospy.init_node("tts_node", anonymous=True)
-		TTSManager()
-		SynthesizeServer("synthesizing")
+		ttsm = TTSManager()
+		SynthesizeServer("synthesizing", ttsm)
 		rospy.spin()

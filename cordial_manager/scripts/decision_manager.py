@@ -75,7 +75,7 @@ class DecisionManager():
     def interaction_done_callback(self, terminal_state, result):
         """Handle completed interaction"""
         # Read message
-        rospy.loginfo("Heard back from: "+ result.action, terminal_state, result)
+        rospy.loginfo("Heard back from: "+ result.action + " terminal state is: "+  str(terminal_state) +" and the result is: "+ str(result))
         self.action_result[result.action]["do_continue"] = result.do_continue
         self.action_result[result.action]["message"] = result.message 
 

@@ -10,7 +10,7 @@ from cordial_behavior.msg import Behavior
 from qt_robot_gestures.msg import Gesture
 from cordial_face.msg import FaceRequest
 from cordial_manager.msg import *
-from qt_robot_speaker.msg import PlayRequest # Rename it! PlayAudio
+from qt_nuc_speaker.msg import PlayRequest # Rename it! PlayAudio
 from threading import Timer
 import os
 
@@ -31,7 +31,8 @@ class LongBehaviorServer():
 	_feedback = CordialFeedback()
 	_result = CordialResult()
 
-	def __init__(self, name):
+	def __init__(self, name, manager):
+		self.bm = manager
 		self.action_name = name
 		self.action = actionlib.SimpleActionServer(self.action_name, CordialAction, self.execute_goal, False)
 		self.action.start()
@@ -42,8 +43,7 @@ class LongBehaviorServer():
 		success = True
 		if goal.optional_data != '':
 			DETECTOR_MESSAGE = goal.optional_data
-		bm = BehaviorManager()
-		bm.handle_tracker(DETECTOR_MESSAGE)
+		self.bm.handle_tracker(DETECTOR_MESSAGE)
 		self._feedback.action = goal_name
 		self._feedback.state = FEEDBACK_MESSAGE
 		## Decide when to send the feedback
@@ -68,7 +68,8 @@ class LongBehaviorServer():
 class BehaviorServer():
 	_feedback = CordialFeedback()
 	_result = CordialResult()
-	def __init__(self, name):
+	def __init__(self, name, manager):
+		self.bm = manager
 		self.action_name = name
 		self.action = actionlib.SimpleActionServer(self.action_name, CordialAction, self.execute_goal, False)
 		self.action.start()
@@ -79,8 +80,7 @@ class BehaviorServer():
 		success = True
 		if goal.optional_data != '':
 			TTS_MESSAGE = goal.optional_data
-		bm = BehaviorManager()
-		bm.handle_behavior(TTS_MESSAGE)
+		self.bm.handle_behavior(TTS_MESSAGE)
 		self._feedback.action = goal_name
 		self._feedback.state = FEEDBACK_MESSAGE
 		## Decide when to send the feedback
@@ -102,13 +102,13 @@ class BehaviorServer():
 class BehaviorManager():
 
 	def __init__(self):
-		rospy.Subscriber('cordial/behavior', Behavior, self.handle_tts_message)
-		rospy.Subscriber('cordial/speaker/done', Bool, self.handle_speaker_message)
-		rospy.Subscriber('cordial/detector/faces', String, self.handle_detector_message) # I dont know if it is a string!
-		rospy.Subscriber('cordial/behavior/tracking/state', String, self.handle_tracking_state) # States: NO_TRACK, ACQUIRING, FOUND, LOST 
-		self.face_publisher = rospy.Publisher('cordial/behavior/face/expressing', FaceRequest, queue_size=10)
-		self.gesture_publisher = rospy.Publisher('cordial/behavior/gesture/moving', Gesture, queue_size=10)
-		self.speaker_publisher = rospy.Publisher('cordial/speaker/playing', PlayRequest, queue_size=10)
+		rospy.Subscriber('cordial/behavior', Behavior, self.handle_tts_message, queue_size=1)
+		rospy.Subscriber('cordial/speaker/done', Bool, self.handle_speaker_message, queue_size=1)
+		rospy.Subscriber('cordial/detector/faces', String, self.handle_detector_message, queue_size=1) # I dont know if it is a string!
+		rospy.Subscriber('cordial/behavior/tracking/state', String, self.handle_tracking_state, queue_size=1) # States: NO_TRACK, ACQUIRING, FOUND, LOST 
+		self.face_publisher = rospy.Publisher('cordial/behavior/face/expressing', FaceRequest, queue_size=1)
+		self.gesture_publisher = rospy.Publisher('cordial/behavior/gesture/moving', Gesture, queue_size=1)
+		self.speaker_publisher = rospy.Publisher('cordial/speaker/playing', PlayRequest, queue_size=1)
 		self.tracker_publisher = rospy.Publisher('cordial/behavior/tracking', Bool, queue_size=1)
 		self.get_facial_expressions_list()
 		#self.handle_behavior(data) #FOR TESTING
@@ -121,13 +121,14 @@ class BehaviorManager():
 	def handle_tts_message(self, data):
 		global TTS_MESSAGE
 		TTS_MESSAGE = data
-		print("The message received from the TTS is:", TTS_MESSAGE)
+		print("The message is received from the TTS")
 
 			
 	def handle_speaker_message(self, data):
 		global SPEAKER_DONE
 		SPEAKER_DONE = data.data
-		rospy.loginfo("The speaker has finished: " +str(data.data))
+		if SPEAKER_DONE:
+			rospy.loginfo("The speaker has finished")
 
 	def handle_detector_message(self, data):
 		global DETECTOR_MESSAGE
@@ -250,9 +251,9 @@ class BehaviorManager():
 
 if __name__ == '__main__':
 	rospy.init_node("behavior_node", anonymous=True)
-	BehaviorManager()
-	BehaviorServer("behaving")
-	LongBehaviorServer("long_behaving")
+	bm = BehaviorManager()
+	BehaviorServer("behaving", bm)
+	LongBehaviorServer("long_behaving",bm)
 	rospy.spin()
 
 
