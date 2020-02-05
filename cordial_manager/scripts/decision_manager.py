@@ -46,7 +46,7 @@ class DecisionManager():
         all_interactions = self.success_interaction_name + self.failure_interaction_name
         for interaction in all_interactions:
             self.action_result[interaction] = {
-                    "continue": False,
+                    "do_continue": False,
                     "message": ""}
             self.action_feedback[interaction] = {
                     "state": ""}
@@ -62,7 +62,7 @@ class DecisionManager():
         goal = CordialGoal()
         goal.action = interaction_name
         goal.optional_data = optional_data
-        rospy.loginfo("The goal to be sent is:", goal)
+        rospy.loginfo("The goal to be sent is:"+ str(goal))
 
         # Send goal
         self.action_client.send_goal(goal,
@@ -76,11 +76,11 @@ class DecisionManager():
         """Handle completed interaction"""
         # Read message
         rospy.loginfo("Heard back from: "+ result.action, terminal_state, result)
-        self.action_result[result.action]["continue"] = result.do_continue
+        self.action_result[result.action]["do_continue"] = result.do_continue
         self.action_result[result.action]["message"] = result.message 
 
         # Continue if successful
-        if self.action_result[result.action]["continue"]:
+        if self.action_result[result.action]["do_continue"]:
             self.failure_counter = 0
             self.index += 1
             self.state = DecisionState.SUCCESS

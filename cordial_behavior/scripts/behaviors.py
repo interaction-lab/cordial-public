@@ -9,7 +9,7 @@ from std_msgs.msg import String, Bool
 from cordial_behavior.msg import Behavior
 from qt_robot_gestures.msg import Gesture
 from cordial_face.msg import FaceRequest
-from cordial_manager.msg import InteractionFeedback, InteractionAction, InteractionResult
+from cordial_manager.msg import *
 from qt_robot_speaker.msg import PlayRequest # Rename it! PlayAudio
 from threading import Timer
 import os
@@ -28,24 +28,24 @@ INTERACTION_MESSAGE = ''
 INTERACTION_CONTINUE = True
 
 class LongBehaviorServer():
-	_feedback = InteractionFeedback()
-	_result = InteractionResult()
+	_feedback = CordialFeedback()
+	_result = CordialResult()
 
 	def __init__(self, name):
 		self.action_name = name
-		self.action = actionlib.SimpleActionServer(self.action_name, InteractionAction, self.execute_goal, False)
+		self.action = actionlib.SimpleActionServer(self.action_name, CordialAction, self.execute_goal, False)
 		self.action.start()
 
 	def execute_goal(self, goal):
 		global DETECTOR_MESSAGE , DETECTOR_MESSAGE, TRACKER_STATE
-		goal_name = goal.interacting_action
+		goal_name = goal.action
 		success = True
 		if goal.optional_data != '':
 			DETECTOR_MESSAGE = goal.optional_data
 		bm = BehaviorManager()
 		bm.handle_tracker(DETECTOR_MESSAGE)
-		self._feedback.interacting_action = goal_name
-		self._feedback.interaction_state = FEEDBACK_MESSAGE
+		self._feedback.action = goal_name
+		self._feedback.state = FEEDBACK_MESSAGE
 		## Decide when to send the feedback
 		RATE_FEEDBACK = rospy.Rate(10)
 		while not TRACKER_DONE:
@@ -56,8 +56,8 @@ class LongBehaviorServer():
 			rospy.Rate(10)
 
 		if success:
-			self._result.interaction_continue = INTERACTION_CONTINUE
-			self._result.interacting_action = goal_name
+			self._result.do_continue = INTERACTION_CONTINUE
+			self._result.action = goal_name
 			self._result.message = INTERACTION_MESSAGE
 			TRACKER_STATE = ''
 			TRACKER_DONE = False
@@ -66,23 +66,23 @@ class LongBehaviorServer():
 
 
 class BehaviorServer():
-	_feedback = InteractionFeedback()
-	_result = InteractionResult()
+	_feedback = CordialFeedback()
+	_result = CordialResult()
 	def __init__(self, name):
 		self.action_name = name
-		self.action = actionlib.SimpleActionServer(self.action_name, InteractionAction, self.execute_goal, False)
+		self.action = actionlib.SimpleActionServer(self.action_name, CordialAction, self.execute_goal, False)
 		self.action.start()
 
 	def execute_goal(self, goal):
 		global TTS_MESSAGE, SPEAKER_DONE
-		goal_name = goal.interacting_action
+		goal_name = goal.action
 		success = True
 		if goal.optional_data != '':
 			TTS_MESSAGE = goal.optional_data
 		bm = BehaviorManager()
 		bm.handle_behavior(TTS_MESSAGE)
-		self._feedback.interacting_action = goal_name
-		self._feedback.interaction_state = FEEDBACK_MESSAGE
+		self._feedback.action = goal_name
+		self._feedback.state = FEEDBACK_MESSAGE
 		## Decide when to send the feedback
 		# self.action.publish_feedback(self._feedback)
 		while not SPEAKER_DONE:
@@ -91,8 +91,8 @@ class BehaviorServer():
 					success = False
 			rospy.Rate(10)
 		if success:
-			self._result.interaction_continue = INTERACTION_CONTINUE
-			self._result.interacting_action = goal_name
+			self._result.do_continue = INTERACTION_CONTINUE
+			self._result.action = goal_name
 			self._result.message = INTERACTION_MESSAGE
 			SPEAKER_DONE = False
 			TTS_MESSAGE = ''
@@ -160,7 +160,7 @@ class BehaviorManager():
 
 
 	def handle_behavior(self, data):
-		print("The behaviors data are:", data)
+		#print("The behaviors data are:", data)
 		audio_frame = data.audio_frame
 		audio_data = data.audio_data
 		data = literal_eval(data.behavior_json)
@@ -182,7 +182,7 @@ class BehaviorManager():
 		speaker_msg = PlayRequest()
 		speaker_msg.audio_frame = audio_frame
 		speaker_msg.data = audio_data
-		print("The speaker message is:" , speaker_msg)
+		print("The speaker message is published")
 		self.speaker_publisher.publish(speaker_msg)
 
 
@@ -198,7 +198,7 @@ class BehaviorManager():
 		for f in validated_face_expr:
 			aus = map(lambda s: s[2:], f['aus'])
 			au_ms = f['au_ms']*1000
-			print(str(aus), str(f['au_degrees']), str(au_ms))
+			#print(str(aus), str(f['au_degrees']), str(au_ms))
 			f_expr_req = FaceRequest(aus=aus, au_degrees=f['au_degrees'], au_ms=au_ms)
 			def send_facerequest():
 				print("Send face request")

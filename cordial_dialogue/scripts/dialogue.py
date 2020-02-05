@@ -20,17 +20,17 @@ INTERACTION_MESSAGE = ''
 INTERACTION_CONTINUE = True
 
 class DialogueServer():
-	_feedback = InteractionFeedback()
-	_result = InteractionResult()
+	_feedback = CordialFeedback()
+	_result = CordialResult()
 	def __init__(self, name):
 		self.action_name = name
-		self.action = actionlib.SimpleActionServer(self.action_name, InteractionAction, self.execute_goal, False)
+		self.action = actionlib.SimpleActionServer(self.action_name, CordialAction, self.execute_goal, False)
 		self.action.start()
 
 	def execute_goal(self, goal):
 		global PROMPT_MESSAGE, DIALOGUE_PROCESSING_DONE, FEEDBACK_MESSAGE, INTERACTION_MESSAGE, INTERACTION_CONTINUE
 		print(goal)
-		goal_name = goal.interacting_action
+		goal_name = goal.action
 		success = True
 		if goal.optional_data != '':
 			PROMPT_MESSAGE = goal.optional_data
@@ -43,8 +43,8 @@ class DialogueServer():
 				rospy.Rate(10)
 			dm = DialogueManager()
 			dm.send_audioToAWS_client(PROMPT_MESSAGE)
-		self._feedback.interacting_action = goal_name
-		self._feedback.interaction_state = FEEDBACK_MESSAGE
+		self._feedback.action = goal_name
+		self._feedback.state = FEEDBACK_MESSAGE
 		## Decide when to send the feedback
 		# self.action.publish_feedback(self._feedback)
 		while not DIALOGUE_PROCESSING_DONE:
@@ -55,8 +55,8 @@ class DialogueServer():
 			rospy.Rate(10)
 		if success:
 			print("enter if success")
-			self._result.interaction_continue = INTERACTION_CONTINUE
-			self._result.interacting_action = goal_name
+			self._result.do_continue = INTERACTION_CONTINUE
+			self._result.action = goal_name
 			self._result.message = INTERACTION_MESSAGE
 			PROMPT_MESSAGE = ''
 			DIALOGUE_PROCESSING_DONE = False

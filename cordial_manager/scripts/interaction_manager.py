@@ -15,8 +15,8 @@ INTERACTION_TIMEOUT = rospy.Duration.from_sec(60.0)
 
 class InteractionManager():
     """Receive interactions and execute interaction steps"""
-    # _feedback = InteractionFeedback()
-    # _result = InteractionResult()
+    _feedback = CordialFeedback()
+    _result = CordialResult()
     def __init__(self):
         # Read interactions from json file
         self.read_interactions()
@@ -28,7 +28,7 @@ class InteractionManager():
         self.action_clients = {}
         self.action_result = {}
         self.action_feedback = {}
-        action_types = ["behaving", "long_behaving", "synthesizing", "dialoging", "sensing", "detecting"]
+        action_types = ["behaving", "long_behaving", "synthesizing", "dialoging", "sensing","long_sensing", "detecting"]
         for action_type in action_types:
             self.action_clients[action_type] = actionlib.SimpleActionClient(action_type, CordialAction)
             rospy.loginfo("Waiting for {} module server".format(action_type))
@@ -38,7 +38,7 @@ class InteractionManager():
                 "message": ""}
             self.action_feedback[action_type] = {
                 "state": ""}
-        
+        rospy.loginfo("Module servers initialization completed")
         self.interaction_server.start()
         rospy.loginfo("The interaction_manager server starts")
         return
@@ -70,8 +70,7 @@ class InteractionManager():
 
         # Recieve goal and load steps
         interaction_block_label = goal_data.action
-        rospy.loginfo("The interaction manager received the following command block:", 
-                        interaction_block_label)
+        rospy.loginfo("The interaction manager received the following command block:"+ str(interaction_block_label))
         interaction_steps = self.interaction_data[interaction_block_label]['steps']
         rospy.logdebug("The interaction steps are:", interaction_steps)
 
@@ -123,7 +122,7 @@ class InteractionManager():
 
     def _send_interaction_result_(self, label, action_continue, message):
         self._result.action = label
-        self._result.action_continue = action_continue
+        self._result.do_continue = action_continue
         self._result.message = message
         if action_continue:
             self.interaction_server.set_succeeded(self._result)     
@@ -157,10 +156,10 @@ class InteractionManager():
         return(loop_action)
 
 
-    def _send_goal_(self, action, optional="", wait=True):
+    def _send_goal_(self, action, optional = "", wait=True):
         rospy.loginfo("sending out instruction to start - " + action)
-        goal = CordialGoal(action=action, optional_data="")
-        rospy.loginfo("goal message:", goal)
+        goal = CordialGoal(action=action, optional_data=optional)
+        rospy.loginfo("goal message:"+ str(goal))
         self.action_clients[action].send_goal(goal,
                                                     done_cb=self.action_done_callback,
                                                     feedback_cb=self.action_feedback_callback)

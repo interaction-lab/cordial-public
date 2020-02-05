@@ -6,10 +6,11 @@
 		<include file="$(find cordial_face)/launch/face_client.launch"/>
 		<include file="$(find qt_robot_gestures)/launch/gestures.launch"/>
 		<!--<include file="$(find qt_tracker)/launch/head_track.launch" />-->
-		<include file="$(find cordial_dialogue)/launch/lex_demo.launch" />
+		<include file="$(find cordial_dialogue)/launch/dialogue.launch" />
 		<include file="$(find cordial_behavior)/launch/behaviors.launch" />
 		<include file="$(find cordial_tts)/launch/tts.launch" />
 		<include file="$(find cordial_sensor)/launch/sensor.launch" />
+		<include file="$(find cordial_detector)/launch/detector.launch" />
   	</group>
 
 

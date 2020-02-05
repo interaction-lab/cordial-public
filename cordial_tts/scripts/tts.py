@@ -28,16 +28,16 @@ INTERACTION_CONTINUE = True
 
 
 class SynthesizeServer():
-	_feedback = InteractionFeedback()
-	_result = InteractionResult()
+	_feedback = CordialFeedback()
+	_result = CordialResult()
 	def __init__(self, name):
 		self.action_name = name
-		self.action = actionlib.SimpleActionServer(self.action_name, InteractionAction, self.execute_goal, False)
+		self.action = actionlib.SimpleActionServer(self.action_name, CordialAction, self.execute_goal, False)
 		self.action.start()
 
 	def execute_goal(self, goal):
 		global DIALOGUE_MESSAGE, SYNTHESIZE_DONE, FEEDBACK_MESSAGE, INTERACTION_CONTINUE, INTERACTION_MESSAGE
-		goal_name = goal.interacting_action
+		goal_name = goal.action
 		success = True
 		if goal.optional_data != '':
 			DIALOGUE_MESSAGE = goal.optional_data
@@ -47,8 +47,8 @@ class SynthesizeServer():
 		ttsm = TTSManager()
 		ttsm.handle_tts_realtime(DIALOGUE_MESSAGE)
 		print("The dialogue message is:" + DIALOGUE_MESSAGE)
-		self._feedback.interacting_action = goal_name
-		self._feedback.interaction_state = FEEDBACK_MESSAGE
+		self._feedback.action = goal_name
+		self._feedback.state = FEEDBACK_MESSAGE
 		## Decide when to send the feedback
 		# self.action.publish_feedback(self._feedback)
 		while not SYNTHESIZE_DONE:
@@ -57,8 +57,8 @@ class SynthesizeServer():
 					success = False
 			rospy.Rate(10)
 		if success:
-			self._result.interaction_continue = INTERACTION_CONTINUE
-			self._result.interacting_action = goal_name
+			self._result.do_continue = INTERACTION_CONTINUE
+			self._result.action = goal_name
 			self._result.message = INTERACTION_MESSAGE
 			DIALOGUE_MESSAGE = ''
 			SYNTHESIZE_DONE = False
@@ -83,7 +83,7 @@ class TTSManager():
 
 	def handle_tts_realtime(self, data):
 		global SYNTHESIZE_DONE
-		print("The TTS message received is:" + data)
+		print("The TTS message received")
 		#outdir = os.path.dirname(os.path.abspath("home		
 		outdir = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_dialogue/scripts/data"
 		voice = "Ivy"	
@@ -107,7 +107,7 @@ class TTSManager():
 		behavior_msg.audio_frame = audio_frame
 		behavior_msg.audio_data =  data_array
 		behavior_msg.behavior_json = str(behaviours)
-		print("The behavior message is:", behavior_msg)
+		print("The behavior message is sent")
 		self.behavior_publisher.publish(behavior_msg)
 		SYNTHESIZE_DONE = True
 
