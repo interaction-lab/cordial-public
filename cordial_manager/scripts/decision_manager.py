@@ -10,13 +10,18 @@ import actionlib
 import rospy
 import roslib
 
+
 class DecisionState():
     SUCCESS = 0
     FAILURE = 1
     EMERGENCY = 2
 
 class DecisionManager():
-
+    """Commands a series of interactions to the interaction manager
+    
+        Actions commanding: do_interaction - ManagerAction
+        Actions receiving: none
+    """
     def __init__(self):
         #Initialize the state variable
         self.state = DecisionState.SUCCESS
@@ -24,62 +29,76 @@ class DecisionManager():
         self.failure_counter = 0
         self.action_feedback = {}
         self.action_result = {}
+
         # Setup clients for all of the different interaction blocks
         topic_name = "do_interaction"
-        self.action_client = actionlib.SimpleActionClient(topic_name, ManagerAction)
-        print("Waiting for the server")
+        self.action_client = actionlib.SimpleActionClient(topic_name, CordialAction)
+
+        rospy.loginfo("Waiting for the server")
         self.action_client.wait_for_server()
-        print("Server is ready")
-        self.success_action_name = ['greeting1', 'greeting2']
-        self.failure_action_name = ['greeting1b', 'greeting2b']
-        topics = self.success_action_name + self.failure_action_name
-        for topic_name in topics:
-            self.action_result[topic_name] = {
-                    "action_block":"",
-                    "action_block_continue": False,
+        rospy.loginfo("Server is ready")
+
+        # TODO Initialize with list of interactions and interaction failure options
+        self.success_interaction_name = ['greeting1', 'greeting2']
+        self.failure_interaction_name = ['greeting1b', 'greeting2b']
+
+        # Set response to action to default - will be changed by callback
+        all_interactions = self.success_interaction_name + self.failure_interaction_name
+        for interaction in all_interactions:
+            self.action_result[interaction] = {
+                    "continue": False,
                     "message": ""}
-            self.action_feedback[topic_name] = {
-                    "action_block":"",
-                    "action_block_state": ""}
-        self.send_request_to_interaction_manager(self.success_action_name[self.index])
+            self.action_feedback[interaction] = {
+                    "state": ""}
+        
+        # Send out the first action
+        self.send_interaction_request(self.success_interaction_name[self.index])
+        return
        
 
-    def send_request_to_interaction_manager(self, action_name):
-        goal = ManagerGoal()
-        goal.action_block = action_name
-        goal.optional_data = ""
-        print("The goal to be sent is:", goal)
+    def send_interaction_request(self, interaction_name, optional_data=""):
+        """Send goal to interaction manager """
+        # Create goal
+        goal = CordialGoal()
+        goal.action = interaction_name
+        goal.optional_data = optional_data
+        rospy.loginfo("The goal to be sent is:", goal)
+
+        # Send goal
         self.action_client.send_goal(goal,
-                                    done_cb=self.action_done_callback,
-                                    feedback_cb=self.action_feedback_callback)
-        self.action_client.wait_for_result(rospy.Duration(10))
+                                    done_cb=self.interaction_done_callback,
+                                    feedback_cb=self.interaction_feedback_callback)
+        self.action_client.wait_for_result()
+        return
 
-    def action_done_callback(self, terminal_state, result):
-        print("Heard back from: "+ result.action_block, terminal_state, result)
-        self.action_result[result.action_block]["action_block_continue"] = result.action_block_continue
-        self.action_result[result.action_block]["message"] = result.message
 
-        if self.action_result[result.action_block]["action_block_continue"]:
+    def interaction_done_callback(self, terminal_state, result):
+        """Handle completed interaction"""
+        # Read message
+        rospy.loginfo("Heard back from: "+ result.action, terminal_state, result)
+        self.action_result[result.action]["continue"] = result.do_continue
+        self.action_result[result.action]["message"] = result.message 
+
+        # Continue if successful
+        if self.action_result[result.action]["continue"]:
             self.failure_counter = 0
             self.index += 1
             self.state = DecisionState.SUCCESS
-            if self.index < len(self.success_action_name):
-                self.send_request_to_interaction_manager(self.success_action_name[self.index])
+            if self.index < len(self.success_interaction_name): # not done with all interactions
+                self.send_interaction_request(self.success_interaction_name[self.index])
         else:
-            if self.action_result[result.action_block]["message"] == 'understanding':
+            if self.action_result[result.action]["message"] == 'failed_understanding':
                 self.failure_counter += 1
-                self.index = self.index
                 self.state = DecisionState.FAILURE
-                if self.failure_counter < 4: # 3 re-entry allowed
-                    self.send_request_to_interaction_manager(self.failure_action_name[self.index])
-            elif self.action_result[result.action_block]["message"] == 'emergency':
+                if self.failure_counter < 4: # 3 re-try allowed
+                    self.send_interaction_request(self.failure_interaction_name[self.index])
+            elif self.action_result[result.action]["message"] == 'emergency':
                 self.state = DecisionState.EMERGENCY
         return
-        
-    
 
-    def action_feedback_callback(self, feedback):
-        self.action_feedback[feedback.action_block]["action_block_state"] = feedback.action_block_state
+
+    def interaction_feedback_callback(self, feedback):
+        self.action_feedback[feedback.action]["state"] = feedback.states
         return
 
 
