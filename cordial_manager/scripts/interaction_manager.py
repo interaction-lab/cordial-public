@@ -53,7 +53,7 @@ class InteractionManager():
 
     def action_done_callback(self, terminal_state, result):
         """Save action results"""
-        rospy.logdebug("Heard back from: "+ result.action +" terminal state: "  + str(terminal_state) +" and result : "  + str(result))
+        rospy.loginfo("Heard back from: "+ result.action +" terminal state: "  + str(terminal_state) +" and result : "  + str(result))
         self.action_result[result.action]["do_continue"] = result.do_continue
         self.action_result[result.action]["message"] = result.message
         return
@@ -61,6 +61,7 @@ class InteractionManager():
 
     def action_feedback_callback(self, feedback):
         """Save action feedback"""
+        rospy.logdebug("Heard back from: "+ feedback.action +" and result : "  + str(feedback))
         self.action_feedback[feedback.action]["state"] = feedback.state
         return
 
@@ -95,16 +96,21 @@ class InteractionManager():
                     else:
                         self._send_interaction_result_(interaction_block_label, False, error_message)
                         return()
-
-            # At the end of the a step check if the step failed
-            if not self.action_result[action["action"]]["do_continue"]:
-                action_success, error_message = self._check_result_status_(action["action"])
+            
+            if not action["running_option"] == "parallel": # Check if not parallel, otherwise not needed to check the results
+                if action["action"].split('_')[0] == "long":
+                    if not self.action_result[action["action"]]["do_continue"]:
+                        rospy.loginfo("This is a:" + str(action["action"]))
+                        action_success, error_message = self._check_feedback_status_(action["action"])
+                else:
+                    if not self.action_result[action["action"]]["do_continue"]:
+                        action_success, error_message = self._check_result_status_(action["action"])
                 if action_success:
                     continue
                 else:
                     self._send_interaction_result_(interaction_block_label, False, error_message)
                     return()
-
+    
         # When the block has been successfully completed
         self._send_interaction_result_(interaction_block_label,True,"")
         return
@@ -112,8 +118,23 @@ class InteractionManager():
 
     def _check_result_status_(self, action):
         message = self.action_result[action]["message"]
+        rospy.loginfo("The message result of the action is: " + str(message))
         status = message.split('_')[0]
         if status == "success":
+            return(True, "")
+        else:
+            error = message.split('_')[1]
+            return(False, error)
+
+
+    def _check_feedback_status_(self, action):
+        while self.action_feedback[action]["state"] == '':
+            rospy.logdebug("Wait for the feedback status")
+        message = self.action_feedback[action]["state"]
+        rospy.loginfo("The message feedback of the action is: " + str(message))
+        status = message.split('_')[0]
+        if status == "FOUND":
+            rospy.loginfo("Get status from" + str(action))
             return(True, "")
         else:
             error = message.split('_')[1]
@@ -156,6 +177,7 @@ class InteractionManager():
         return(loop_action)
 
 
+
     def _send_goal_(self, action, optional = "", wait=True):
         rospy.loginfo("sending out instruction to start - " + action)
         goal = CordialGoal(action=action, optional_data=optional)
@@ -164,7 +186,8 @@ class InteractionManager():
                                                     done_cb=self.action_done_callback,
                                                     feedback_cb=self.action_feedback_callback)
         if wait:
-            self.action_clients[action].wait_for_result(INTERACTION_TIMEOUT)
+            if not action.split('_')[0] == "long": # Check if it is a long action or not!
+                self.action_clients[action].wait_for_result(INTERACTION_TIMEOUT)
         return
 
 

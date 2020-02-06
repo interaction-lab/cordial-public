@@ -6,6 +6,7 @@ import actionlib
 import json
 from ast import literal_eval
 from std_msgs.msg import String, Bool
+from geometry_msgs.msg import Point
 from cordial_behavior.msg import Behavior
 from qt_robot_gestures.msg import Gesture
 from cordial_face.msg import FaceRequest
@@ -20,8 +21,9 @@ TTS_MESSAGE = ''
 SPEAKER_DONE = False
 
 DETECTOR_STATE = ''
-DETECTOR_DONE = False
+TRACKER_DONE = False
 TRACKER_MESSAGE = ''
+TRACKING_STATE = ''
 
 
 FEEDBACK_MESSAGE = ''
@@ -39,7 +41,7 @@ class LongBehaviorServer():
 		self.action.start()
 
 	def execute_goal(self, goal):
-		global TRACKER_MESSAGE , DETECTOR_STATE, FEEDBACK_MESSAGE, DETECTOR_DONE
+		global TRACKER_MESSAGE , DETECTOR_STATE, FEEDBACK_MESSAGE, TRACKER_DONE
 		goal_name = goal.action
 		success = True
 		# Starting the tracking
@@ -47,25 +49,27 @@ class LongBehaviorServer():
 			TRACKER_MESSAGE = goal.optional_data
 		self.bm.handle_long_behavior(TRACKER_MESSAGE)
 		while DETECTOR_STATE == '':
-			print("Waiting state from tracker")
+			#print("Waiting state from tracker")
 			rospy.Rate(10)
 		FEEDBACK_MESSAGE = DETECTOR_STATE
 		self._feedback.action = goal_name
 		self._feedback.state = FEEDBACK_MESSAGE
-		while not DETECTOR_DONE:
+		
+		while not TRACKER_DONE:
 			if self.action.is_preempt_requested():
 					self.action.set_preempted()
 					success = False
 			self.action.publish_feedback(self._feedback)
-			rospy.Rate(10)
+			rospy.Rate(20)
 
 		if success:
 			self._result.do_continue = INTERACTION_CONTINUE
 			self._result.action = goal_name
 			self._result.message = INTERACTION_MESSAGE
+			print(self._result)
 			TRACKER_MESSAGE = ''
 			DETECTOR_STATE = ''
-			DETECTOR_DONE = False
+			TRACKER_DONE = False
 			FEEDBACK_MESSAGE = ''
 			INTERACTION_MESSAGE = ''
 			INTERACTION_CONTINUE = True
@@ -82,7 +86,7 @@ class BehaviorServer():
 		self.action.start()
 
 	def execute_goal(self, goal):
-		global TTS_MESSAGE, SPEAKER_DONE
+		global TTS_MESSAGE, SPEAKER_DONE, FEEDBACK_MESSAGE, INTERACTION_CONTINUE, INTERACTION_MESSAGE
 		goal_name = goal.action
 		success = True
 		if goal.optional_data != '':
@@ -114,7 +118,7 @@ class BehaviorManager():
 	def __init__(self):
 		rospy.Subscriber('cordial/behavior', Behavior, self.handle_tts_message, queue_size=1)
 		rospy.Subscriber('cordial/speaker/done', Bool, self.handle_speaker_message, queue_size=1)
-		rospy.Subscriber('cordial/detector/faces', String, self.handle_detector_message, queue_size=1) # I dont know if it is a string!
+		rospy.Subscriber('/cordial/detector/faces', Point, self.handle_detector_message, queue_size=1) 
 		rospy.Subscriber('cordial/behavior/tracking/state', Bool, self.handle_tracking_state, queue_size=1) # States: NO_TRACK, ACQUIRING, FOUND, LOST 
 		self.face_publisher = rospy.Publisher('cordial/behavior/face/expressing', FaceRequest, queue_size=1)
 		self.gesture_publisher = rospy.Publisher('cordial/behavior/gesture/moving', Gesture, queue_size=1)
@@ -125,8 +129,8 @@ class BehaviorManager():
 		
 
 	def handle_tracking_state(self, data):
-		global DETECTOR_STATE
-		DETECTOR_STATE = data.data
+		global TRACKING_STATE
+		TRACKING_STATE = data.data
 
 	def handle_tts_message(self, data):
 		global TTS_MESSAGE
@@ -141,11 +145,12 @@ class BehaviorManager():
 			rospy.loginfo("The speaker has finished")
 
 	def handle_detector_message(self, data):
-		global DETECTOR_MESSAGE
-		DETECTOR_MESSAGE = data
+		global DETECTOR_STATE
+		#rospy.loginfo("I received the message from the detector!!")
+		DETECTOR_STATE = "FOUND"
 
 	def handle_long_behavior(self, data):
-		if data == "tracking":
+		if data == "tracking_face":
 			self.tracker_publisher.publish(True)
 
 		

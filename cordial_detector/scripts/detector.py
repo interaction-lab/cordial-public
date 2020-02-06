@@ -31,14 +31,13 @@ class DetectorServer():
 		global FACE_DETECTING_MESSAGE, DETECTING_DONE, FEEDBACK_MESSAGE, INTERACTION_MESSAGE, INTERACTION_CONTINUE
 		goal_name = goal.action
 		success = True
-		FACE_DETECTING_MESSAGE = True
 		if goal.optional_data != '':
 			FACE_DETECTING_MESSAGE = goal.optional_data
 		self.dm.handle_face_detecting_start(FACE_DETECTING_MESSAGE)
 		self._feedback.action = goal_name
 		self._feedback.state = FEEDBACK_MESSAGE
 		## Decide when to send the feedback
-		# self.action.publish_feedback(self._feedback)
+		self.action.publish_feedback(self._feedback)
 		while not DETECTING_DONE:
 			if self.action.is_preempt_requested():
 					self.action.set_preempted()
@@ -61,7 +60,12 @@ class DetectorManager():
 		self.face_detector_publisher = rospy.Publisher("cordial/detector/faces/detecting", Bool, queue_size=1)
 		
 	def handle_face_detecting_start(self, data):
-		self.face_detector_publisher.publish(data)
+		global DETECTING_DONE, INTERACTION_CONTINUE, INTERACTION_MESSAGE
+		rospy.loginfo("Starting the detection")
+		self.face_detector_publisher.publish(True)
+		INTERACTION_CONTINUE = False
+		INTERACTION_MESSAGE = "success"
+		DETECTING_DONE = True
 		
 
 if __name__ == '__main__':
