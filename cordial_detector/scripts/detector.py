@@ -12,6 +12,7 @@ from cordial_manager.msg import *
 
 FACE_DETECTING_MESSAGE = ''
 DETECTING_DONE = False
+
 FEEDBACK_MESSAGE = ''
 INTERACTION_MESSAGE = ''
 INTERACTION_CONTINUE = True
@@ -61,6 +62,7 @@ class DetectorManager():
 		
 	def handle_face_detecting_start(self, data):
 		self.face_detector_publisher.publish(data)
+		
 
 if __name__ == '__main__':
 		rospy.init_node("detector_node", anonymous=True)
