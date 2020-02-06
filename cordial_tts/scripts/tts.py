@@ -20,74 +20,67 @@ import soundfile as sf
 
 WAV_HEADER_LENGTH = 24
 
-DIALOGUE_MESSAGE = ''
-SYNTHESIZE_DONE = False
-FEEDBACK_MESSAGE = ''
-INTERACTION_MESSAGE = ''
-INTERACTION_CONTINUE = True
-
-
 class SynthesizeServer():
 	_feedback = CordialFeedback()
 	_result = CordialResult()
 	def __init__(self, name, manager):
-		self.ttsm = manager
+		self.controller_manager = manager
+		self.controller_manager.dialogue_message = ''
+		self.controller_manager.synthesize_done = False
+		self.controller_manager.interaction_message = ''
+		self.controller_manager.interaction_continue = True
 		self.action_name = name
 		self.action = actionlib.SimpleActionServer(self.action_name, CordialAction, self.execute_goal, False)
 		self.action.start()
 
 	def execute_goal(self, goal):
-		global DIALOGUE_MESSAGE, SYNTHESIZE_DONE, FEEDBACK_MESSAGE, INTERACTION_CONTINUE, INTERACTION_MESSAGE
 		goal_name = goal.action
 		success = True
 		if goal.optional_data != '':
-			DIALOGUE_MESSAGE = goal.optional_data
-		while DIALOGUE_MESSAGE == '':
+			self.controller_manager.dialogue_message = goal.optional_data
+		while self.controller_manager.dialogue_message == '':
 			#print("Wait until dialogue message is updated")
 			rospy.Rate(10)
-		self.ttsm.handle_tts_realtime(DIALOGUE_MESSAGE)
-		print("The dialogue message is:" + DIALOGUE_MESSAGE)
+		self.controller_manager.handle_tts_realtime(self.controller_manager.dialogue_message)
+		print("The dialogue message is:" + self.controller_manager.dialogue_message)
 		self._feedback.action = goal_name
-		self._feedback.state = FEEDBACK_MESSAGE
+		#self._feedback.state = controller state
 		## Decide when to send the feedback
 		# self.action.publish_feedback(self._feedback)
-		while not SYNTHESIZE_DONE:
+		while not self.controller_manager.synthesize_done:
 			if self.action.is_preempt_requested():
 					self.action.set_preempted()
 					success = False
 			rospy.Rate(10)
 		if success:
-			self._result.do_continue = INTERACTION_CONTINUE
+			self._result.do_continue = self.controller_manager.interaction_continue
 			self._result.action = goal_name
-			self._result.message = INTERACTION_MESSAGE
-			DIALOGUE_MESSAGE = ''
-			SYNTHESIZE_DONE = False
-			FEEDBACK_MESSAGE = ''
-			INTERACTION_MESSAGE = ''
-			INTERACTION_CONTINUE = True
+			self._result.message = self.controller_manager.interaction_message
+			self.controller_manager.dialogue_message = ''
+			self.controller_manager.synthesize_done = False
+			self.controller_manager.interaction_message = ''
+			self.controller_manager.interaction_continue = True
 			self.action.set_succeeded(self._result)
 
 
 class TTSManager():
 	def __init__(self):
-		self.counter = 0
+		# Initialize variables useful for the Server
+		self.dialogue_message = ""
+		self.synthesize_done = False
+		self.interaction_message = ""
+		self.interaction_continue = True
+		# Declare subscribers and publishers
 		rospy.Subscriber('cordial/dialogue/script', String, self.handle_dialogue_message, queue_size=1)
 		self.behavior_publisher = rospy.Publisher("cordial/behavior", Behavior, queue_size=1)
-		#self.handle_tts_realtime("Hello *QT/bye* I am QT *happy_face*") #FOR TESTING
 		
 
 	def handle_dialogue_message(self, data):
-		print("---------------------------------dfjklsfjsdklfjdklj")
-		print(data)
-		global DIALOGUE_MESSAGE
-		DIALOGUE_MESSAGE = data.data
-		self.counter += 1
-		print("TTS Heard from Lex: " + DIALOGUE_MESSAGE)
-		print("The counter is ", self.counter)
+		self.dialogue_message = data.data
+		print("TTS Heard from Lex: " + self.dialogue_message)
 		return
 
 	def handle_tts_realtime(self, data):
-		global SYNTHESIZE_DONE
 		print("The TTS message received")
 		#outdir = os.path.dirname(os.path.abspath("home		
 		outdir = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_dialogue/scripts/data"
@@ -114,10 +107,10 @@ class TTSManager():
 		behavior_msg.behavior_json = str(behaviours)
 		print("The behavior message is sent")
 		self.behavior_publisher.publish(behavior_msg)
-		SYNTHESIZE_DONE = True
+		self.synthesize_done = True
 
 if __name__ == '__main__':
 		rospy.init_node("tts_node", anonymous=True)
-		ttsm = TTSManager()
-		SynthesizeServer("synthesizing", ttsm)
+		controller_manager = TTSManager()
+		SynthesizeServer("synthesizing", controller_manager)
 		rospy.spin()

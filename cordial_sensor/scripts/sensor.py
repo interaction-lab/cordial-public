@@ -9,73 +9,68 @@ import actionlib
 from std_msgs.msg import String, Bool
 from cordial_manager.msg import *
 
-
-LISTENING_MESSAGE = ''
-RECORDING_MESSAGE = ''
-LISTENING_DONE = False
-RECORDING_DONE = False
-FEEDBACK_MESSAGE = ''
-INTERACTION_MESSAGE = ''
-INTERACTION_CONTINUE = True
-
 class LongSensorsServer():
 	_feedback = CordialFeedback()
 	_result = CordialResult()
 	def __init__(self, name, manager):
-		self.sm = manager
+		self.controller_manager = manager
+		self.controller_manager.recording_message = ''
+		self.controller_manager.recording_done = False
+		self.controller_manager.long_interaction_message = ''
+		self.controller_manager.long_interaction_continue = False
 		self.action_name = name
 		self.action = actionlib.SimpleActionServer(self.action_name, CordialAction, self.execute_goal, False)
 		self.action.start()
 
 	def execute_goal(self, goal):
-		global RECORDING_DONE, RECORDING_MESSAGE, INTERACTION_MESSAGE, INTERACTION_CONTINUE, FEEDBACK_MESSAGE
 		goal_name = goal.action
 		success = True
 		if goal.optional_data != '':
-			LISTENING_MESSAGE = goal.optional_data
-		self.sm.handle_listening_start(LISTENING_MESSAGE)
+			self.controller_manager.recording_message = goal.optional_data
+		self.controller_manager.handle_recording_start(self.controller_manager.recording_message)
 		self._feedback.action = goal_name
-		self._feedback.state = FEEDBACK_MESSAGE
+		#self._feedback.state = # Controller state
 		## Decide when to send the feedback
 		# self.action.publish_feedback(self._feedback)
-		while not LISTENING_DONE:
+		while not self.controller_manager.recording_done:
 			if self.action.is_preempt_requested():
 					self.action.set_preempted()
 					success = False
 			rospy.Rate(10)
 		if success:
-			self._result.do_continue = INTERACTION_CONTINUE
+			self._result.do_continue = self.controller_manager.long_interaction_continue
 			self._result.action = goal_name
-			self._result.message = INTERACTION_MESSAGE
-			RECORDING_MESSAGE = ''
-			RECORDING_DONE = False
-			FEEDBACK_MESSAGE = ''
-			INTERACTION_MESSAGE = ''
-			INTERACTION_CONTINUE = True
+			self._result.message = self.controller_manager.long_interaction_message
+			self.controller_manager.recording_message = ''
+			self.controller_manager.recording_done = False
+			self.controller_manager.long_interaction_message = ''
+			self.controller_manager.long_interaction_continue = False
 			self.action.set_succeeded(self._result)
 
 class SensorsServer():
 	_feedback = CordialFeedback()
 	_result = CordialResult()
 	def __init__(self, name, manager):
-		self.sm = manager
+		self.controller_manager = manager
+		self.controller_manager.listening_message = ''
+		self.controller_manager.listening_done = False
+		self.controller_manager.interaction_message = ''
+		self.controller_manager.interaction_continue = True
 		self.action_name = name
 		self.action = actionlib.SimpleActionServer(self.action_name, CordialAction, self.execute_goal, False)
 		self.action.start()
 
 	def execute_goal(self, goal):
-		global LISTENING_MESSAGE, LISTENING_DONE, INTERACTION_CONTINUE, INTERACTION_MESSAGE, FEEDBACK_MESSAGE
 		goal_name = goal.action
 		success = True
-		LISTENING_MESSAGE = True
 		if goal.optional_data != '':
-			LISTENING_MESSAGE = goal.optional_data
-		self.sm.handle_listening_start(LISTENING_MESSAGE)
+			self.controller_manager.listening_message = goal.optional_data
+		self.controller_manager.handle_listening_start(self.controller_manager.listening_message)
 		self._feedback.action = goal_name
-		self._feedback.state = FEEDBACK_MESSAGE
+		#self._feedback.state = #Controller state
 		## Decide when to send the feedback
 		# self.action.publish_feedback(self._feedback)
-		while not LISTENING_DONE:
+		while not self.controller_manager.listening_done:
 			if self.action.is_preempt_requested():
 					self.action.set_preempted()
 					success = False
@@ -83,17 +78,26 @@ class SensorsServer():
 		if success:
 			self._result.do_continue = True
 			self._result.action = goal_name
-			self._result.message = INTERACTION_MESSAGE
-			LISTENING_MESSAGE = ''
-			LISTENING_DONE = False
-			FEEDBACK_MESSAGE = ''
-			INTERACTION_MESSAGE = ''
-			INTERACTION_CONTINUE = True
+			self._result.message = self.controller_manager.interaction_message
+			self.controller_manager.listening_message = ''
+			self.controller_manager.listening_done = False
+			self.controller_manager.interaction_message = ''
+			self.controller_manager.interaction_continue = True
 			self.action.set_succeeded(self._result)
 
 
 class SensorsManager():
 	def __init__(self):
+		# Initialize variables useful for the Server
+		self.listening_message = ""
+		self.recording_message = ""
+		self.listening_done = False
+		self.recording_done = False
+		self.interaction_message = ""
+		self.interaction_continue = True
+		self.long_interaction_message = ""
+		self.long_interaction_continue = False
+		# Declare subscribers and publishers
 		rospy.Subscriber('cordial/listening/done', Bool, self.handle_listening_done, queue_size=1)
 		self.microphone_publisher = rospy.Publisher("cordial/listening", Bool, queue_size=1)
 		self.camera_record_publisher = rospy.Publisher("cordial/recording/video", Bool, queue_size=1)
@@ -101,15 +105,19 @@ class SensorsManager():
 		
 
 	def handle_listening_start(self, data):
-		self.microphone_publisher.publish(data)
+		self.microphone_publisher.publish(True)
+
+	def handle_recording_start(self, data):
+		#self.camera_record_publisher.publish(True)
+		#self.microphone_record_publisher.publish(True)
+		return
 
 	def handle_listening_done(self,data):
-		global LISTENING_DONE
-		LISTENING_DONE = data.data
+		self.listening_done = data.data
 
 if __name__ == '__main__':
 		rospy.init_node("sensor_node", anonymous=True)
-		sm = SensorsManager()
-		SensorsServer("sensing", sm)
-		LongSensorsServer("long_sensing", sm)
+		controller_manager = SensorsManager()
+		SensorsServer("sensing", controller_manager)
+		LongSensorsServer("long_sensing", controller_manager)
 		rospy.spin()

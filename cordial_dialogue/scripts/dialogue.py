@@ -13,41 +13,38 @@ from std_msgs.msg import String
 from audio_common_msgs.msg import AudioData
 from cordial_manager.msg import *
 
-PROMPT_MESSAGE = ''
-DIALOGUE_PROCESSING_DONE = False
-
-FEEDBACK_MESSAGE = ''
-INTERACTION_MESSAGE = ''
-INTERACTION_CONTINUE = True
 
 class DialogueServer():
 	_feedback = CordialFeedback()
 	_result = CordialResult()
 	def __init__(self, name, manager):
-		self.dm = manager
+		self.controller_manager = manager
+		self.controller_manager.prompt_message = ''
+		self.controller_manager.dialogue_process_done = False
+		self.controller_manager.interaction_message = ''
+		self.controller_manager.interaction_continue = True
 		self.action_name = name
 		self.action = actionlib.SimpleActionServer(self.action_name, CordialAction, self.execute_goal, False)
 		self.action.start()
 
 	def execute_goal(self, goal):
-		global PROMPT_MESSAGE, DIALOGUE_PROCESSING_DONE, FEEDBACK_MESSAGE, INTERACTION_MESSAGE, INTERACTION_CONTINUE
 		print(goal)
 		goal_name = goal.action
 		success = True
 		if goal.optional_data != '':
-			PROMPT_MESSAGE = goal.optional_data
-			print("Dialogue has heard: " + PROMPT_MESSAGE)
-			self.dm.send_textToAWS(PROMPT_MESSAGE)
+			self.controller_manager.prompt_message = goal.optional_data
+			print("Dialogue has heard: " + self.controller_manager.prompt_message)
+			self.controller_manager.send_textToAWS(self.controller_manager.prompt_message)
 		else:
-			while PROMPT_MESSAGE == '':
+			while self.controller_manager.prompt_message == '':
 				print("Waiting from the microphone input data")
 				rospy.Rate(10)
-			self.dm.send_audioToAWS_client(PROMPT_MESSAGE)
+			self.controller_manager.send_audioToAWS_client(self.controller_manager.prompt_message)
 		self._feedback.action = goal_name
-		self._feedback.state = FEEDBACK_MESSAGE
+		#self._feedback.state = #Controller state
 		## Decide when to send the feedback
 		# self.action.publish_feedback(self._feedback)
-		while not DIALOGUE_PROCESSING_DONE:
+		while not self.controller_manager.dialogue_process_done:
 			if self.action.is_preempt_requested():
 					print("action preempted")
 					self.action.set_preempted()
@@ -55,49 +52,48 @@ class DialogueServer():
 			rospy.Rate(10)
 		if success:
 			print("enter if success")
-			self._result.do_continue = INTERACTION_CONTINUE
+			self._result.do_continue = self.controller_manager.interaction_continue
 			self._result.action = goal_name
-			self._result.message = INTERACTION_MESSAGE
-			PROMPT_MESSAGE = ''
-			DIALOGUE_PROCESSING_DONE = False
-			FEEDBACK_MESSAGE = ''
-			INTERACTION_MESSAGE = ''
-			INTERACTION_CONTINUE = True
+			self._result.message = self.controller_manager.interaction_message
+			self.controller_manager.prompt_message = ''
+			self.controller_manager.dialogue_process_done = False
+			self.controller_manager.interaction_message = ''
+			self.controller_manager.interaction_continue = True
 			self.action.set_succeeded(self._result)
 
 
 class DialogueManager():
 	def __init__(self):
+		# Initialize variables useful for the Server
+		self.prompt_message = ""
+		self.dialogue_process_done = False
+		self.interaction_message = ""
+		self.interaction_continue = True
+		# Declare subscribers and publishers
 	   	rospy.Subscriber('/cordial/microphone/audio', AudioData, self.handle_audio_data, queue_size=1)
 		self.text_publisher = rospy.Publisher('cordial/dialogue/script', String, queue_size=1)
-		#self.send_textToAWS("Hey") # FOR TESTING
 		
 
 	def handle_audio_data(self, data):
-		global PROMPT_MESSAGE
-		PROMPT_MESSAGE = data.data
-		#print("The audio prompt_messages are: ", PROMPT_MESSAGE)
+		self.prompt_message = data.data
 
 	def handle_lex_response(self,lex_response):
-		global INTERACTION_CONTINUE
-		global INTERACTION_MESSAGE
-		global DIALOGUE_PROCESSING_DONE
 		if len(lex_response.text_response) > 0:
 			print("The lex response is: ", lex_response)
 			#When lex failed in understanding the user
 			if lex_response.dialog_state == 'Failed':
-				INTERACTION_MESSAGE = 'failed_understanding'
-				INTERACTION_CONTINUE = False
+				self.interaction_message = 'failed_understanding'
+				self.interaction_continue = False
 				print("In Failed dialogue state")
 			elif lex_response.dialog_state == 'Fulfilled':
-				INTERACTION_MESSAGE = 'success'
-				INTERACTION_CONTINUE = False
+				self.interaction_message = 'success'
+				self.interaction_continue = False
 				print("In Fulfilled dialogue state, the response is:" + lex_response.text_response)
 				self.text_publisher.publish(lex_response.text_response)
 			else:
 				print("In general dialogue state, the response is:" + lex_response.text_response)
 				self.text_publisher.publish(lex_response.text_response)
-			DIALOGUE_PROCESSING_DONE = True
+			self.dialogue_process_done = True
 
 	def send_audioToAWS_client(self,audiodatarequest):
 		print("Starting client request..")
@@ -134,8 +130,8 @@ class DialogueManager():
 
 if __name__ == '__main__':
 		rospy.init_node("dialogue_node", anonymous=True)
-		dm = DialogueManager()
-		DialogueServer("dialoging", dm)
+		controller_manager = DialogueManager()
+		DialogueServer("dialoging", controller_manager)
 		rospy.spin()
     
     
