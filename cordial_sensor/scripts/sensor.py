@@ -108,8 +108,8 @@ class SensorsManager():
 		self.microphone_publisher.publish(True)
 
 	def handle_recording_start(self, data):
-		#self.camera_record_publisher.publish(True)
-		#self.microphone_record_publisher.publish(True)
+		self.camera_record_publisher.publish(True)
+		self.microphone_record_publisher.publish(True)
 		return
 
 	def handle_listening_done(self,data):

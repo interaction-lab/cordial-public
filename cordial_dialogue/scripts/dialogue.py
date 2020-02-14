@@ -72,6 +72,7 @@ class DialogueManager():
 		# Declare subscribers and publishers
 	   	rospy.Subscriber('/cordial/microphone/audio', AudioData, self.handle_audio_data, queue_size=1)
 		self.text_publisher = rospy.Publisher('cordial/dialogue/script', String, queue_size=1)
+		self.dialogue_data_publisher = rospy.Publisher('cordial/dialogue/data', String, queue_size=1)
 		
 
 	def handle_audio_data(self, data):
@@ -80,6 +81,9 @@ class DialogueManager():
 	def handle_lex_response(self,lex_response):
 		if len(lex_response.text_response) > 0:
 			print("The lex response is: ", lex_response)
+			#Stored the user data:
+			#if lex_response.intent_name == "questionnairePhase":
+			print(lex_response.slots) 
 			#When lex failed in understanding the user
 			if lex_response.dialog_state == 'Failed':
 				self.interaction_message = 'failed_understanding'
