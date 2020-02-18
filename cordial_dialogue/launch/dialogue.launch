@@ -3,13 +3,6 @@
    
 
    	<arg name="config_file" default="$(find cordial_dialogue)/config/configuration.yaml"/>
-	<arg name="user_id" value="$(optenv LEX_USER_ID)" doc="UserID sent when communicating with the Lex Bot, can be any string. Defauls to value in config .yaml if unset"/>
-	<arg name="lex_node_name" value="lex_node"/>
-    	<include file="$(find lex_node)/launch/lex_node.launch" >
-           	<arg name="config_file" value="$(find cordial_dialogue)/config/configuration.yaml"/>
-    	</include>
-	<arg name="node_name" value="$(arg lex_node_name)"/>	
-
   	<arg name="use_lex" default="true"/>
   	<group if="$(arg use_lex)">
 	    <node pkg="cordial_dialogue" type="dialogue.py" name="dialogue" output="screen"/>

@@ -5,13 +5,23 @@ from struct import pack
 import sys
 import pyaudio
 import wave
-import struct
 import rospy
 import actionlib
-from lex_common_msgs.srv import *
 from std_msgs.msg import String
 from audio_common_msgs.msg import AudioData
 from cordial_manager.msg import *
+import boto3
+import json
+from datetime import datetime
+
+
+USER_ID = "manuela"
+BOT_NAME = "QTDemo"
+BOT_ALIAS = "qt_sample_demo" 
+
+SAMPLERATE = 16000
+FORMAT_SIZE = pyaudio.paInt16
+CHUNK_SIZE = 1024
 
 
 class DialogueServer():
@@ -69,6 +79,7 @@ class DialogueManager():
 		self.dialogue_process_done = False
 		self.interaction_message = ""
 		self.interaction_continue = True
+		self.lex_client = boto3.client('lex-runtime', region_name='us-west-2')
 		# Declare subscribers and publishers
 	   	rospy.Subscriber('/cordial/microphone/audio', AudioData, self.handle_audio_data, queue_size=1)
 		self.text_publisher = rospy.Publisher('cordial/dialogue/script', String, queue_size=1)
@@ -79,57 +90,65 @@ class DialogueManager():
 		self.prompt_message = data.data
 
 	def handle_lex_response(self,lex_response):
-		if len(lex_response.text_response) > 0:
-			print("The lex response is: ", lex_response)
-			#Stored the user data:
-			#if lex_response.intent_name == "questionnairePhase":
-			print(lex_response.slots) 
+		#lex_response = json.loads(lex_response)
+		if len(lex_response["message"]) > 0:
+			print("The lex response is: ", lex_response["message"])
+			#Stored the user data
+			self.dialogue_data_publisher.publish(str(lex_response["sessionAttributes"]))
 			#When lex failed in understanding the user
-			if lex_response.dialog_state == 'Failed':
+			if lex_response["dialogState"] == 'Failed':
 				self.interaction_message = 'failed_understanding'
 				self.interaction_continue = False
 				print("In Failed dialogue state")
-			elif lex_response.dialog_state == 'Fulfilled':
+			elif lex_response["dialogState"] == 'Fulfilled':
 				self.interaction_message = 'success'
 				self.interaction_continue = False
-				print("In Fulfilled dialogue state, the response is:" + lex_response.text_response)
-				self.text_publisher.publish(lex_response.text_response)
+				print("In Fulfilled dialogue state, the response is:" + lex_response["message"])
+				self.text_publisher.publish(lex_response["message"])
 			else:
-				print("In general dialogue state, the response is:" + lex_response.text_response)
-				self.text_publisher.publish(lex_response.text_response)
+				print("In general dialogue state, the response is:" + lex_response["message"])
+				self.text_publisher.publish(lex_response["message"])
 			self.dialogue_process_done = True
 
 	def send_audioToAWS_client(self,audiodatarequest):
 		print("Starting client request..")
 		#print("The audio data request is: ", audiodatarequest)
 		audiodata = audiodatarequest
-		rospy.wait_for_service("/lex_node/lex_conversation")
+		p = pyaudio.PyAudio()
+		file_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+		outdir = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_logger/scripts/data/audio_user"
+		wf = wave.open(outdir + "/"+ file_name + ".wav", 'wb')
+		wf.setnchannels(1)
+		wf.setsampwidth(p.get_sample_size(FORMAT_SIZE))
+		wf.setframerate(SAMPLERATE)
+		wf.setnframes(CHUNK_SIZE)
+		wf.writeframes(b''.join(audiodata))
+		wf.close()
+		wav_file = wave.open(outdir + "/"+ file_name + ".wav", 'rb')
 		try:
-			send_data_service = rospy.ServiceProxy("/lex_node/lex_conversation", AudioTextConversation)
-			lex_response = send_data_service(content_type='audio/x-l16; sample-rate=16000; channel-count=1',
-		                           accept_type='text/plain; charset=utf-8',
-		                           text_request=None,
-		                           audio_request=AudioData(data=audiodata))
+			lex_response = self.lex_client.post_content(botName = BOT_NAME,
+														botAlias = BOT_ALIAS,
+														userId = USER_ID,
+														contentType = 'audio/x-l16; sample-rate=16000; channel-count=1',
+														accept = 'text/plain; charset=utf-8',
+														inputStream = audiodata)
 			self.handle_lex_response(lex_response)
 		except rospy.ServiceException, e:
 			print "Service call failed: %s" %e
 
 	def send_textToAWS(self,textdatarequest):
 		print("Starting client request..")
-		#textdata = textdatarequest.data
-		textdata = textdatarequest # FOR TESTING
-		rospy.wait_for_service("/lex_node/lex_conversation")
+		textdata = textdatarequest
 		try:
-			send_data_service = rospy.ServiceProxy("/lex_node/lex_conversation", AudioTextConversation)
-			lex_response = send_data_service(content_type='text/plain; charset=utf-8',
-		                           accept_type='text/plain; charset=utf-8',
-		                           text_request= textdata,
-		                           audio_request= AudioData(data=''))
+			lex_response = self.lex_client.post_content(botName = BOT_NAME,
+														botAlias = BOT_ALIAS,
+														userId = USER_ID,
+														contentType = 'text/plain; charset=utf-8',
+														accept = 'text/plain; charset=utf-8',
+														inputStream = textdata)
 			self.handle_lex_response(lex_response)
 		except rospy.ServiceException, e:
 			print "Service call failed: %s" %e
-
-	
 	
 
 if __name__ == '__main__':

@@ -52,9 +52,6 @@ $ git clone https://github.com/micolspitale93/qt_robot_nuc.git
 $ sudo apt-get install ros-kinetic-audio-common-msgs
 $ sudo apt-get install ros-kinetic-aws-common
 $ sudo apt-get install ros-kinetic-aws-ros1-common
-$ sudo apt-get install ros-kinetic-lex-common
-$ sudo apt-get install ros-kinetic-lex-common-msgs
-$ sudo apt-get install ros-kinetic-lex-node
 ~~~~
 
 7. Make everything

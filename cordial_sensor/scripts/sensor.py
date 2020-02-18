@@ -102,14 +102,16 @@ class SensorsManager():
 		self.microphone_publisher = rospy.Publisher("cordial/listening", Bool, queue_size=1)
 		self.camera_record_publisher = rospy.Publisher("cordial/recording/video", Bool, queue_size=1)
 		self.microphone_record_publisher = rospy.Publisher("cordial/recording/audio", Bool, queue_size=1)
+		self.data_record_publisher = rospy.Publisher("cordial/recording/data", Bool, queue_size=1)
 		
 
 	def handle_listening_start(self, data):
 		self.microphone_publisher.publish(True)
 
 	def handle_recording_start(self, data):
-		self.camera_record_publisher.publish(True)
+		#self.camera_record_publisher.publish(True)
 		self.microphone_record_publisher.publish(True)
+		self.data_record_publisher.publish(True)
 		return
 
 	def handle_listening_done(self,data):

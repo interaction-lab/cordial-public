@@ -7,11 +7,8 @@ catkin_python_setup()
 find_package(catkin REQUIRED COMPONENTS
   aws_common
   aws_ros1_common
-  lex_common
-  lex_common_msgs
   roscpp
   std_msgs
-  lex_node
   actionlib_msgs
   message_generation
 )
@@ -24,8 +21,8 @@ generate_messages(
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES cordial_lex
-  CATKIN_DEPENDS aws_ros1_common lex_common_msgs roscpp std_msgs
+  LIBRARIES cordial_dialogue
+  CATKIN_DEPENDS aws_ros1_common roscpp std_msgs
   #DEPENDS system_lib
 )
 
@@ -39,7 +36,6 @@ include_directories(
  include
   ${catkin_INCLUDE_DIRS}
   ${AWSSDK_INCLUDE_DIR}
-  ${lex_common_INCLUDE_DIR}
 )
 
 include_directories(
