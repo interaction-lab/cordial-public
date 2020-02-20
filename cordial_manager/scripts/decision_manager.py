@@ -27,6 +27,7 @@ class DecisionManager():
         self.state = DecisionState.SUCCESS
         self.index = 0
         self.failure_counter = 0
+        self.failure_counter_userlost = 0
         self.action_feedback = {}
         self.action_result = {}
 
@@ -39,11 +40,12 @@ class DecisionManager():
         rospy.loginfo("Server is ready")
 
         # TODO Initialize with list of interactions and interaction failure options
-        self.success_interaction_name = ['greeting1', 'greeting2']
-        self.failure_interaction_name = ['greeting1b', 'greeting2b']
+        self.success_interaction_name = ['greeting1', 'greeting2', "goodbye"]
+        self.failure_understanding_name = ['greeting1b', 'greeting2b']
+        self.failure_tracking_name = ["user_lost"]
 
         # Set response to action to default - will be changed by callback
-        all_interactions = self.success_interaction_name + self.failure_interaction_name
+        all_interactions = self.success_interaction_name + self.failure_understanding_name + self.failure_tracking_name
         for interaction in all_interactions:
             self.action_result[interaction] = {
                     "do_continue": False,
@@ -87,13 +89,25 @@ class DecisionManager():
             if self.index < len(self.success_interaction_name): # not done with all interactions
                 self.send_interaction_request(self.success_interaction_name[self.index])
         else:
-            if self.action_result[result.action]["message"] == 'failed_understanding':
+            if self.action_result[result.action]["message"] == 'understanding':
+                rospy.loginfo("DM received failed understanding")
                 self.failure_counter += 1
                 self.state = DecisionState.FAILURE
                 if self.failure_counter < 4: # 3 re-try allowed
-                    self.send_interaction_request(self.failure_interaction_name[self.index])
+                    self.send_interaction_request(self.failure_understanding_name[self.index])
+                else:
+                    self.send_interaction_request(self.success_interaction_name[self.index]) #CONTINUE THE INTERACTION
+            elif self.action_result[result.action]["message"] == 'userlost':
+                self.failure_counter_userlost += 1
+                self.state = DecisionState.FAILURE
+                if self.failure_counter_userlost < 4: # 3 re-try allowed
+                    self.send_interaction_request(self.failure_tracking_name[0])
+                else:
+                    self.send_interaction_request(self.success_interaction_name[len(self.success_interaction_name)]) #GOODBYE
             elif self.action_result[result.action]["message"] == 'emergency':
                 self.state = DecisionState.EMERGENCY
+                rospy.loginfo("DM received emergency")
+                #self.send_interaction_request(self.emergency_name[]) ##TODO: change it according to the different level of emergency
         return
 
 

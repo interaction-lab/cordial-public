@@ -9,13 +9,6 @@
                 "goal": "detecting_face"
             },
             {
-                "name": "start_recording",
-                "description": "Starting the recording from the camera chest",
-                "running_option": "parallel",
-                "action": "long_sensing",
-                "goal": "recording"
-            },
-            {
                 "name": "start_face_tracking",
                 "description": "Starting the face tracker",
                 "running_option": "block",
@@ -38,14 +31,45 @@
             {
                 "name": "start_dialogue",
                 "description": "Starting the dialogue",
-                "running_option": "loop",
+                "running_option": "block",
                 "action": "dialoging",
                 "goal": "Repeat Name"
+            }
+
+        ]
+    }
+,
+    "user_lost": {
+        "steps": [
+            {
+                "name": "start_dialogue",
+                "description": "Starting the dialogue",
+                "running_option": "loop",
+                "action": "dialoging",
+                "goal": "UserLost"
+            },
+            {
+                "name": "start_dialogue",
+                "description": "Starting the dialogue",
+                "running_option": "loop",
+                "action": "dialoging",
+                "goal": "UserFound"
+            }
+        ]
+    }
+    ,
+    "goodbye": {
+        "steps": [
+            {
+                "name": "start_dialogue",
+                "description": "Starting the dialogue",
+                "running_option": "block",
+                "action": "dialoging",
+                "goal": "Goodbye"
             }
         ]
     }
 ,
-
     "greeting2": {
         "steps": [
             {
@@ -54,6 +78,13 @@
                 "running_option": "loop",
                 "action": "dialoging",
                 "goal": "greeting"
+            },
+            {
+                "name": "start_recording",
+                "description": "Starting the recording from the camera chest",
+                "running_option": "parallel",
+                "action": "long_sensing",
+                "goal": "recording"
             }
         ]
     }

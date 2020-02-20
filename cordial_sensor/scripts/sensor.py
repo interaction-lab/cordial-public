@@ -14,7 +14,7 @@ class LongSensorsServer():
 	_result = CordialResult()
 	def __init__(self, name, manager):
 		self.controller_manager = manager
-		self.controller_manager.recording_message = ''
+		self.controller_manager.recording_message = True
 		self.controller_manager.recording_done = False
 		self.controller_manager.long_interaction_message = ''
 		self.controller_manager.long_interaction_continue = False
@@ -26,7 +26,7 @@ class LongSensorsServer():
 		goal_name = goal.action
 		success = True
 		if goal.optional_data != '':
-			self.controller_manager.recording_message = goal.optional_data
+			self.controller_manager.recording_message = False
 		self.controller_manager.handle_recording_start(self.controller_manager.recording_message)
 		self._feedback.action = goal_name
 		#self._feedback.state = # Controller state
@@ -64,7 +64,10 @@ class SensorsServer():
 		goal_name = goal.action
 		success = True
 		if goal.optional_data != '':
-			self.controller_manager.listening_message = goal.optional_data
+			if goal.optional_data == "UserLost":
+				self.controller_manager.listening_message = False
+				self.controller_manager.listening_done = True
+				
 		self.controller_manager.handle_listening_start(self.controller_manager.listening_message)
 		self._feedback.action = goal_name
 		#self._feedback.state = #Controller state
@@ -106,11 +109,11 @@ class SensorsManager():
 		
 
 	def handle_listening_start(self, data):
-		self.microphone_publisher.publish(True)
+		self.microphone_publisher.publish(data)
 
 	def handle_recording_start(self, data):
 		#self.camera_record_publisher.publish(True)
-		self.microphone_record_publisher.publish(True)
+		#self.microphone_record_publisher.publish(True)
 		self.data_record_publisher.publish(True)
 		return
 

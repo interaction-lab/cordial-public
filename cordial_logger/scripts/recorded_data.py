@@ -7,7 +7,7 @@ import json
 import time
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
-from std_msgs.msg import String, Bool
+from std_msgs.msg import String, Bool, Int32
 from sensor_msgs.msg import Image
 from audio_common_msgs.msg import AudioData
 from qt_robot_speaker.msg import PlayRequest
@@ -30,6 +30,8 @@ class RecordingManager():
 		self.recorded_video_frames = []
 		self.recorded_video_head_frames = []
 		self.script_data = []
+		self.skeleton_data = []
+		self.audio_direction_data = []
 		self.first_video_frame = True
 		self.first_video_head_frame = True
 		self.is_video_recording = False
@@ -38,18 +40,24 @@ class RecordingManager():
 		self.cv_bridge = CvBridge()
 		self.fps = FPS
 		rospy.Subscriber("/cordial/chest_camera/video", Image, self.handle_recorded_video, queue_size=1)
+		rospy.Subscriber("/camera/color/image_raw", Image, self.handle_recorded_video_head, queue_size=1)
 		rospy.Subscriber("/audio/channel0", AudioData, self.handle_recorded_audio_common, queue_size=1)
 		rospy.Subscriber("/cordial/dialogue/data", String, self.handle_user_prompt, queue_size=1)
-		#audio direction
-		rospy.Subscriber("/camera/color/image_raw", Image, self.handle_recorded_video_head, queue_size=1)
-		rospy.Subscriber("/qt_nuitrack_app/skeletons", Skeletons, self.handle_recorded_skeleton_position, queue_size=1)
-
+		rospy.Subscriber("/sound_direction", Int32, self.handle_recorded_audio_direction, queue_size=1)
+		
 		rospy.Subscriber("/cordial/recording/audio", Bool, self.handle_trigger_recorded_audio, queue_size=1)
 		rospy.Subscriber("/cordial/recording/video", Bool, self.handle_trigger_recorded_video, queue_size=1)
 		rospy.Subscriber("/cordial/recording/data", Bool, self.handle_trigger_recorded_data, queue_size=1)
 		
 
+	def handle_recorded_audio_direction(self, data):
+		if self.is_data_recording:
+			self.audio_direction_data.append({"audio_direction": data})
+		return
+
 	def handle_recorded_skeleton_position(self, data):
+		if self.is_data_recording:
+			self.skeleton_data.append(str(data))
 		return
 	
 	def handle_user_prompt(self,data):
@@ -65,6 +73,9 @@ class RecordingManager():
 			outdir = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_logger/scripts/data/logfile/script/"
 			with open(outdir + file_name+'.json', 'w') as outfile:
 				json.dump(self.script_data, outfile)
+			outdir = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_logger/scripts/data/logfile/audio_direction/"
+			with open(outdir + file_name+'.json', 'w') as outfile:
+				json.dump(self.audio_direction_data, outfile)
 		else:
 			self.is_data_recording = True
 

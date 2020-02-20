@@ -86,7 +86,7 @@ class InteractionManager():
             # Enter loop if dialoging
             if action["running_option"] == "loop":
                 rospy.loginfo("Entering action loop")
-                loop_action = self._process_looping_action_()
+                loop_action = self._process_looping_action_(action["goal"])
 
                 # After exiting the loop check if loop action failed
                 if not self.action_result[loop_action]["do_continue"]:
@@ -152,12 +152,14 @@ class InteractionManager():
             self.interaction_server.set_aborted(self._result)
         return 
 
-    def _process_looping_action_(self):
+    def _process_looping_action_(self, goal):
         while not rospy.is_shutdown():  # dialoguing loops continue until do_continue is false
 
             # expected behavior is to start looping after starting a dialogue
             for loop_action in ["synthesizing", "behaving", "sensing", "dialoging"]:
-                self._send_goal_(loop_action)
+                if loop_action == "dialoging": ## TODO: we should think how to manage!!!!!!!!
+                    goal = ''
+                self._send_goal_(loop_action, optional = goal)
 
                 if not self.action_result[loop_action]["do_continue"]:
                     rospy.loginfo("received instructions to stop - do not continue")

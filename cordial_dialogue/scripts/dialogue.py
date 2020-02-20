@@ -33,6 +33,7 @@ class DialogueServer():
 		self.controller_manager.dialogue_process_done = False
 		self.controller_manager.interaction_message = ''
 		self.controller_manager.interaction_continue = True
+		self.counter = 0
 		self.action_name = name
 		self.action = actionlib.SimpleActionServer(self.action_name, CordialAction, self.execute_goal, False)
 		self.action.start()
@@ -42,13 +43,13 @@ class DialogueServer():
 		goal_name = goal.action
 		success = True
 		if goal.optional_data != '':
-			self.controller_manager.prompt_message = goal.optional_data
-			print("Dialogue has heard: " + self.controller_manager.prompt_message)
-			self.controller_manager.send_textToAWS(self.controller_manager.prompt_message)
+				self.controller_manager.prompt_message = goal.optional_data
+				print("Dialogue has heard: " + self.controller_manager.prompt_message)
+				self.controller_manager.send_textToAWS(self.controller_manager.prompt_message)
 		else:
 			while self.controller_manager.prompt_message == '':
 				print("Waiting from the microphone input data")
-				rospy.Rate(10)
+				rospy.Rate(1)
 			self.controller_manager.send_audioToAWS_client(self.controller_manager.prompt_message)
 		self._feedback.action = goal_name
 		#self._feedback.state = #Controller state
@@ -96,17 +97,21 @@ class DialogueManager():
 			#Stored the user data
 			self.dialogue_data_publisher.publish(str(lex_response["sessionAttributes"]))
 			#When lex failed in understanding the user
-			if lex_response["dialogState"] == 'Failed':
-				self.interaction_message = 'failed_understanding'
-				self.interaction_continue = False
-				print("In Failed dialogue state")
-			elif lex_response["dialogState"] == 'Fulfilled':
-				self.interaction_message = 'success'
-				self.interaction_continue = False
-				print("In Fulfilled dialogue state, the response is:" + lex_response["message"])
-				self.text_publisher.publish(lex_response["message"])
+			if "intentName" in lex_response:
+				if lex_response["dialogState"] == 'Failed':
+					self.interaction_message = 'failed_understanding'
+					self.interaction_continue = False
+					print("In Failed dialogue state")
+				elif lex_response["dialogState"] == 'Fulfilled':
+					self.interaction_message = 'success'
+					self.interaction_continue = False
+					print("In Fulfilled dialogue state, the response is:" + lex_response["message"])
+					self.text_publisher.publish(lex_response["message"])
+				else:
+					print("In general dialogue state, the response is:" + lex_response["message"])
+					self.text_publisher.publish(lex_response["message"])
 			else:
-				print("In general dialogue state, the response is:" + lex_response["message"])
+				print("Empty string")
 				self.text_publisher.publish(lex_response["message"])
 			self.dialogue_process_done = True
 

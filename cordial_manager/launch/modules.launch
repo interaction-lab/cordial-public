@@ -6,7 +6,7 @@
 	<!-- Launch the children -->
 		<include file="$(find cordial_face)/launch/face_client.launch"/>
 		<include file="$(find qt_robot_gestures)/launch/gestures.launch"/>
-		<include file="$(find qt_chest_camera)/launch/chest_camera.launch" />
+	<!--	<include file="$(find qt_chest_camera)/launch/chest_camera.launch" />-->
 		<include file="$(find qt_tracker)/launch/head_track.launch" />
 		<include file="$(find qt_face_detector)/launch/face_detect.launch" />
 	<!-- Launch the controller parents -->

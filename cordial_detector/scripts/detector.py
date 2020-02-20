@@ -26,7 +26,8 @@ class DetectorServer():
 		goal_name = goal.action
 		success = True
 		if goal.optional_data != '':
-			self.controller_manager.face_detector_message = goal.optional_data
+			if goal.optional_data == "detecting_face":
+				self.controller_manager.face_detector_message = goal.optional_data
 		self.controller_manager.handle_face_detecting_start(self.controller_manager.face_detector_message)
 		self._feedback.action = goal_name
 		# self._feedback.state = Detector status
