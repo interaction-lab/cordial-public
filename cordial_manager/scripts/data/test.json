@@ -16,6 +16,13 @@
                 "goal":"tracking_face"
             },
             {
+                "name": "start_recording",
+                "description": "Starting the recording",
+                "running_option": "parallel",
+                "action": "long_sensing",
+                "goal": "start_recording"
+            },
+            {
                 "name": "start_dialogue",
                 "description": "Starting the dialogue",
                 "running_option": "loop",
@@ -25,8 +32,7 @@
         ]
     }
 ,
-
-    "greeting1b": {
+    "fail1": {
         "steps": [
             {
                 "name": "start_dialogue",
@@ -46,14 +52,28 @@
                 "description": "Starting the dialogue",
                 "running_option": "loop",
                 "action": "dialoging",
-                "goal": "UserLost"
+                "goal": "userlost"
             },
             {
                 "name": "start_dialogue",
                 "description": "Starting the dialogue",
-                "running_option": "loop",
+                "running_option": "block",
                 "action": "dialoging",
-                "goal": "UserFound"
+                "goal": "userfound"
+            },
+            {
+                "name": "start_tts",
+                "description": "Starting the tts",
+                "running_option": "block",
+                "action": "synthesizing",
+                "goal": ""
+            },
+            {
+                "name": "start_behav",
+                "description": "Starting the behav",
+                "running_option": "block",
+                "action": "behaving",
+                "goal": "endblock"
             }
         ]
     }
@@ -65,26 +85,54 @@
                 "description": "Starting the dialogue",
                 "running_option": "block",
                 "action": "dialoging",
-                "goal": "Goodbye"
+                "goal": "goodbye"
+            },
+            {
+                "name": "start_tts",
+                "description": "Starting the tts",
+                "running_option": "block",
+                "action": "synthesizing",
+                "goal": ""
+            },
+            {
+                "name": "start_behav",
+                "description": "Starting the behav",
+                "running_option": "block",
+                "action": "behaving",
+                "goal": "endblock"
+            },
+            {
+                "name": "stop_recording",
+                "description": "Stopping the recording",
+                "running_option": "parallel",
+                "action": "long_sensing",
+                "goal": "stop_recording"
             }
         ]
     }
 ,
-    "greeting2": {
+    "storytelling1": {
         "steps": [
             {
                 "name": "start_dialogue",
                 "description": "Starting the dialogue",
-                "running_option": "loop",
+                "running_option": "block",
                 "action": "dialoging",
-                "goal": "greeting"
+                "goal": "storytelling"
             },
             {
-                "name": "start_recording",
-                "description": "Starting the recording from the camera chest",
-                "running_option": "parallel",
-                "action": "long_sensing",
-                "goal": "recording"
+                "name": "start_tts",
+                "description": "Starting the tts",
+                "running_option": "block",
+                "action": "synthesizing",
+                "goal": ""
+            },
+            {
+                "name": "start_behav",
+                "description": "Starting the behav",
+                "running_option": "block",
+                "action": "behaving",
+                "goal": "endblock"
             }
         ]
     }

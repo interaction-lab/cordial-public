@@ -40,8 +40,8 @@ class DecisionManager():
         rospy.loginfo("Server is ready")
 
         # TODO Initialize with list of interactions and interaction failure options
-        self.success_interaction_name = ['greeting1', 'greeting2', "goodbye"]
-        self.failure_understanding_name = ['greeting1b', 'greeting2b']
+        self.success_interaction_name = ['greeting1', 'storytelling1', "goodbye"]
+        self.failure_understanding_name = ['fail1', 'greeting2b', 'greeting2b']
         self.failure_tracking_name = ["user_lost"]
 
         # Set response to action to default - will be changed by callback
@@ -70,11 +70,12 @@ class DecisionManager():
         self.action_client.send_goal(goal,
                                     done_cb=self.interaction_done_callback,
                                     feedback_cb=self.interaction_feedback_callback)
-        self.action_client.wait_for_result()
+        #self.action_client.wait_for_result()
         return
 
 
     def interaction_done_callback(self, terminal_state, result):
+        print("Callback Done")
         """Handle completed interaction"""
         # Read message
         rospy.loginfo("Heard back from: "+ result.action + " terminal state is: "+  str(terminal_state) +" and the result is: "+ str(result))
@@ -103,7 +104,7 @@ class DecisionManager():
                 if self.failure_counter_userlost < 4: # 3 re-try allowed
                     self.send_interaction_request(self.failure_tracking_name[0])
                 else:
-                    self.send_interaction_request(self.success_interaction_name[len(self.success_interaction_name)]) #GOODBYE
+                    self.send_interaction_request(self.success_interaction_name[len(self.success_interaction_name)-1]) #GOODBYE
             elif self.action_result[result.action]["message"] == 'emergency':
                 self.state = DecisionState.EMERGENCY
                 rospy.loginfo("DM received emergency")

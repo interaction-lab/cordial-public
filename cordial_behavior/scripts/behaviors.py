@@ -85,8 +85,10 @@ class BehaviorServer():
 		goal_name = goal.action
 		success = True
 		if goal.optional_data != '':
-			if goal.optional_data == "UserLost":
+			if goal.optional_data == "userlost":
 				self.controller_manager.user_lost_override = True
+			elif goal.optional_data == "endblock": ##TODO: do that directly from the block. Stop all the nodes and children! Not from here!
+				self.controller_manager.end_block = True
 		self.controller_manager.handle_behavior(self.controller_manager.tts_message)
 		self._feedback.action = goal_name
 		#self._feedback.state = behavior state
@@ -142,6 +144,7 @@ class BehaviorManager():
 		self.facial_expression_done = False
 		self.user_lost = True
 		self.user_lost_override = False
+		self.end_block = False
 		
 
 	def handle_tracking_state(self, data):
@@ -207,49 +210,49 @@ class BehaviorManager():
 								"au_ms": au_ms})
 
 	def handle_behavior(self, data):
-		audio_frame_array = data.audio_frame
-		audio_data_array = data.audio_data
-		data_array = data.behavior_json
-		for index in range(len(audio_frame_array)):
-			audio_frame = audio_frame_array[index]
-			audio_data = audio_data_array[index] 
-			data = literal_eval(data_array[index])
-			word_timing = filter(lambda b: b["type"] == "word", data)
-			behav = filter(lambda b: b["type"] != "word", data)
-			facial_expression_list = self.facial_expression_list
-			visemes = ["BILABIAL","LABIODENTAL","INTERDENTAL","DENTAL_ALVEOLAR","POSTALVEOLAR","VELAR_GLOTTAL","CLOSE_FRONT_VOWEL","OPEN_FRONT_VOWEL","MID_CENTRAL_VOWEL","OPEN_BACK_VOWEL","CLOSE_BACK_VOWEL", 'IDLE']
-			all_gesture_behaviors = filter(lambda b: b["id"] not in visemes, behav)
-			gesture_behaviors = filter(lambda b: b["id"] not in facial_expression_list, all_gesture_behaviors)
-			viseme_behaviors = filter(lambda b: b["id"] in visemes, behav)
-			facial_expression_behaviors = filter(lambda b: b["id"] in facial_expression_list, behav)
-			if not index == 0: 
-				while not self.is_behavior_done:
-					self.check_if_behavior_done()
-			r = rospy.Rate(10)
-			counter = 0
-			while self.user_lost and not self.user_lost_override:
-				counter += 1
-				rospy.loginfo("User is lost!! Do something " + str(counter))
-				r.sleep()
-				if counter > 40:
-					self.interaction_message = "failure_userlost"
-					self.interaction_continue = False
-					#self.all_behaviors_done = True
+		if data != "":
+			audio_frame_array = data.audio_frame
+			audio_data_array = data.audio_data
+			data_array = data.behavior_json
+			for index in range(len(audio_frame_array)):
+				audio_frame = audio_frame_array[index]
+				audio_data = audio_data_array[index] 
+				data = literal_eval(data_array[index])
+				word_timing = filter(lambda b: b["type"] == "word", data)
+				behav = filter(lambda b: b["type"] != "word", data)
+				facial_expression_list = self.facial_expression_list
+				visemes = ["BILABIAL","LABIODENTAL","INTERDENTAL","DENTAL_ALVEOLAR","POSTALVEOLAR","VELAR_GLOTTAL","CLOSE_FRONT_VOWEL","OPEN_FRONT_VOWEL","MID_CENTRAL_VOWEL","OPEN_BACK_VOWEL","CLOSE_BACK_VOWEL", 'IDLE']
+				all_gesture_behaviors = filter(lambda b: b["id"] not in visemes, behav)
+				gesture_behaviors = filter(lambda b: b["id"] not in facial_expression_list, all_gesture_behaviors)
+				viseme_behaviors = filter(lambda b: b["id"] in visemes, behav)
+				facial_expression_behaviors = filter(lambda b: b["id"] in facial_expression_list, behav)
+				if not index == 0: 
+					while not self.is_behavior_done:
+						self.check_if_behavior_done()
+				r = rospy.Rate(10)
+				counter = 0
+				while self.user_lost and not self.user_lost_override:
+					counter += 1
+					rospy.loginfo("User is lost!! Do something " + str(counter))
+					r.sleep()
+					if counter > 40:
+						self.interaction_message = "failure_userlost"
+						self.interaction_continue = False
+						break
+				if not self.user_lost or (self.user_lost and (self.user_lost_override or self.end_block)):
+					self.is_behavior_done = False
+					self.gesture_done = False
+					self.speaker_done = False
+					self.handle_audio(audio_data, audio_frame)
+					self.handle_visemes(viseme_behaviors)
+					self.handle_gestures(gesture_behaviors, word_timing)
+					self.handle_facial_expression(facial_expression_behaviors)
+				else:
 					break
-			if not self.user_lost or (self.user_lost and self.user_lost_override):
-				self.is_behavior_done = False
-				self.gesture_done = False
-				self.speaker_done = False
-				self.handle_audio(audio_data, audio_frame)
-				self.handle_visemes(viseme_behaviors)
-				self.handle_gestures(gesture_behaviors, word_timing)
-				self.handle_facial_expression(facial_expression_behaviors)
-			else:
-				break
-		while not self.is_behavior_done:
-			self.check_if_behavior_done()
-		self.all_behaviors_done = True
-		rospy.loginfo("All behaviors done")
+			while not self.is_behavior_done:
+				self.check_if_behavior_done()
+			self.all_behaviors_done = True
+			rospy.loginfo("All behaviors done")
 	
 
 	def handle_audio(self, audio_data, audio_frame):

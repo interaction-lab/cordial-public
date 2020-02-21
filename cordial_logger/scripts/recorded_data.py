@@ -21,7 +21,7 @@ CHANNEL = 1
 SAMPLERATE = 16000
 FORMAT_SIZE = pyaudio.paInt16
 CHUNK_SIZE = 1024
-FPS = 23
+FPS = 10
 
 class RecordingManager():
 
@@ -39,11 +39,11 @@ class RecordingManager():
 		self.is_data_recording = False
 		self.cv_bridge = CvBridge()
 		self.fps = FPS
-		rospy.Subscriber("/cordial/chest_camera/video", Image, self.handle_recorded_video, queue_size=1)
+		#rospy.Subscriber("/cordial/chest_camera/video", Image, self.handle_recorded_video, queue_size=1)
 		rospy.Subscriber("/camera/color/image_raw", Image, self.handle_recorded_video_head, queue_size=1)
 		rospy.Subscriber("/audio/channel0", AudioData, self.handle_recorded_audio_common, queue_size=1)
 		rospy.Subscriber("/cordial/dialogue/data", String, self.handle_user_prompt, queue_size=1)
-		rospy.Subscriber("/sound_direction", Int32, self.handle_recorded_audio_direction, queue_size=1)
+		#rospy.Subscriber("/sound_direction", Int32, self.handle_recorded_audio_direction, queue_size=1)
 		
 		rospy.Subscriber("/cordial/recording/audio", Bool, self.handle_trigger_recorded_audio, queue_size=1)
 		rospy.Subscriber("/cordial/recording/video", Bool, self.handle_trigger_recorded_video, queue_size=1)
@@ -108,7 +108,7 @@ class RecordingManager():
 			for frame in self.recorded_video_head_frames:
 				self.video_head_data.write(frame)
 			self.is_video_recording = False
-			self.video_data.release()
+			#self.video_data.release()
 			self.video_head_data.release()
 			cv2.destroyAllWindows()
 		elif data.data:

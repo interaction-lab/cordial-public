@@ -27,6 +27,10 @@ class LongSensorsServer():
 		success = True
 		if goal.optional_data != '':
 			self.controller_manager.recording_message = False
+		if goal.optional_data == "stop_recording": ##CHANGE IT IN V2
+			self.controller_manager.recording_message = False
+		elif goal.optional_data == "start_recording": ##CHANGE IT IN V2
+			self.controller_manager.recording_done = True
 		self.controller_manager.handle_recording_start(self.controller_manager.recording_message)
 		self._feedback.action = goal_name
 		#self._feedback.state = # Controller state
@@ -52,7 +56,7 @@ class SensorsServer():
 	_result = CordialResult()
 	def __init__(self, name, manager):
 		self.controller_manager = manager
-		self.controller_manager.listening_message = ''
+		self.controller_manager.listening_start = True
 		self.controller_manager.listening_done = False
 		self.controller_manager.interaction_message = ''
 		self.controller_manager.interaction_continue = True
@@ -64,11 +68,11 @@ class SensorsServer():
 		goal_name = goal.action
 		success = True
 		if goal.optional_data != '':
-			if goal.optional_data == "UserLost":
-				self.controller_manager.listening_message = False
+			if goal.optional_data == "userlost":
+				self.controller_manager.listening_start = False
 				self.controller_manager.listening_done = True
-				
-		self.controller_manager.handle_listening_start(self.controller_manager.listening_message)
+				print("If user lost not listen but directly dialoging")
+		self.controller_manager.handle_listening_start(self.controller_manager.listening_start)
 		self._feedback.action = goal_name
 		#self._feedback.state = #Controller state
 		## Decide when to send the feedback
@@ -82,7 +86,7 @@ class SensorsServer():
 			self._result.do_continue = True
 			self._result.action = goal_name
 			self._result.message = self.controller_manager.interaction_message
-			self.controller_manager.listening_message = ''
+			self.controller_manager.listening_start = True
 			self.controller_manager.listening_done = False
 			self.controller_manager.interaction_message = ''
 			self.controller_manager.interaction_continue = True
@@ -92,7 +96,7 @@ class SensorsServer():
 class SensorsManager():
 	def __init__(self):
 		# Initialize variables useful for the Server
-		self.listening_message = ""
+		self.listening_start = True ##Bool which trigger the microphone
 		self.recording_message = ""
 		self.listening_done = False
 		self.recording_done = False
@@ -102,6 +106,7 @@ class SensorsManager():
 		self.long_interaction_continue = False
 		# Declare subscribers and publishers
 		rospy.Subscriber('cordial/listening/done', Bool, self.handle_listening_done, queue_size=1)
+		#self.microphone_data_publisher = rospy.Publisher('/cordial/microphone/audio', AudioData, self.handle_audio_data, queue_size=1)
 		self.microphone_publisher = rospy.Publisher("cordial/listening", Bool, queue_size=1)
 		self.camera_record_publisher = rospy.Publisher("cordial/recording/video", Bool, queue_size=1)
 		self.microphone_record_publisher = rospy.Publisher("cordial/recording/audio", Bool, queue_size=1)
@@ -112,9 +117,9 @@ class SensorsManager():
 		self.microphone_publisher.publish(data)
 
 	def handle_recording_start(self, data):
-		#self.camera_record_publisher.publish(True)
-		#self.microphone_record_publisher.publish(True)
-		self.data_record_publisher.publish(True)
+		self.camera_record_publisher.publish(data)
+		#self.microphone_record_publisher.publish(data)
+		self.data_record_publisher.publish(data)
 		return
 
 	def handle_listening_done(self,data):

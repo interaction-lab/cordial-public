@@ -112,6 +112,7 @@ class InteractionManager():
                     return()
     
         # When the block has been successfully completed
+        rospy.loginfo("Block successfully completed")
         self._send_interaction_result_(interaction_block_label,True,"")
         return
 
@@ -145,7 +146,9 @@ class InteractionManager():
         self._result.action = label
         self._result.do_continue = action_continue
         self._result.message = message
+        print("The result are: ", self._result)
         if action_continue:
+            print("Set the result to succeded, sending it to the decision manager")
             self.interaction_server.set_succeeded(self._result)     
         else:
             rospy.loginfo("Do not continue, error said:"+ message)
@@ -157,8 +160,6 @@ class InteractionManager():
 
             # expected behavior is to start looping after starting a dialogue
             for loop_action in ["synthesizing", "behaving", "sensing", "dialoging"]:
-                if loop_action == "dialoging": ## TODO: we should think how to manage!!!!!!!!
-                    goal = ''
                 self._send_goal_(loop_action, optional = goal)
 
                 if not self.action_result[loop_action]["do_continue"]:
@@ -168,7 +169,8 @@ class InteractionManager():
                     status = message.split('_')[0]
 
                     # Still need to finish behaving after dialogue indicates success
-                    if status == "success":
+                    if status == "success": ## TODO: CHECK IF HAS TO FINISH THE ACTION BEFORE EXITING THE LOOP ALSO in the Failed condition should we finish the Loop?
+                        rospy.loginfo("After dialogue success, breaking the loop!")
                         for loop_action in ["synthesizing", "behaving"]:
                             self._send_goal_(loop_action)
                     break  # the for loop
