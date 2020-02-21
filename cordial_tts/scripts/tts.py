@@ -102,7 +102,7 @@ class TTSManager():
 		data_array = data
 		audio_frame = samplerate
 		behavior_msg = Behavior()
-		behavior_msg.audio_frame = audio_frame
+		behavior_msg.audio_frame = int(audio_frame)
 		behavior_msg.audio_data =  data_array
 		behavior_msg.behavior_json = str(behaviours)
 		print("The behavior message is sent")

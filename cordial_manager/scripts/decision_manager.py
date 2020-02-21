@@ -68,7 +68,7 @@ class DecisionManager():
         self.action_client.send_goal(goal,
                                     done_cb=self.interaction_done_callback,
                                     feedback_cb=self.interaction_feedback_callback)
-        self.action_client.wait_for_result()
+        #self.action_client.wait_for_result()
         return
 
 
@@ -87,11 +87,15 @@ class DecisionManager():
             if self.index < len(self.success_interaction_name): # not done with all interactions
                 self.send_interaction_request(self.success_interaction_name[self.index])
         else:
-            if self.action_result[result.action]["message"] == 'failed_understanding':
+            print("Do continue False")
+            if self.action_result[result.action]["message"] == 'understanding':
+                print("Failed understanding")
                 self.failure_counter += 1
                 self.state = DecisionState.FAILURE
                 if self.failure_counter < 4: # 3 re-try allowed
                     self.send_interaction_request(self.failure_interaction_name[self.index])
+                else:
+                    self.send_interaction_request(self.success_interaction_name[self.index])
             elif self.action_result[result.action]["message"] == 'emergency':
                 self.state = DecisionState.EMERGENCY
         return
