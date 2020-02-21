@@ -19,6 +19,7 @@ import ast
 
 CHANNEL = 1
 SAMPLERATE = 16000
+SAMPLERATE_MIC_EXT = 44100
 FORMAT_SIZE = pyaudio.paInt16
 CHUNK_SIZE = 1024
 FPS = 23
@@ -27,8 +28,7 @@ class RecordingManager():
 
 	def __init__(self):
 		self.recorded_audio_common_frames = []
-		self.recorded_video_frames = []
-		self.recorded_video_head_frames = []
+		self.recorded_audio_respeaker_frames = []
 		self.script_data = []
 		self.first_video_frame = True
 		self.first_video_head_frame = True
@@ -38,9 +38,10 @@ class RecordingManager():
 		self.cv_bridge = CvBridge()
 		self.fps = FPS
 		rospy.Subscriber("/cordial/chest_camera/video", Image, self.handle_recorded_video, queue_size=1)
-		rospy.Subscriber("/audio/channel0", AudioData, self.handle_recorded_audio_common, queue_size=1)
+		rospy.Subscriber("/audio/channel0", AudioData, self.handle_recorded_audio_respeaker, queue_size=1)
+		rospy.Subscriber("/audio", AudioData, self.handle_recorded_audio_common, queue_size=1)
+		#rospy.Subscriber("/cordial/recording/audio/data", PlayRequest, self.handle_recorded_audio_common, queue_size=1)
 		rospy.Subscriber("/cordial/dialogue/data", String, self.handle_user_prompt, queue_size=1)
-		#audio direction
 		rospy.Subscriber("/camera/color/image_raw", Image, self.handle_recorded_video_head, queue_size=1)
 		rospy.Subscriber("/qt_nuitrack_app/skeletons", Skeletons, self.handle_recorded_skeleton_position, queue_size=1)
 
@@ -83,20 +84,14 @@ class RecordingManager():
 				self.first_video_head_frame = False
 			else:
 				frame = self.cv_bridge.imgmsg_to_cv2(data, "bgr8")
-				#cv2.imshow("QTHeadCamVideo", frame)
 			try:
 				self.video_head_data.write(frame)
-				#self.recorded_video_head_frames.append(frame)
 			except:
 				print("Not writing!!")
 
 	def handle_trigger_recorded_video(self, data):
 		if not data.data:
 			print("Stop video recording")
-			#for frame in self.recorded_video_frames:
-			#	self.video_data.write(frame)
-			#for frame in self.recorded_video_head_frames:
-			#	self.video_head_data.write(frame)
 			self.is_video_recording = False
 			self.video_data.release()
 			self.video_head_data.release()
@@ -125,9 +120,11 @@ class RecordingManager():
 				print("Is recording")
 			try:
 				self.video_data.write(frame)
-				#self.recorded_video_frames.append(frame)
 			except:
 				print("Not writing!!")
+
+	def handle_recorded_audio_respeaker(self,data):
+		self.recorded_audio_respeaker_frames.append(data.data)
 
 	def handle_recorded_audio_common(self,data):
 		self.recorded_audio_common_frames.append(data.data)
@@ -138,6 +135,15 @@ class RecordingManager():
 			p = pyaudio.PyAudio()
 			file_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 			outdir = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_logger/scripts/data/audio/"
+			wf = wave.open(outdir + "/"+ file_name + ".wav", 'wb')
+			wf.setnchannels(CHANNEL)
+			wf.setsampwidth(p.get_sample_size(FORMAT_SIZE))
+			wf.setframerate(SAMPLERATE)
+			wf.setnframes(CHUNK_SIZE)
+			wf.writeframes(b''.join(self.recorded_audio_respeaker_frames))
+			wf.close()
+
+			outdir = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_logger/scripts/data/external_audio/"
 			wf = wave.open(outdir + "/"+ file_name + ".wav", 'wb')
 			wf.setnchannels(CHANNEL)
 			wf.setsampwidth(p.get_sample_size(FORMAT_SIZE))

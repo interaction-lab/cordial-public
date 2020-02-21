@@ -4,11 +4,11 @@
   <arg name="record_qt_state" default="true" />
 
  <node pkg="rosbag" type="record" name="rosbag_record_cam"
-       args="record -o /media/qtrobot/Elements/rosbag_data/qt-cameras /camera/color/image_raw /cordial/chest_camera/video"
+       args="record -o /media/qtrobot/Elements/rosbag_data/qt-cameras /cordial/chest_camera/video"
        if="$(arg record_cameras)" />
 
 <node pkg="rosbag" type="record" name="rosbag_record_mic"
-       args="record -o /media/qtrobot/Elements/rosbag_data/qt-microphones /audio/channel0 /sound_direction"
+       args="record -o /media/qtrobot/Elements/rosbag_data/qt-microphones /audio/channel0 /sound_direction /audio /audio_respeaker"
        if="$(arg record_microphones)" />
 
  <node pkg="rosbag" type="record" name="rosbag_record_robot_state"
