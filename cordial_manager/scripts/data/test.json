@@ -16,6 +16,13 @@
                 "goal":"tracking_face"
             },
             {
+                "name": "start_recording",
+                "description": "Starting the recording",
+                "running_option": "parallel",
+                "action": "long_sensing",
+                "goal": "recording"
+            },
+            {
                 "name": "start_dialogue",
                 "description": "Starting the dialogue",
                 "running_option": "loop",
@@ -26,7 +33,7 @@
     }
 ,
 
-    "greeting1b": {
+    "fail1": {
         "steps": [
             {
                 "name": "start_dialogue",
@@ -34,18 +41,25 @@
                 "running_option": "loop",
                 "action": "dialoging",
                 "goal": "Repeat Name"
-            },
-            {
-                "name": "start_recording",
-                "description": "Starting the recording from the camera chest",
-                "running_option": "parallel",
-                "action": "long_sensing",
-                "goal": "recording"
             }
+
         ]
     }
 ,
-
+    "goodbye": {
+        "steps": [
+            {
+                "name": "start_dialogue",
+                "description": "Starting the dialogue",
+                "running_option": "loop",
+                "action": "dialoging",
+                "goal": "goodbye"
+            }
+            
+        ]
+    }
+,
+            
     "greeting2": {
         "steps": [
             {

@@ -48,7 +48,7 @@ class DialogueServer():
 		else:
 			while self.controller_manager.prompt_message == '':
 				print("Waiting from the microphone input data")
-				rospy.Rate(10)
+				rospy.Rate(1)
 			self.controller_manager.send_audioToAWS_client(self.controller_manager.prompt_message)
 		self._feedback.action = goal_name
 		#self._feedback.state = #Controller state

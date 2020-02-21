@@ -74,16 +74,16 @@ class RecordingManager():
 			if self.first_video_head_frame:
 				print("First frame")
 				# Create the writer for the video
-				fps = data.header.stamp.secs
 				fourcc = cv2.VideoWriter_fourcc(*'MJPG')
 				file_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S') 
 				path = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_logger/scripts/data/video_head/"
-				#fps = FPS
+				fps = FPS
 				self.video_head_data = cv2.VideoWriter(path + file_name + ".avi", fourcc , fps, (data.width, data.height), True)
 				frame = self.cv_bridge.imgmsg_to_cv2(data, "bgr8")
 				self.first_video_head_frame = False
 			else:
 				frame = self.cv_bridge.imgmsg_to_cv2(data, "bgr8")
+				cv2.imshow("QTHeadCamVideo", frame)
 			try:
 				self.recorded_video_head_frames.append(frame)
 			except:
@@ -110,6 +110,7 @@ class RecordingManager():
 				print("First frame")
 				# Create the writer for the video
 				#self.fps = data.header.stamp.secs
+				print("Is recording")
 				fps = FPS
 				fourcc = cv2.VideoWriter_fourcc(*'MJPG')
 				file_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S') 
@@ -120,6 +121,7 @@ class RecordingManager():
 			
 			else:
 				frame = self.cv_bridge.imgmsg_to_cv2(data, "rgb8")
+				print("Is recording")
 			try:
 				self.recorded_video_frames.append(frame)
 			except:
