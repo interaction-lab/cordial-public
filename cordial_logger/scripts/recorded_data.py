@@ -83,19 +83,20 @@ class RecordingManager():
 				self.first_video_head_frame = False
 			else:
 				frame = self.cv_bridge.imgmsg_to_cv2(data, "bgr8")
-				cv2.imshow("QTHeadCamVideo", frame)
+				#cv2.imshow("QTHeadCamVideo", frame)
 			try:
-				self.recorded_video_head_frames.append(frame)
+				self.video_head_data.write(frame)
+				#self.recorded_video_head_frames.append(frame)
 			except:
 				print("Not writing!!")
 
 	def handle_trigger_recorded_video(self, data):
 		if not data.data:
 			print("Stop video recording")
-			for frame in self.recorded_video_frames:
-				self.video_data.write(frame)
-			for frame in self.recorded_video_head_frames:
-				self.video_head_data.write(frame)
+			#for frame in self.recorded_video_frames:
+			#	self.video_data.write(frame)
+			#for frame in self.recorded_video_head_frames:
+			#	self.video_head_data.write(frame)
 			self.is_video_recording = False
 			self.video_data.release()
 			self.video_head_data.release()
@@ -123,7 +124,8 @@ class RecordingManager():
 				frame = self.cv_bridge.imgmsg_to_cv2(data, "rgb8")
 				print("Is recording")
 			try:
-				self.recorded_video_frames.append(frame)
+				self.video_data.write(frame)
+				#self.recorded_video_frames.append(frame)
 			except:
 				print("Not writing!!")
 
