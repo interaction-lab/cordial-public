@@ -39,8 +39,8 @@ class DecisionManager():
         rospy.loginfo("Server is ready")
 
         # TODO Initialize with list of interactions and interaction failure options
-        self.success_interaction_name = ['greeting1','greeting2','greeting2', 'goodbye']
-        self.failure_interaction_name = ['fail1', 'fail1','fail1', 'fail1']
+        self.success_interaction_name = ['greeting1','goodbye']
+        self.failure_interaction_name = ['fail1', 'fail1']
 
         # Set response to action to default - will be changed by callback
         all_interactions = self.success_interaction_name + self.failure_interaction_name

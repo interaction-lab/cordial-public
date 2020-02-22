@@ -49,13 +49,19 @@
     "goodbye": {
         "steps": [
             {
+                "name": "stop_recording",
+                "description": "Stop the recording",
+                "running_option": "stop",
+                "action": "long_sensing",
+                "goal": "recording"
+            },
+            {
                 "name": "start_dialogue",
                 "description": "Starting the dialogue",
                 "running_option": "loop",
                 "action": "dialoging",
                 "goal": "goodbye"
             }
-            
         ]
     }
 ,

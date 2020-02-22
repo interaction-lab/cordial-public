@@ -106,7 +106,6 @@ class RecordingManager():
 				print("First frame")
 				# Create the writer for the video
 				#self.fps = data.header.stamp.secs
-				print("Is recording")
 				fps = FPS
 				fourcc = cv2.VideoWriter_fourcc(*'MJPG')
 				file_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S') 
@@ -117,7 +116,6 @@ class RecordingManager():
 			
 			else:
 				frame = self.cv_bridge.imgmsg_to_cv2(data, "rgb8")
-				print("Is recording")
 			try:
 				self.video_data.write(frame)
 			except:

@@ -97,7 +97,7 @@ class InteractionManager():
                         self._send_interaction_result_(interaction_block_label, False, error_message)
                         return()
             
-            if not action["running_option"] == "parallel": # Check if not parallel, otherwise not needed to check the results
+            if not (action["running_option"] == "parallel" or action["running_option"] == "stop"): # Check if not parallel, otherwise not needed to check the results
                 if action["action"].split('_')[0] == "long":
                     if not self.action_result[action["action"]]["do_continue"]:
                         rospy.loginfo("This is a:" + str(action["action"]))
@@ -110,7 +110,11 @@ class InteractionManager():
                 else:
                     self._send_interaction_result_(interaction_block_label, False, error_message)
                     return()
-    
+
+            if action["running_option"] == "stop":
+                self.action_clients[action["action"]].cancel_all_goals()
+                continue
+
         # When the block has been successfully completed
         self._send_interaction_result_(interaction_block_label,True,"")
         return
@@ -133,7 +137,7 @@ class InteractionManager():
         message = self.action_feedback[action]["state"]
         rospy.loginfo("The message feedback of the action is: " + str(message))
         status = message.split('_')[0]
-        if status == "FOUND":
+        if status == "FOUND" or "STOP":
             rospy.loginfo("Get status from" + str(action))
             return(True, "")
         else:
