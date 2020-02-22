@@ -15,9 +15,9 @@ import json
 from datetime import datetime
 
 
-USER_ID = "manuela"
-BOT_NAME = "QTDemo"
-BOT_ALIAS = "qt_sample_demo" 
+USER_ID = "micol_testing"
+BOT_NAME = "QTRobotBot"
+BOT_ALIAS = "qt_robot_demo" 
 
 SAMPLERATE = 16000
 FORMAT_SIZE = pyaudio.paInt16
@@ -90,23 +90,28 @@ class DialogueManager():
 		self.prompt_message = data.data
 
 	def handle_lex_response(self,lex_response):
-		#lex_response = json.loads(lex_response)
 		if len(lex_response["message"]) > 0:
 			print("The lex response is: ", lex_response["message"])
 			#Stored the user data
 			self.dialogue_data_publisher.publish(str(lex_response["sessionAttributes"]))
 			#When lex failed in understanding the user
-			if lex_response["dialogState"] == 'Failed':
-				self.interaction_message = 'failed_understanding'
-				self.interaction_continue = False
-				print("In Failed dialogue state")
-			elif lex_response["dialogState"] == 'Fulfilled':
+			if "intentName" in lex_response:
+				if lex_response["dialogState"] == 'Failed':
+					self.interaction_message = 'failed_understanding'
+					self.interaction_continue = False
+					print("In Failed dialogue state")
+				elif lex_response["dialogState"] == 'Fulfilled':
+					self.interaction_message = 'success'
+					self.interaction_continue = False
+					print("In Fulfilled dialogue state, the response is:" + lex_response["message"])
+					self.text_publisher.publish(lex_response["message"])
+				else:
+					print("In general dialogue state, the response is:" + lex_response["message"])
+					self.text_publisher.publish(lex_response["message"])
+			else:
 				self.interaction_message = 'success'
 				self.interaction_continue = False
-				print("In Fulfilled dialogue state, the response is:" + lex_response["message"])
-				self.text_publisher.publish(lex_response["message"])
-			else:
-				print("In general dialogue state, the response is:" + lex_response["message"])
+				print("Empty string")
 				self.text_publisher.publish(lex_response["message"])
 			self.dialogue_process_done = True
 
@@ -116,6 +121,7 @@ class DialogueManager():
 		audiodata = audiodatarequest
 		p = pyaudio.PyAudio()
 		file_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+		file_name = "audio_user_"+file_name
 		outdir = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_logger/scripts/data/audio_user"
 		wf = wave.open(outdir + "/"+ file_name + ".wav", 'wb')
 		wf.setnchannels(1)

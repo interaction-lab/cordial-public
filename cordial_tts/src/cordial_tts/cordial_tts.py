@@ -110,9 +110,9 @@ class CoRDialTTS():
         #data will collect also information about word timing
         data=[]
         for w in word_times:
-            data.append({"time":float(w["time"]) / 1000.,  # convert ms to seconds
+            data.append({"character":float(w["start"]) / 1000.,  # convert ms to seconds
                              "type":"word",
-                             "start":float(w["start"]),
+                             "start":float(w["time"]) / 1000.,
                              "value": str(w["value"])})
         
         #assign the actions the correct time based on when they appear in the script

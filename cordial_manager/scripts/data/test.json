@@ -40,7 +40,86 @@
                 "description": "Starting the dialogue",
                 "running_option": "loop",
                 "action": "dialoging",
-                "goal": "Repeat Name"
+                "goal": "repeatname"
+            }
+
+        ]
+    }
+,
+
+    "fail2": {
+        "steps": [
+            {
+                "name": "start_dialogue",
+                "description": "Starting the dialogue",
+                "running_option": "loop",
+                "action": "dialoging",
+                "goal": "repeatstory"
+            }
+
+        ]
+    }
+,
+    "story1": {
+        "steps": [
+            {
+                "name": "start_dialogue",
+                "description": "Starting the dialogue",
+                "running_option": "loop",
+                "action": "dialoging",
+                "goal": "storyone"
+            }
+
+        ]
+    }
+,
+    "story2": {
+        "steps": [
+            {
+                "name": "start_dialogue",
+                "description": "Starting the dialogue",
+                "running_option": "loop",
+                "action": "dialoging",
+                "goal": "storytwo"
+            }
+
+        ]
+    }
+,
+    "story3": {
+        "steps": [
+            {
+                "name": "start_dialogue",
+                "description": "Starting the dialogue",
+                "running_option": "loop",
+                "action": "dialoging",
+                "goal": "storythree"
+            }
+
+        ]
+    }
+,
+    "wait": {
+        "steps": [
+            {
+                "name": "start_dialogue",
+                "description": "Starting the dialogue",
+                "running_option": "loop",
+                "action": "dialoging",
+                "goal": "wait"
+            }
+
+        ]
+    }
+,
+    "lastwait": {
+        "steps": [
+            {
+                "name": "start_dialogue",
+                "description": "Starting the dialogue",
+                "running_option": "loop",
+                "action": "dialoging",
+                "goal": "lastwait"
             }
 
         ]

@@ -63,6 +63,7 @@ class RecordingManager():
 		if not data.data:
 			self.is_data_recording = False
 			file_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+			file_name = "transcript_" + file_name
 			outdir = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_logger/scripts/data/logfile/script/"
 			with open(outdir + file_name+'.json', 'w') as outfile:
 				json.dump(self.script_data, outfile)
@@ -77,6 +78,7 @@ class RecordingManager():
 				# Create the writer for the video
 				fourcc = cv2.VideoWriter_fourcc(*'MJPG')
 				file_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S') 
+				file_name = "video_head_" + file_name
 				path = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_logger/scripts/data/video_head/"
 				fps = FPS
 				self.video_head_data = cv2.VideoWriter(path + file_name + ".avi", fourcc , fps, (data.width, data.height), True)
@@ -109,6 +111,7 @@ class RecordingManager():
 				fps = FPS
 				fourcc = cv2.VideoWriter_fourcc(*'MJPG')
 				file_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S') 
+				file_name = "video_chest_" + file_name
 				path = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_logger/scripts/data/video/"
 				self.video_data = cv2.VideoWriter(path + file_name + ".avi", fourcc , fps, (data.width, data.height), True)
 				frame = self.cv_bridge.imgmsg_to_cv2(data, "rgb8")
@@ -131,7 +134,8 @@ class RecordingManager():
 		if not data.data:
 			self.is_audio_recording = False
 			p = pyaudio.PyAudio()
-			file_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+			file_name_date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+			file_name = "audio_head_" + file_name_date
 			outdir = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_logger/scripts/data/audio/"
 			wf = wave.open(outdir + "/"+ file_name + ".wav", 'wb')
 			wf.setnchannels(CHANNEL)
@@ -142,6 +146,7 @@ class RecordingManager():
 			wf.close()
 
 			outdir = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_logger/scripts/data/external_audio/"
+			file_name = "audio_ext_" + file_name_date
 			wf = wave.open(outdir + "/"+ file_name + ".wav", 'wb')
 			wf.setnchannels(CHANNEL)
 			wf.setsampwidth(p.get_sample_size(FORMAT_SIZE))

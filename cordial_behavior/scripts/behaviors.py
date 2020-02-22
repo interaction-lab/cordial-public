@@ -231,14 +231,15 @@ class BehaviorManager():
 		ordered_behaviors = sorted(gesture_behaviors, key=lambda behavior: behavior["start"])
 		timing_word_behaviors = word_timing + gesture_behaviors
 		ordered_timing_word_behaviors = sorted(timing_word_behaviors, key=lambda behavior: behavior["start"]) # I dont know why is not sorted!!!!! CHECK IT
+		print(ordered_timing_word_behaviors)
 		start_time = rospy.Time.now()
-		for index, behav in enumerate(ordered_timing_word_behaviors[:-1]):
+		for index, behav in enumerate(ordered_timing_word_behaviors[:]):
 			if behav["type"] != "word":
 				while rospy.Time.now()-start_time < rospy.Duration.from_sec(behav["start"]):
 					pass
 				if index == len(ordered_timing_word_behaviors) - 1:
-					gesture_timing = ordered_timing_word_behaviors[index +1 ]["time"]
-				gesture_timing = float(ordered_timing_word_behaviors[index +1]["time"]) #you cannot have a behavior sets at the end of the sentence
+					gesture_timing = ordered_timing_word_behaviors[index +1]["start"]
+				gesture_timing = float(ordered_timing_word_behaviors[index +1]["start"]) #you cannot have a behavior sets at the end of the sentence
 				rospy.loginfo("Play " + str(behav["id"]) + " at time:" + str(behav["start"]) + " with a duration of: " + str(gesture_timing))
 				self.gesture_publisher.publish(gesture_timing, behav["id"])
 
