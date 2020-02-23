@@ -24,6 +24,32 @@
     }
   ]
 },
+"closeeyes_face":
+{
+  "dofs": ["au43", "au1"],
+  "keyframes": [
+    {
+      "pose": [0, 0],
+      "time": 0,
+      "ending_action": false
+    },
+    {
+      "pose": [1.0, 1.0],
+      "time": 1,
+      "ending_action": false
+    },
+    {
+      "pose": [1.0, 1.0],
+      "time": 23,
+      "ending_action": false
+    },
+    {
+      "pose": [0, 0],
+      "time": 25,
+      "ending_action": false
+    }
+  ]
+},
 "pensive_face":
 {
   "dofs": ["au1", "au2", "au7", "au17", "au43"],
