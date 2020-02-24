@@ -10,7 +10,7 @@ import actionlib
 import rospy
 import roslib
 
-INTERACTION_TIMEOUT = rospy.Duration.from_sec(60.0)
+INTERACTION_TIMEOUT = rospy.Duration.from_sec(250.0)
 
 
 class InteractionManager():

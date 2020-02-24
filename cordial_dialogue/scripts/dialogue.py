@@ -47,7 +47,7 @@ class DialogueServer():
 			self.controller_manager.send_textToAWS(self.controller_manager.prompt_message)
 		else:
 			while self.controller_manager.prompt_message == '':
-				print("Waiting from the microphone input data")
+				rospy.logdebug("Waiting from the microphone input data")
 				rospy.Rate(1)
 			self.controller_manager.send_audioToAWS_client(self.controller_manager.prompt_message)
 		self._feedback.action = goal_name
@@ -109,7 +109,7 @@ class DialogueManager():
 					print("In general dialogue state, the response is:" + lex_response["message"])
 					self.text_publisher.publish(lex_response["message"])
 			else:
-				self.interaction_message = 'success'
+				self.interaction_message = 'failed_understanding'
 				self.interaction_continue = False
 				print("Empty string")
 				self.text_publisher.publish(lex_response["message"])

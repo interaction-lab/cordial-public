@@ -34,12 +34,12 @@
       "ending_action": false
     },
     {
-      "pose": [1.0, 1.0],
+      "pose": [0.85, 0.85],
       "time": 1,
       "ending_action": false
     },
     {
-      "pose": [1.0, 1.0],
+      "pose": [0.85, 0.85],
       "time": 23,
       "ending_action": false
     },
