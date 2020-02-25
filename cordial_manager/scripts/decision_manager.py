@@ -11,6 +11,8 @@ import rospy
 import roslib
 
 
+DECISION_TIME_OUT =  rospy.Duration.from_sec(6000)
+
 class DecisionState():
     SUCCESS = 0
     FAILURE = 1
@@ -39,8 +41,10 @@ class DecisionManager():
         rospy.loginfo("Server is ready")
 
         # TODO Initialize with list of interactions and interaction failure options
-        self.success_interaction_name = ['greeting1','story1', 'wait', 'story2', 'wait', 'story3', 'lastwait','goodbye']
-        self.failure_interaction_name = ['fail1', 'fail2', 'wait', 'fail2', 'wait', 'fail2', 'lastwait','goodbye']
+        #self.success_interaction_name = ['greeting1','story1', 'wait', 'story2', 'wait', 'story3', 'lastwait','goodbye']
+        #self.failure_interaction_name = ['fail1', 'fail2', 'wait', 'fail2', 'wait', 'fail2', 'lastwait','goodbye']
+        self.success_interaction_name = [ 'greeting1','goodbye']
+        self.failure_interaction_name = ['fail1', 'goodbye']
 
         # Set response to action to default - will be changed by callback
         all_interactions = self.success_interaction_name + self.failure_interaction_name
@@ -68,7 +72,7 @@ class DecisionManager():
         self.action_client.send_goal(goal,
                                     done_cb=self.interaction_done_callback,
                                     feedback_cb=self.interaction_feedback_callback)
-        #self.action_client.wait_for_result()
+        #self.action_client.wait_for_result(DECISION_TIME_OUT)
         return
 
 

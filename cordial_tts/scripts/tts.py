@@ -89,22 +89,36 @@ class TTSManager():
 		phraseID = "1"
 		text_content = data
 		print("The text content is: " + text_content)
-		#text_content = req #FOR TESTING
-		file_saved = tts.phrase_to_file(phraseID, text_content, outdir)
-		#print("The output from the TTS is: ", file_saved)
-		behaviours = sorted(file_saved["behaviors"], key = lambda i: i['start']) # sorting the behaviours
-		path_audio_file = file_saved["file"] # path of audiofile.ogg
-		data, samplerate = sf.read(outdir + '/'+phraseID+'.ogg')
-		sf.write(outdir + '/'+phraseID+'.wav', data, samplerate)
-		file_handle =outdir + '/'+phraseID+'.wav'
-		data = np.fromfile(file_handle, np.uint8)[WAV_HEADER_LENGTH:] #Loading wav file
-		data = data.astype(np.uint8).tostring()
-		data_array = data
-		audio_frame = samplerate
+		if "." in text_content:
+			text_array = text_content.split(".")
+		else:
+			text_array = []
+			text_array.append(text_content)
+		behavior_array = []
+		audio_frame_array = []
+		audio_data_array = []
+		for text in text_array:
+			if text == "":
+				rospy.loginfo("Empty string")
+			else:
+				file_saved = tts.phrase_to_file(phraseID, text, outdir)
+				#print("The output from the TTS is: ", file_saved)
+				behaviours = sorted(file_saved["behaviors"], key = lambda i: i['start']) # sorting the behaviours
+				path_audio_file = file_saved["file"] # path of audiofile.ogg
+				data, samplerate = sf.read(outdir + '/'+phraseID+'.ogg')
+				sf.write(outdir + '/'+phraseID+'.wav', data, samplerate)
+				file_handle =outdir + '/'+phraseID+'.wav'
+				data = np.fromfile(file_handle, np.uint8)[WAV_HEADER_LENGTH:] #Loading wav file
+				data = data.astype(np.uint8).tostring()
+				data_array = data
+				audio_frame = samplerate
+				behavior_array.append(str(behaviours))
+				audio_data_array.append(data_array)
+				audio_frame_array.append(audio_frame)
 		behavior_msg = Behavior()
-		behavior_msg.audio_frame = int(audio_frame)
-		behavior_msg.audio_data =  data_array
-		behavior_msg.behavior_json = str(behaviours)
+		behavior_msg.audio_frame = audio_frame_array
+		behavior_msg.audio_data =  audio_data_array
+		behavior_msg.behavior_json = behavior_array
 		print("The behavior message is sent")
 		self.behavior_publisher.publish(behavior_msg)
 		self.synthesize_done = True

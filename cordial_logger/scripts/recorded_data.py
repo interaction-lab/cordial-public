@@ -125,10 +125,12 @@ class RecordingManager():
 				print("Not writing!!")
 
 	def handle_recorded_audio_respeaker(self,data):
-		self.recorded_audio_respeaker_frames.append(data.data)
+		if self.is_audio_recording:
+			self.recorded_audio_respeaker_frames.append(data.data)
 
 	def handle_recorded_audio_common(self,data):
-		self.recorded_audio_common_frames.append(data.data)
+		if self.is_audio_recording:
+			self.recorded_audio_common_frames.append(data.data)
 
 	def handle_trigger_recorded_audio(self, data):
 		if not data.data:

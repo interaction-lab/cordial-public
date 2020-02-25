@@ -14,6 +14,7 @@ from cordial_manager.msg import *
 from qt_nuc_speaker.msg import PlayRequest # Rename it! PlayAudio
 from threading import Timer
 import os
+import numpy
 
 RATE_FEEDBACK = 10
 #data = "[{'start': 0.075, 'time': 2,'type': 'action', 'id': 'QT/bye'},{'start': 0.075, 'time': 2,'type': 'action', 'id': 'QT/point_front'}, {'start': 0.075,'time': 2, 'type': 'viseme', 'id': 'POSTALVEOLAR'},{'start': 0.006, 'time': 2,  'type': 'action', 'id': 'happy_face'}]"
@@ -71,7 +72,7 @@ class BehaviorServer():
 	_result = CordialResult()
 	def __init__(self, name, manager):
 		self.controller_manager = manager
-		self.controller_manager.speaker_done = False
+		self.controller_manager.all_behaviors_done = False
 		self.controller_manager.tts_message = ''
 		self.controller_manager.interaction_message = ''
 		self.controller_manager.interaction_continue = True
@@ -89,7 +90,7 @@ class BehaviorServer():
 		#self._feedback.state = behavior state
 		## Decide when to send the feedback
 		# self.action.publish_feedback(self._feedback)
-		while not self.controller_manager.speaker_done:
+		while not self.controller_manager.all_behaviors_done:
 			if self.action.is_preempt_requested():
 					self.action.set_preempted()
 					success = False
@@ -98,7 +99,7 @@ class BehaviorServer():
 			self._result.do_continue = self.controller_manager.interaction_continue
 			self._result.action = goal_name
 			self._result.message = self.controller_manager.interaction_message
-			self.controller_manager.speaker_done = False
+			self.controller_manager.all_behaviors_done = False
 			self.controller_manager.tts_message = ''
 			self.controller_manager.interaction_message = ''
 			self.controller_manager.interaction_continue = True
@@ -116,7 +117,7 @@ class BehaviorManager():
 		self.long_interaction_message = ""
 		self.long_interaction_continue = False
 		self.tts_message = ""
-		self.speaker_done = False
+		self.all_behaviors_done = False
 		self.interaction_message = ""
 		self.interaction_continue = True
 
@@ -125,11 +126,17 @@ class BehaviorManager():
 		rospy.Subscriber('cordial/speaker/done', Bool, self.handle_speaker_message, queue_size=1)
 		rospy.Subscriber('/cordial/detector/faces', Point, self.handle_detector_message, queue_size=1) 
 		rospy.Subscriber('cordial/behavior/tracking/state', Bool, self.handle_tracking_state, queue_size=1) # States: NO_TRACK, ACQUIRING, FOUND, LOST 
+		rospy.Subscriber("/cordial/behavior/gesture/done", Bool, self.handle_gesture_message, queue_size=1)
 		self.face_publisher = rospy.Publisher('cordial/behavior/face/expressing', FaceRequest, queue_size=1)
 		self.gesture_publisher = rospy.Publisher('cordial/behavior/gesture/moving', Gesture, queue_size=1)
 		self.speaker_publisher = rospy.Publisher('cordial/speaker/playing', PlayRequest, queue_size=1)
 		self.tracker_publisher = rospy.Publisher('cordial/behavior/tracking', Bool, queue_size=1)
 		self.get_facial_expressions_list()
+		self.is_behavior_done = False
+		self.speaker_done = False
+		self.gesture_done = False
+		self.facial_expression_done = False
+
 		
 
 	def handle_tracking_state(self, data):
@@ -138,6 +145,11 @@ class BehaviorManager():
 	def handle_tts_message(self, data):
 		self.tts_message = data
 		print("The message is received from the TTS")
+
+	def handle_gesture_message(self, data):
+		self.gesture_done = data.data
+		if self.gesture_done:
+			rospy.loginfo("The gesture has finished")
 
 			
 	def handle_speaker_message(self, data):
@@ -153,7 +165,11 @@ class BehaviorManager():
 		if data == "tracking_face":
 			self.tracker_publisher.publish(True)
 
-		
+	def check_if_behavior_done(self):
+		if self.gesture_done and self.speaker_done:
+			self.is_behavior_done = True
+			self.gesture_done = False
+			self.speaker_done = False
 
 	def get_facial_expressions_list(self):
 		self.facial_expression_list = []
@@ -178,22 +194,41 @@ class BehaviorManager():
 
 	def handle_behavior(self, data):
 		#print("The behaviors data are:", data)
-		audio_frame = data.audio_frame
-		audio_data = data.audio_data
-		data = literal_eval(data.behavior_json)
-		#data = literal_eval(data) #FOR TESTING
-		word_timing = filter(lambda b: b["type"] == "word", data)
-		behav = filter(lambda b: b["type"] != "word", data)
-		facial_expression_list = self.facial_expression_list
-		visemes = ["BILABIAL","LABIODENTAL","INTERDENTAL","DENTAL_ALVEOLAR","POSTALVEOLAR","VELAR_GLOTTAL","CLOSE_FRONT_VOWEL","OPEN_FRONT_VOWEL","MID_CENTRAL_VOWEL","OPEN_BACK_VOWEL","CLOSE_BACK_VOWEL", 'IDLE']
-		all_gesture_behaviors = filter(lambda b: b["id"] not in visemes, behav)
-		gesture_behaviors = filter(lambda b: b["id"] not in facial_expression_list, all_gesture_behaviors)
-		viseme_behaviors = filter(lambda b: b["id"] in visemes, behav)
-		facial_expression_behaviors = filter(lambda b: b["id"] in facial_expression_list, behav)
-		self.handle_audio(audio_data, audio_frame)
-		self.handle_visemes(viseme_behaviors)
-		self.handle_gestures(gesture_behaviors, word_timing)
-		self.handle_facial_expression(facial_expression_behaviors)
+		if data != "":
+			audio_frame_array = data.audio_frame
+			audio_data_array = data.audio_data
+			data_array = data.behavior_json
+			for index in range(len(audio_frame_array)):
+				audio_frame = audio_frame_array[index]
+				audio_data = audio_data_array[index]
+				data = literal_eval(data_array[index])
+				word_timing = filter(lambda b: b["type"] == "word", data)
+				behav = filter(lambda b: b["type"] != "word", data)
+				facial_expression_list = self.facial_expression_list
+				visemes = ["BILABIAL","LABIODENTAL","INTERDENTAL","DENTAL_ALVEOLAR","POSTALVEOLAR","VELAR_GLOTTAL","CLOSE_FRONT_VOWEL","OPEN_FRONT_VOWEL","MID_CENTRAL_VOWEL","OPEN_BACK_VOWEL","CLOSE_BACK_VOWEL", 'IDLE']
+				all_gesture_behaviors = filter(lambda b: b["id"] not in visemes, behav)
+				gesture_behaviors = filter(lambda b: b["id"] not in facial_expression_list, all_gesture_behaviors)
+				viseme_behaviors = filter(lambda b: b["id"] in visemes, behav)
+				facial_expression_behaviors = filter(lambda b: b["id"] in facial_expression_list, behav)
+				if not index == 0:
+					while not self.is_behavior_done:
+						self.check_if_behavior_done()
+				self.is_behavior_done = False
+				self.gesture_done = False
+				self.speaker_done = False
+				self.handle_audio(audio_data, audio_frame)
+				self.handle_visemes(viseme_behaviors)
+				self.handle_gestures(gesture_behaviors, word_timing)
+				self.handle_facial_expression(facial_expression_behaviors)
+
+			while not self.is_behavior_done:
+				self.check_if_behavior_done()
+			self.all_behaviors_done = True
+			rospy.loginfo("All behaviors done")
+		else:
+			self.all_behaviors_done = True
+
+
 
 	def handle_audio(self, audio_data, audio_frame):
 		speaker_msg = PlayRequest()
@@ -229,18 +264,22 @@ class BehaviorManager():
 	def handle_gestures(self, gesture_behaviors, word_timing):
 		#Handle Gestures
 		ordered_behaviors = sorted(gesture_behaviors, key=lambda behavior: behavior["start"])
+		if ordered_behaviors == []:
+			rospy.loginfo("No gestures")
+			self.gesture_done = True
 		timing_word_behaviors = word_timing + gesture_behaviors
 		ordered_timing_word_behaviors = sorted(timing_word_behaviors, key=lambda behavior: behavior["start"]) # I dont know why is not sorted!!!!! CHECK IT
 		start_time = rospy.Time.now()
 		for index, behav in enumerate(ordered_timing_word_behaviors[:-1]):
 			if behav["type"] != "word":
+				print("Here")
 				while rospy.Time.now()-start_time < rospy.Duration.from_sec(behav["start"]):
 					pass
-				if index == len(ordered_timing_word_behaviors) - 1:
-					gesture_timing = ordered_timing_word_behaviors[index +1]["start"]
 				gesture_timing = float(ordered_timing_word_behaviors[index +1]["start"]) #you cannot have a behavior sets at the end of the sentence
 				rospy.loginfo("Play " + str(behav["id"]) + " at time:" + str(behav["start"]) + " with a duration of: " + str(gesture_timing))
 				self.gesture_publisher.publish(gesture_timing, behav["id"])
+			else:
+				self.gesture_done = True
 
 	def handle_visemes(self, viseme_behaviors):
 		min_duration=0.05
