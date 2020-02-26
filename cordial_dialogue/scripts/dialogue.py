@@ -15,9 +15,14 @@ import json
 from datetime import datetime
 
 
+#USER_ID = "micol_testing"
+#BOT_NAME = "QTRobotBot"
+#BOT_ALIAS = "qt_robot_demo" 
+
+
 USER_ID = "micol_testing"
-BOT_NAME = "QTRobotBot"
-BOT_ALIAS = "qt_robot_demo" 
+BOT_NAME = "QTDemo"
+BOT_ALIAS = "qt_sample_demo" 
 
 SAMPLERATE = 16000
 FORMAT_SIZE = pyaudio.paInt16

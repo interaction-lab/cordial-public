@@ -18,6 +18,7 @@ class InteractionManager():
     _feedback = CordialFeedback()
     _result = CordialResult()
     def __init__(self):
+        self.action_done = False
         # Read interactions from json file
         self.read_interactions()
         # Setup server for decision manager to call
@@ -54,6 +55,7 @@ class InteractionManager():
     def action_done_callback(self, terminal_state, result):
         """Save action results"""
         rospy.loginfo("Heard back from: "+ result.action +" terminal state: "  + str(terminal_state) +" and result : "  + str(result))
+        self.action_done = True
         self.action_result[result.action]["do_continue"] = result.do_continue
         self.action_result[result.action]["message"] = result.message
         return
@@ -192,6 +194,10 @@ class InteractionManager():
         if wait:
             if not action.split('_')[0] == "long": # Check if it is a long action or not!
                 self.action_clients[action].wait_for_result(INTERACTION_TIMEOUT)
+                while not self.action_done:
+                    rospy.logdebug("Wait for the result")
+                self.action_done = False
+               
         return
 
 

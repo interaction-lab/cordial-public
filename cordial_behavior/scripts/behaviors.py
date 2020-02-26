@@ -271,6 +271,7 @@ class BehaviorManager():
 		ordered_timing_word_behaviors = sorted(timing_word_behaviors, key=lambda behavior: behavior["start"]) # I dont know why is not sorted!!!!! CHECK IT
 		start_time = rospy.Time.now()
 		for index, behav in enumerate(ordered_timing_word_behaviors[:-1]):
+			print(ordered_timing_word_behaviors[index])
 			if behav["type"] != "word":
 				print("Here")
 				while rospy.Time.now()-start_time < rospy.Duration.from_sec(behav["start"]):
@@ -278,9 +279,17 @@ class BehaviorManager():
 				gesture_timing = float(ordered_timing_word_behaviors[index +1]["start"]) #you cannot have a behavior sets at the end of the sentence
 				rospy.loginfo("Play " + str(behav["id"]) + " at time:" + str(behav["start"]) + " with a duration of: " + str(gesture_timing))
 				self.gesture_publisher.publish(gesture_timing, behav["id"])
-			else:
-				self.gesture_done = True
 
+		if ordered_timing_word_behaviors[len(ordered_timing_word_behaviors)-1]:
+			if ordered_timing_word_behaviors[len(ordered_timing_word_behaviors)-1]["type"] != "word":
+				print("Here")
+				while rospy.Time.now()-start_time < rospy.Duration.from_sec(ordered_timing_word_behaviors[len(ordered_timing_word_behaviors)-1]["start"]):
+					pass
+				gesture_timing = float(ordered_timing_word_behaviors[len(ordered_timing_word_behaviors)-1]["start"]) #you cannot have a behavior sets at the end of the sentence
+				rospy.loginfo("Play " + str(ordered_timing_word_behaviors[len(ordered_timing_word_behaviors)-1]["id"]) + " at time:" + str(ordered_timing_word_behaviors[len(ordered_timing_word_behaviors)-1]["start"]) + " with a duration of: " + str(gesture_timing))
+				self.gesture_publisher.publish(gesture_timing, ordered_timing_word_behaviors[len(ordered_timing_word_behaviors)-1]["id"])
+			
+			
 	def handle_visemes(self, viseme_behaviors):
 		min_duration=0.05
 		for i in range(0,len(viseme_behaviors)-1):

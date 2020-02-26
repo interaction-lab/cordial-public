@@ -84,7 +84,7 @@ class TTSManager():
 		print("The TTS message received")
 		#outdir = os.path.dirname(os.path.abspath("home		
 		outdir = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_dialogue/scripts/data" #TODO: absolute path
-		voice = "Ivy"	
+		voice = "Justin"	
 		tts = CoRDialTTS(voice)
 		phraseID = "1"
 		text_content = data
