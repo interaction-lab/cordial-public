@@ -31,7 +31,13 @@ class DecisionManager():
         self.failure_counter = 0
         self.action_feedback = {}
         self.action_result = {}
-
+        story_first_name = rospy.search_param('first_story')
+        story_first = rospy.get_param(story_first_name)
+        story_sec_name = rospy.search_param('second_story')
+        story_second = rospy.get_param(story_sec_name)
+        story_third_name = rospy.search_param('third_story')
+        story_third = rospy.get_param(story_third_name)
+        print(story_first)
         # Setup clients for all of the different interaction blocks
         topic_name = "do_interaction"
         self.action_client = actionlib.SimpleActionClient(topic_name, CordialAction)
@@ -41,8 +47,8 @@ class DecisionManager():
         rospy.loginfo("Server is ready")
 
         # TODO Initialize with list of interactions and interaction failure options
-        self.success_interaction_name = ['greeting1','greeting2','goodbye']
-        self.failure_interaction_name = ['fail1', 'fail1', 'goodbye']
+        self.success_interaction_name = ['greeting1',str(story_first),'wait',str(story_second), 'wait', str(story_third), 'lastwait','goodbye']
+        self.failure_interaction_name = ['fail1', 'fail2','wait','fail2', 'wait', 'fail2', 'lastwait', 'goodbye']
         #self.success_interaction_name = [ 'greeting1','goodbye']
         #self.failure_interaction_name = ['fail1', 'goodbye']
 

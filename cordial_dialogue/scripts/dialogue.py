@@ -15,14 +15,14 @@ import json
 from datetime import datetime
 
 
-#USER_ID = "micol_testing"
-#BOT_NAME = "QTRobotBot"
-#BOT_ALIAS = "qt_robot_demo" 
-
-
 USER_ID = "micol_testing"
-BOT_NAME = "QTDemo"
-BOT_ALIAS = "qt_sample_demo" 
+BOT_NAME = "QTRobotBot"
+BOT_ALIAS = "qt_robot_demo" 
+
+
+#USER_ID = "micol_testing"
+#BOT_NAME = "QTDemo"
+#BOT_ALIAS = "qt_sample_demo" 
 
 SAMPLERATE = 16000
 FORMAT_SIZE = pyaudio.paInt16
@@ -126,7 +126,7 @@ class DialogueManager():
 		audiodata = audiodatarequest
 		p = pyaudio.PyAudio()
 		file_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-		file_name = "audio_user_"+file_name
+		file_name = "audio_user"
 		outdir = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_logger/scripts/data/audio_user"
 		wf = wave.open(outdir + "/"+ file_name + ".wav", 'wb')
 		wf.setnchannels(1)

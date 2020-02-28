@@ -99,6 +99,45 @@
         ]
     }
 ,
+"story1_3": {
+    "steps": [
+        {
+            "name": "start_dialogue",
+            "description": "Starting the dialogue",
+            "running_option": "loop",
+            "action": "dialoging",
+            "goal": "storyonethird"
+        }
+
+    ]
+}
+,
+"story2_3": {
+    "steps": [
+        {
+            "name": "start_dialogue",
+            "description": "Starting the dialogue",
+            "running_option": "loop",
+            "action": "dialoging",
+            "goal": "storytwothird"
+        }
+
+    ]
+}
+,
+"story3_3": {
+    "steps": [
+        {
+            "name": "start_dialogue",
+            "description": "Starting the dialogue",
+            "running_option": "loop",
+            "action": "dialoging",
+            "goal": "storythreethird"
+        }
+
+    ]
+}
+,
     "wait": {
         "steps": [
             {

@@ -40,12 +40,12 @@
     },
     {
       "pose": [0.85, 0.85], 
-      "time": 40,
+      "time": 45,
       "ending_action": false
     },
     {
       "pose": [0, 0],
-      "time": 45,
+      "time": 47,
       "ending_action": false
     }
   ]
@@ -61,17 +61,17 @@
     },
     {
       "pose": [0.75, 0.25, 1.0, 0.6, 0],
-      "time": 0.2,
-      "ending_action": false
-    },
-    {
-      "pose": [0.75, 0.25, 1.0, 0.6, 0],
       "time": 1,
       "ending_action": false
     },
     {
+      "pose": [0.75, 0.25, 1.0, 0.6, 0],
+      "time": 10,
+      "ending_action": false
+    },
+    {
       "pose": [0, 0, 0, 0, 0],
-      "time": 1.2,
+      "time": 15,
       "ending_action": false
     }
   ]

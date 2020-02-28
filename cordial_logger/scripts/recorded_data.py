@@ -22,7 +22,7 @@ SAMPLERATE = 16000
 SAMPLERATE_MIC_EXT = 44100
 FORMAT_SIZE = pyaudio.paInt16
 CHUNK_SIZE = 1024
-FPS = 23
+FPS = 24
 
 class RecordingManager():
 
@@ -32,6 +32,8 @@ class RecordingManager():
 		self.script_data = []
 		self.first_video_frame = True
 		self.first_video_head_frame = True
+		self.first_audio_frame = True
+		self.first_audio_ext_frame = True
 		self.is_video_recording = False
 		self.is_audio_recording = False
 		self.is_data_recording = False
@@ -64,7 +66,7 @@ class RecordingManager():
 			self.is_data_recording = False
 			file_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 			file_name = "transcript_" + file_name
-			outdir = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_logger/scripts/data/logfile/script/"
+			outdir = "/media/qtrobot/Micol-Study/EmpiricalStudy/logfile/script/"
 			with open(outdir + file_name+'.json', 'w') as outfile:
 				json.dump(self.script_data, outfile)
 		else:
@@ -79,7 +81,7 @@ class RecordingManager():
 				fourcc = cv2.VideoWriter_fourcc(*'MJPG')
 				file_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S') 
 				file_name = "video_head_" + file_name
-				path = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_logger/scripts/data/video_head/"
+				path = "/media/qtrobot/Micol-Study/EmpiricalStudy/video_head/"
 				fps = FPS
 				self.video_head_data = cv2.VideoWriter(path + file_name + ".avi", fourcc , fps, (data.width, data.height), True)
 				frame = self.cv_bridge.imgmsg_to_cv2(data, "bgr8")
@@ -112,7 +114,7 @@ class RecordingManager():
 				fourcc = cv2.VideoWriter_fourcc(*'MJPG')
 				file_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S') 
 				file_name = "video_chest_" + file_name
-				path = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_logger/scripts/data/video/"
+				path = "/media/qtrobot/Micol-Study/EmpiricalStudy/video/"
 				self.video_data = cv2.VideoWriter(path + file_name + ".avi", fourcc , fps, (data.width, data.height), True)
 				frame = self.cv_bridge.imgmsg_to_cv2(data, "rgb8")
 				self.first_video_frame = False
@@ -126,36 +128,45 @@ class RecordingManager():
 
 	def handle_recorded_audio_respeaker(self,data):
 		if self.is_audio_recording:
-			self.recorded_audio_respeaker_frames.append(data.data)
+			#self.recorded_audio_respeaker_frames.append(data.data)
+			if self.first_audio_frame:
+				file_name_date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+				p = pyaudio.PyAudio()
+				file_name = "audio_head_" + file_name_date
+				outdir = "/media/qtrobot/Micol-Study/EmpiricalStudy/audio/"
+				self.wf = wave.open(outdir + "/"+ file_name + ".wav", 'wb')
+				self.wf.setnchannels(CHANNEL)
+				self.wf.setsampwidth(p.get_sample_size(FORMAT_SIZE))
+				self.wf.setframerate(SAMPLERATE)
+				self.wf.setnframes(CHUNK_SIZE)
+				self.wf.writeframes(b''.join(data.data))
+				self.first_audio_frame = False
+			else:
+				self.wf.writeframes(b''.join(data.data))
 
 	def handle_recorded_audio_common(self,data):
 		if self.is_audio_recording:
-			self.recorded_audio_common_frames.append(data.data)
+			#self.recorded_audio_common_frames.append(data.data)
+			if self.first_audio_ext_frame:
+				file_name_date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+				p_ext = pyaudio.PyAudio()
+				outdir = "/media/qtrobot/Micol-Study/EmpiricalStudy/audio_ext/"
+				file_name = "audio_ext_" + file_name_date
+				self.wf_ext = wave.open(outdir + "/"+ file_name + ".wav", 'wb')
+				self.wf_ext.setnchannels(CHANNEL)
+				self.wf_ext.setsampwidth(p_ext.get_sample_size(FORMAT_SIZE))
+				self.wf_ext.setframerate(SAMPLERATE)
+				self.wf_ext.setnframes(CHUNK_SIZE)
+				self.first_audio_ext_frame = False
+				self.wf_ext.writeframes(b''.join(data.data))
+			else:
+				self.wf_ext.writeframes(b''.join(data.data))
 
 	def handle_trigger_recorded_audio(self, data):
 		if not data.data:
 			self.is_audio_recording = False
-			p = pyaudio.PyAudio()
-			file_name_date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-			file_name = "audio_head_" + file_name_date
-			outdir = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_logger/scripts/data/audio/"
-			wf = wave.open(outdir + "/"+ file_name + ".wav", 'wb')
-			wf.setnchannels(CHANNEL)
-			wf.setsampwidth(p.get_sample_size(FORMAT_SIZE))
-			wf.setframerate(SAMPLERATE)
-			wf.setnframes(CHUNK_SIZE)
-			wf.writeframes(b''.join(self.recorded_audio_respeaker_frames))
-			wf.close()
-
-			outdir = "/home/qtrobot/catkin_ws/src/cordial-public/cordial_logger/scripts/data/external_audio/"
-			file_name = "audio_ext_" + file_name_date
-			wf = wave.open(outdir + "/"+ file_name + ".wav", 'wb')
-			wf.setnchannels(CHANNEL)
-			wf.setsampwidth(p.get_sample_size(FORMAT_SIZE))
-			wf.setframerate(SAMPLERATE)
-			wf.setnframes(CHUNK_SIZE)
-			wf.writeframes(b''.join(self.recorded_audio_common_frames))
-			wf.close()
+			self.wf.close()
+			self.wf_ext.close()
 		elif data.data:
 			self.is_audio_recording = True
 
