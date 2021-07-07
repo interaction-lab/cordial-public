@@ -14,6 +14,8 @@ add_message_files(
 
 generate_messages(DEPENDENCIES geometry_msgs sensor_msgs)
 
+catkin_package()
+
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}

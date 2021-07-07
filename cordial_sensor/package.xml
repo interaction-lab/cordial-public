@@ -1,5 +1,5 @@
 <package>
-  <name>cordial_tts</name>
+  <name>cordial_sensor</name>
   <version>0.1.2</version>
   <description >
 
@@ -9,7 +9,7 @@
   <author>Elaine Short</author>
   <maintainer email="prmehta24@gmail.com">Parimal Mehta</maintainer>
   <license>GPL</license>
-  <url>http://ros.org/wiki/cordial_tts</url>
+  <url>http://ros.org/wiki/cordial_sensor</url>
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>rospy</build_depend>
   <build_depend>actionlib</build_depend>

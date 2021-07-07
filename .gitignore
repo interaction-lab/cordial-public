@@ -88,6 +88,7 @@ ENV/
 # Rope project settings
 .ropeproject
 
+.vscode/
 **/*.pyc
 **/msg_gen/**
 **/srv_gen/**
@@ -103,3 +104,4 @@ ENV/
 **/build/**
 **/__*__.py
 **/*.yaml
+cordial_lex/scripts/data/*
