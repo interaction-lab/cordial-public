@@ -106,15 +106,25 @@ class CoRDialTTS():
 
         #find the times to play beginnings of words, so the actions can be spliced in.
     	word_times = filter(lambda l: l["type"]=="word", xSheet)
+        #data will be the list of visemes and actions in order by time
+        #data will collect also information about word timing
+        data=[]
+        for w in word_times:
+            data.append({"character":float(w["start"]) / 1000.,  # convert ms to seconds
+                             "type":"word",
+                             "start":float(w["time"]) / 1000.,
+                             "value": str(w["value"])})
+        
         #assign the actions the correct time based on when they appear in the script
         for a in actions:
             if a[0] > len(word_times)-1:
                 a[0] = xSheet[-1]["time"] / 1000.  # convert ms to seconds
             else:
 	        a[0] = (word_times[a[0]]["time"]) / 1000.  # convert ms to seconds
+        #data will contain also the information about the timing of the words
 
-        #data will be the list of visemes and actions in order by time
-    	data=[]
+        
+    	
         for a in actions:
             args = a[2]
             data.append({"start":float(a[0])+.01, #prevent visemes and actions from being at exactly the same time

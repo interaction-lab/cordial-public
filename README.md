@@ -1,4 +1,4 @@
-CoRDial Setup Instructions
+# Setup Instructions
 
 1. Install Ubuntu 16.04 on your computer
 
@@ -15,17 +15,13 @@ $ sudo apt-get install nodejs
 $ sudo apt-get install npm
 $ sudo npm install http-server -g
 
-$ sudo ln -s /usr/bin/nodejs /usr/bin/node
+$ ln -s /usr/bin/nodejs /usr/bin/node
 
 
-$ sudo apt-get install ros-kinetic-rosbridge-server vorbis-tools python-pygame python-requests python-serial ros-kinetic-tf python-gst-1.0 python-scipy
+$ sudo apt-get install ros-kinetic-rosbridge-server vorbis-tools python-pygame python-requests python-serial ros-kinetic-tf python-gst0.10 python-scipy
 ~~~~
-4. Install the pololu maestro MCB software (if using the spritebot)
-
-    https://www.pololu.com/file/0J315/maestro-linux-150116.tar.gz
-    installation instructions are in README.txt
     
-5. Set up AWS account following these steps (or request access to the lab account from a PhD): 
+4. Set up AWS account following these steps (or request access to the lab account from a PhD): 
 
     Create an Amazon Web Services account. AWS has a 1 year free trial that includes a limited number of Polly usages.
     Keep this in mind so you do not get charged money at the end of the year.
@@ -39,14 +35,23 @@ $ sudo apt-get install ros-kinetic-rosbridge-server vorbis-tools python-pygame p
     
     Then, in the terminal,
     ~~~~
+    $ pip install awscli --upgrade --user
     $ aws configure
     # Enter the IAM user access and secret keys here.
     ~~~~
 
-6. Clone the repository in <your_catkin_workspace>/src
+5. Clone the repository in <your_catkin_workspace>/src
 
 ~~~~
-$ git clone https://github.com/interaction-lab/cordial-public.git
+$ git clone https://github.com/micolspitale93/qt_robot_nuc.git
+~~~~
+
+6. Install packages:
+
+~~~~
+$ sudo apt-get install ros-kinetic-audio-common-msgs
+$ sudo apt-get install ros-kinetic-aws-common
+$ sudo apt-get install ros-kinetic-aws-ros1-common
 ~~~~
 
 7. Make everything
@@ -68,8 +73,7 @@ $ sudo ufw allow 9090
 
     https://help.github.com/articles/generating-an-ssh-key/
     
-
-10. Test your installation
+10. Test your installation (Classic Method)
 
     1. generate audio files (only needs to be done once or when changes to speech are made):
         
@@ -96,4 +100,28 @@ $ sudo ufw allow 9090
       
         ~~~~
         $ rosrun cordial_example robot_only.py
-        ~~~~
+        
+11. Test your installation (New Method)
+
+    ~~~~
+        $ roslaunch cordial_manager modules.launch
+        $ roslaunch cordial_manager interaction_manager.launch
+        $ roslaunch cordial_manager decision_manager.launch
+    ~~~~
+
+--------------------------------------------
+
+1. Autostart install on QTrobot
+    
+    1. On the Pi (QTRP) and NUC (QTPC),  clone this repository to catkin_ws/src
+    1. catkin_make on each
+    1. [Pi] From the repo, copy ./autostart_scripts/start_cordial_face_pi.sh to ~/robot/autostart/
+    1. [Pi] From the repo, copy ./autostart_scripts/start_audio.sh to ~/robot/autostart/
+    1. [Pi] From the repo, copy ./autostart_scripts/start_microphone.sh to ~/robot/autostart/
+    1. [Pi] From the repo, copy ./autostart_scripts/start_read_gestures.sh to ~/robot/autostart/
+    1. [Pi] Verify the script is executable (e.g. `ls -l` shows a -x at the end)
+    1. [Pi] Add the line `run_script start_cordial_face_pi.sh` to ~/robot/autostart/autostart_screens.sh below similar `run_script` lines.
+    1. [NUC] From the repo, copy ./autostart_scripts/start_cordial_face_nuc.sh to ~/robot/autostart/
+    1. [NUC] Verify the script is executable (e.g. `ls -l` shows a -x at the end)
+    1. [NUC] Add the line `run_script start_cordial_face_nuc.sh` to ~/robot/autostart/autostart_screens.sh below similar `run_script` lines 
+    

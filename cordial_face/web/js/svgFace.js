@@ -219,7 +219,7 @@ function startFace(bkgd_color,
 
           listener = new ROSLIB.Topic({
         ros : ros,
-        name : robot_name+'/face',
+        name : 'cordial/behavior/face/expressing',
         messageType : 'cordial_face/FaceRequest'
           });
 
